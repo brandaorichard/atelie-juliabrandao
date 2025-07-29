@@ -4,6 +4,7 @@ import img2 from "../assets/imgbaby.png";
 import img3 from "../assets/image.png";
 import img4 from "../assets/image2.png";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { motion, AnimatePresence } from "framer-motion";
 
 const images = [
   { src: img1, alt: "Imagem 1" },
@@ -14,20 +15,24 @@ const images = [
 
 export default function Hero() {
   const [current, setCurrent] = useState(0);
+  const [direction, setDirection] = useState(0); // 1 para direita, -1 para esquerda
   const intervalRef = useRef();
 
   useEffect(() => {
     intervalRef.current = setInterval(() => {
+      setDirection(1);
       setCurrent((prev) => (prev + 1) % images.length);
     }, 3000);
 
     return () => clearInterval(intervalRef.current);
-  }, []);
+  }, [images.length]);
 
   const goTo = (idx) => {
+    setDirection(idx > current ? 1 : -1);
     setCurrent(idx);
     clearInterval(intervalRef.current);
     intervalRef.current = setInterval(() => {
+      setDirection(1);
       setCurrent((prev) => (prev + 1) % images.length);
     }, 3000);
   };
@@ -35,15 +40,39 @@ export default function Hero() {
   const prev = () => goTo((current - 1 + images.length) % images.length);
   const next = () => goTo((current + 1) % images.length);
 
+  // Variants para o efeito de roll
+  const variants = {
+    enter: (direction) => ({
+      x: direction > 0 ? 100 : -100,
+      opacity: 0,
+      position: "absolute",
+    }),
+    center: {
+      x: 0,
+      opacity: 1,
+      position: "relative",
+    },
+    exit: (direction) => ({
+      x: direction > 0 ? -100 : 100,
+      opacity: 0,
+      position: "absolute",
+    }),
+  };
+
   return (
     <div>
       {/* Título acima do carousel */}
-      <div className="w-full flex flex-col items-center mb-5 mt-4">
+      <motion.div
+        className="w-full flex flex-col items-center mb-5 mt-4"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+      >
         <h1
           className="
             text-2xl
             md:text-4xl
-            font-medium
+            font-light
             text-[#616161]
             font-['Lexend']
             text-center
@@ -51,40 +80,48 @@ export default function Hero() {
             md:tracking-wide
             flex items-center
             gap-2
-            letter-spacing-2px
           "
         >
-          <span role="img" aria-label="coração">💜</span>
-          Encomende seu bebê reborn personalizado!
-          <span role="img" aria-label="ursinho">🧸</span>
+          {/* Título acima do carousel <span role="title" aria-label="reborn" className="text-3xl md:text-5xl">Encomende seu bebê reborn personalizado!</span> */}
         </h1>
-      </div>
+      </motion.div>
 
-      <section className="w-full h-[26vh] md:h-[40vh] bg-no-repeat bg-cover bg-center relative overflow-hidden">
-        {/* Imagem do carousel */}
-        {images.map((img, idx) => (
-          <img
-            key={img.alt}
-            src={img.src}
-            alt={img.alt}
-            className={`
-              absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-500
-              ${idx === current ? "opacity-100 z-10" : "opacity-0 z-0"}
-            `}
+      <motion.section
+        className="w-full h-[26vh] md:h-[40vh] bg-no-repeat bg-cover bg-center relative overflow-hidden"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1.1, ease: "easeOut" }}
+      >
+        {/* Imagem do carousel com efeito roll */}
+        <AnimatePresence custom={direction} mode="wait">
+          <motion.img
+            key={images[current].alt}
+            src={images[current].src}
+            alt={images[current].alt}
+            custom={direction}
+            variants={variants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{
+              x: { type: "spring", stiffness: 300, damping: 30 },
+              opacity: { duration: 0.4 },
+            }}
+            className="absolute top-0 left-0 w-full h-full object-cover z-10"
             style={{ transition: "opacity 0.5s" }}
           />
-        ))}
+        </AnimatePresence>
 
         {/* Setas */}
         <button
-          onClick={prev}
+          onClick={() => { setDirection(-1); prev(); }}
           className="absolute top-1/2 left-2 -translate-y-1/2 bg-white/70 rounded-full p-2 shadow hover:bg-white transition z-20"
           aria-label="Anterior"
         >
           <FaChevronLeft size={10} />
         </button>
         <button
-          onClick={next}
+          onClick={() => { setDirection(1); next(); }}
           className="absolute top-1/2 right-2 -translate-y-1/2 bg-white/70 rounded-full p-2 shadow hover:bg-white transition z-20"
           aria-label="Próxima"
         >
@@ -104,7 +141,7 @@ export default function Hero() {
             />
           ))}
         </div>
-      </section>
+      </motion.section>
     </div>
   );
 }
