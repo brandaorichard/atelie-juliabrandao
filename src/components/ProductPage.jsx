@@ -57,7 +57,7 @@ export default function ProductPage() {
           <div className="relative w-full h-[340px] md:h-[420px] flex items-center justify-center">
             {/* Seta esquerda */}
             <button
-              className="absolute left-2 top-1/2 -translate-y-1/2 z-10 rounded-full p-2 shadow hover:bg-white transition"
+              className="absolute left-2 top-1/2 -translate-y-1/2 z-10 rounded-full p-2 cursor-pointer shadow transition"
               onClick={handlePrev}
               aria-label="Imagem anterior"
             >
@@ -78,7 +78,7 @@ export default function ProductPage() {
             </AnimatePresence>
             {/* Seta direita */}
             <button
-              className="absolute right-2 top-1/2 -translate-y-1/2 z-10 rounded-full p-2 shadow hover:bg-white transition"
+              className="absolute right-2 top-1/2 -translate-y-1/2 z-10 rounded-full p-2 shadow cursor-pointer transition"
               onClick={handleNext}
               aria-label="Próxima imagem"
             >
@@ -91,7 +91,7 @@ export default function ProductPage() {
               <button
                 key={idx}
                 onClick={() => setCurrent(idx)}
-                className={`object-cover border-2 rounded-md p-1 transition-all ${
+                className={`object-cover border-2 rounded-md p-1 transition-all cursor-pointer ${
                   idx === current
                     ? "border-[#ae95d9]"
                     : "border-transparent opacity-70"
