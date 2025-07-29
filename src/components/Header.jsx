@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from "react";
-import logo from "../assets/logo.png";
-import { FaTimes } from "react-icons/fa";
-import { PiListLight } from "react-icons/pi";
-import { motion, AnimatePresence } from "framer-motion";
-import { CgShoppingCart } from "react-icons/cg";
+import MobileHeader from "../components/MobileHeader";
+import DesktopHeader from "../components/DesktopHeader";
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -23,149 +20,25 @@ export default function Header() {
   };
   const transition = { type: "spring", stiffness: 300, damping: 30 };
   const headerHeight = scrolled ? 144 : 160;
+  const categories = ["Por Encomenda", "Pronta Entrega", "Por Semelhança"];
 
   return (
     <>
-      {/* MOBILE HEADER */}
-      <header className="fixed top-0 left-0 w-full z-50 bg-[#f9e7f6] md:hidden">
-        <div className="max-w-[1246px] px-[20px] mx-auto flex items-center justify-between h-20 relative">
-          {/* Botão hamburger - mobile */}
-          <div className="flex flex-1">
-            {!menuOpen && (
-              <button
-                className="mr-2"
-                onClick={() => setMenuOpen(true)}
-                aria-label="Abrir menu"
-              >
-                <PiListLight size={24} />
-              </button>
-            )}
-          </div>
-
-          {/* Logo centralizada - animada */}
-          <div className="flex-1 flex justify-center">
-            <motion.img
-              src={logo}
-              alt="Logo"
-              className="w-[150px] h-auto"
-              variants={logoVariant}
-              animate={scrolled ? "scrolled" : "initial"}
-              transition={transition}
-              style={{ minWidth: 80, minHeight: 40 }}
-            />
-          </div>
-
-          {/* Espaço reservado para alinhamento */}
-          <div className="flex-1" />
-
-          {/* Carrinho ABSOLUTO no canto direito */}
-          <div className="absolute right-0 top-0 h-full flex items-center pr-6">
-            <button aria-label="Carrinho">
-              <CgShoppingCart size={24} className="text-gray-500"/>
-            </button>
-          </div>
-        </div>
-
-        {/* Dropdown ocupando 100% da tela */}
-        <AnimatePresence>
-          {menuOpen && (
-            <motion.div
-              key="dropdown"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="fixed inset-0 z-50 bg-[#f9e7f6] flex flex-col"
-            >
-              {/* Top bar com X e borda superior */}
-              <div
-                className="flex items-center border-t"
-                style={{ borderColor: "#616161", height: 56 }}
-              >
-                <button
-                  onClick={() => setMenuOpen(false)}
-                  aria-label="Fechar menu"
-                  className="p-4"
-                >
-                  <FaTimes className="text-[#616161] text-xl" />
-                </button>
-                <div className="flex-1" />
-              </div>
-
-              {/* Categorias animando da esquerda para direita */}
-              <div className="flex flex-col items-start gap-8 px-8 mt-8">
-                {["Por Encomenda", "Pronta Entrega", "Por Semelhança"].map(
-                  (cat, i) => (
-                    <motion.span
-                      key={cat}
-                      initial={{ x: -40, opacity: 0 }}
-                      animate={{ x: 0, opacity: 1 }}
-                      exit={{ x: -40, opacity: 0 }}
-                      transition={{ duration: 0.3, delay: 0.08 * i }}
-                      className="text-[#616161] text-lg font-light cursor-pointer"
-                    >
-                      {cat}
-                    </motion.span>
-                  )
-                )}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </header>
-
-      {/* DESKTOP HEADER */}
-      <header className="fixed top-0 left-0 w-full z-50 bg-[#f9e7f6] hidden md:block">
-        {/* Faixa roxa só no desktop, dentro do header */}
-        <div className="h-[27px] bg-[#ae95d9] w-full" />
-        <div
-          className="max-w-[1246px] px-[35px] mx-auto flex items-center justify-between transition-all duration-300 relative"
-          style={{ height: headerHeight }}
-        >
-          {/* Logo à esquerda - animada */}
-          <div className="flex-1 flex justify-start">
-            <motion.img
-              src={logo}
-              alt="Logo"
-              className="w-[220px] h-auto"
-              variants={logoVariant}
-              animate={scrolled ? "scrolled" : "initial"}
-              transition={transition}
-            />
-          </div>
-
-          {/* Categorias centralizadas (não retraem) */}
-          <nav className="flex-1 flex justify-center gap-8 text-large">
-            <span
-              className="text-gray-900 font-light cursor-pointer whitespace-nowrap"
-            >
-              👶🏻 Por Encomenda
-            </span>
-            <span
-              className="text-gray-900 font-light cursor-pointer whitespace-nowrap"
-            >
-              👶🏻 Pronta Entrega
-            </span>
-            <span
-              className="text-gray-900 font-light cursor-pointer whitespace-nowrap"
-            >
-              👶🏻 Por Semelhança
-            </span>
-          </nav>
-
-          {/* Espaço reservado para alinhamento */}
-          <div className="flex-1" />
-
-          {/* Carrinho ABSOLUTO no canto direito */}
-          <div className="absolute right-0 top-0 h-full flex items-center pr-6">
-            <button aria-label="Carrinho">
-              <CgShoppingCart size={28} className="text-gray-700 cursor-pointer"/>
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* Espaço para não sobrepor o conteúdo */}
+      <MobileHeader
+        menuOpen={menuOpen}
+        setMenuOpen={setMenuOpen}
+        scrolled={scrolled}
+        logoVariant={logoVariant}
+        transition={transition}
+        categories={categories}
+      />
+      <DesktopHeader
+        scrolled={scrolled}
+        logoVariant={logoVariant}
+        transition={transition}
+        headerHeight={headerHeight}
+        categories={categories}
+      />
       <div className="pt-20 md:pt-[171px]" />
     </>
   );
