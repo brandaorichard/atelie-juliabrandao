@@ -3,6 +3,7 @@ import logo from "../assets/logo.png";
 import { FaTimes } from "react-icons/fa";
 import { PiListLight } from "react-icons/pi";
 import { motion, AnimatePresence } from "framer-motion";
+import { CgShoppingCart } from "react-icons/cg";
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -56,6 +57,13 @@ export default function Header() {
 
           {/* Espaço reservado para alinhamento */}
           <div className="flex-1" />
+
+          {/* Carrinho ABSOLUTO no canto direito */}
+          <div className="absolute right-0 top-0 h-full flex items-center pr-6">
+            <button aria-label="Carrinho">
+              <CgShoppingCart size={24} className="text-gray-500"/>
+            </button>
+          </div>
         </div>
 
         {/* Dropdown ocupando 100% da tela */}
@@ -111,7 +119,7 @@ export default function Header() {
         {/* Faixa roxa só no desktop, dentro do header */}
         <div className="h-[27px] bg-[#ae95d9] w-full" />
         <div
-          className="max-w-[1246px] px-[35px] mx-auto flex items-center justify-between transition-all duration-300"
+          className="max-w-[1246px] px-[35px] mx-auto flex items-center justify-between transition-all duration-300 relative"
           style={{ height: headerHeight }}
         >
           {/* Logo à esquerda - animada */}
@@ -129,20 +137,17 @@ export default function Header() {
           {/* Categorias centralizadas (não retraem) */}
           <nav className="flex-1 flex justify-center gap-8 text-large">
             <span
-              className="text-gray-800 font-light cursor-pointer whitespace-nowrap"
-              style={{ textShadow: "0 1px 2px #ae95d9, 0 0 1px #ae95d9" }}
+              className="text-gray-900 font-light cursor-pointer whitespace-nowrap"
             >
               👶🏻 Por Encomenda
             </span>
             <span
-              className="text-gray-800 font-light cursor-pointer whitespace-nowrap"
-              style={{ textShadow: "0 1px 2px #ae95d9, 0 0 1px #ae95d9" }}
+              className="text-gray-900 font-light cursor-pointer whitespace-nowrap"
             >
               👶🏻 Pronta Entrega
             </span>
             <span
-              className="text-gray-800 font-light cursor-pointer whitespace-nowrap"
-              style={{ textShadow: "0 1px 2px #ae95d9, 0 0 1px #ae95d9" }}
+              className="text-gray-900 font-light cursor-pointer whitespace-nowrap"
             >
               👶🏻 Por Semelhança
             </span>
@@ -150,6 +155,13 @@ export default function Header() {
 
           {/* Espaço reservado para alinhamento */}
           <div className="flex-1" />
+
+          {/* Carrinho ABSOLUTO no canto direito */}
+          <div className="absolute right-0 top-0 h-full flex items-center pr-6">
+            <button aria-label="Carrinho">
+              <CgShoppingCart size={28} className="text-gray-700 cursor-pointer"/>
+            </button>
+          </div>
         </div>
       </header>
 
