@@ -4,7 +4,7 @@ import img2 from "../assets/imgbaby.png";
 import img3 from "../assets/image.png";
 import img4 from "../assets/image2.png";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 const images = [
   { src: img1, alt: "Imagem 1" },
@@ -13,57 +13,57 @@ const images = [
   { src: img4, alt: "Imagem 4" },
 ];
 
+function useImagesPerSlide() {
+  const [imagesPerSlide, setImagesPerSlide] = useState(window.innerWidth >= 768 ? 2 : 1);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setImagesPerSlide(window.innerWidth >= 768 ? 2 : 1);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  return imagesPerSlide;
+}
+
 export default function Hero() {
+  const imagesPerSlide = useImagesPerSlide();
+  const totalSlides = Math.ceil(images.length / imagesPerSlide);
+
+  // Monta os slides (cada um com 1 ou 2 imagens)
+  const slides = [];
+  for (let i = 0; i < images.length; i += imagesPerSlide) {
+    slides.push(images.slice(i, i + imagesPerSlide));
+  }
+
   const [current, setCurrent] = useState(0);
-  const [direction, setDirection] = useState(0); // 1 para direita, -1 para esquerda
   const intervalRef = useRef();
 
   useEffect(() => {
     intervalRef.current = setInterval(() => {
-      setDirection(1);
-      setCurrent((prev) => (prev + 1) % images.length);
+      setCurrent((prev) => (prev + 1) % totalSlides);
     }, 3000);
 
     return () => clearInterval(intervalRef.current);
-  }, [images.length]);
+  }, [totalSlides]);
 
   const goTo = (idx) => {
-    setDirection(idx > current ? 1 : -1);
     setCurrent(idx);
     clearInterval(intervalRef.current);
     intervalRef.current = setInterval(() => {
-      setDirection(1);
-      setCurrent((prev) => (prev + 1) % images.length);
+      setCurrent((prev) => (prev + 1) % totalSlides);
     }, 3000);
   };
 
-  const prev = () => goTo((current - 1 + images.length) % images.length);
-  const next = () => goTo((current + 1) % images.length);
-
-  // Variants para o efeito de roll
-  const variants = {
-    enter: (direction) => ({
-      x: direction > 0 ? 100 : -100,
-      opacity: 0,
-      position: "absolute",
-    }),
-    center: {
-      x: 0,
-      opacity: 1,
-      position: "relative",
-    },
-    exit: (direction) => ({
-      x: direction > 0 ? -100 : 100,
-      opacity: 0,
-      position: "absolute",
-    }),
-  };
+  const prev = () => goTo((current - 1 + totalSlides) % totalSlides);
+  const next = () => goTo((current + 1) % totalSlides);
 
   return (
     <div>
       {/* Título acima do carousel */}
       <motion.div
-        className="w-full flex flex-col items-center mb-5 mt-4"
+        className="w-full flex flex-col items-center mb-5 -mt-2"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
@@ -82,7 +82,7 @@ export default function Hero() {
             gap-2
           "
         >
-          {/* Título acima do carousel <span role="title" aria-label="reborn" className="text-3xl md:text-5xl">Encomende seu bebê reborn personalizado!</span> */}
+          {/* Título acima do carousel */}
         </h1>
       </motion.div>
 
@@ -92,52 +92,66 @@ export default function Hero() {
         animate={{ opacity: 1 }}
         transition={{ duration: 1.1, ease: "easeOut" }}
       >
-        {/* Imagem do carousel com efeito roll */}
-        <AnimatePresence custom={direction} mode="wait">
-          <motion.img
-            key={images[current].alt}
-            src={images[current].src}
-            alt={images[current].alt}
-            custom={direction}
-            variants={variants}
-            initial="enter"
-            animate="center"
-            exit="exit"
-            transition={{
-              x: { type: "spring", stiffness: 300, damping: 30 },
-              opacity: { duration: 0.4 },
-            }}
-            className="absolute top-0 left-0 w-full h-full object-cover z-10"
-            style={{ transition: "opacity 0.5s" }}
-          />
-        </AnimatePresence>
+        {/* Slides container */}
+        <motion.div
+          className="flex h-full w-full"
+          style={{
+            width: `${totalSlides * 100}%`,
+            height: "100%",
+            position: "absolute",
+            top: 0,
+            left: 0,
+          }}
+          animate={{ x: `-${current * (100 / totalSlides)}%` }}
+          transition={{
+            x: { type: "spring", stiffness: 300, damping: 60 },
+          }}
+        >
+          {slides.map((slide, slideIdx) => (
+            <div
+              key={slideIdx}
+              className="flex w-full h-full"
+              style={{ width: `${100 / totalSlides}%` }}
+            >
+              {slide.map((img, idx) => (
+                <img
+                  key={img.alt}
+                  src={img.src}
+                  alt={img.alt}
+                  className="w-full h-full object-cover"
+                  style={{ flex: 1 }}
+                />
+              ))}
+            </div>
+          ))}
+        </motion.div>
 
         {/* Setas */}
         <button
-          onClick={() => { setDirection(-1); prev(); }}
-          className="absolute top-1/2 left-2 -translate-y-1/2 bg-white/70 rounded-full p-2 shadow hover:bg-white transition z-20"
+          onClick={prev}
+          className="absolute top-1/2 left-2 -translate-y-1/2 rounded-full p-2 shadow hover:bg-white transition z-20"
           aria-label="Anterior"
         >
-          <FaChevronLeft size={10} />
+          <FaChevronLeft size={10} className="text-white" />
         </button>
         <button
-          onClick={() => { setDirection(1); next(); }}
-          className="absolute top-1/2 right-2 -translate-y-1/2 bg-white/70 rounded-full p-2 shadow hover:bg-white transition z-20"
+          onClick={next}
+          className="absolute top-1/2 right-2 -translate-y-1/2 rounded-full p-2 shadow hover:bg-white transition z-20"
           aria-label="Próxima"
         >
-          <FaChevronRight size={10} />
+          <FaChevronRight size={10} className="text-white" />
         </button>
 
         {/* Bolinhas */}
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
-          {images.map((_, idx) => (
+          {slides.map((_, idx) => (
             <button
               key={idx}
               onClick={() => goTo(idx)}
-              className={`w-2 h-2 rounded-full border border-[#ae95d9] transition
+              className={`w-1 h-1 rounded-full border border-[#ae95d9] transition
                 ${current === idx ? "bg-[#ae95d9]" : "bg-white"}
               `}
-              aria-label={`Ir para imagem ${idx + 1}`}
+              aria-label={`Ir para slide ${idx + 1}`}
             />
           ))}
         </div>

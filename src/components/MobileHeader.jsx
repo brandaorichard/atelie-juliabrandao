@@ -1,4 +1,3 @@
-// components/MobileHeader.jsx
 import { PiListLight } from "react-icons/pi";
 import { FaTimes } from "react-icons/fa";
 import { AnimatePresence, motion } from "framer-motion";
@@ -16,7 +15,12 @@ export default function MobileHeader({
 }) {
   return (
     <header className="fixed top-0 left-0 w-full z-50 bg-[#f9e7f6] md:hidden">
-      <div className="max-w-[1246px] px-[20px] mx-auto flex items-center justify-between h-20 relative">
+      <div
+        className="
+          max-w-[1246px] px-[20px] mx-auto flex items-center justify-between h-20 relative
+          border-b border-[#e5d3e9] shadow-[0_2px_8px_0_rgba(174,149,217,0.08)] bg-[#f9e7f6]
+        "
+      >
         <div className="flex flex-1">
           {!menuOpen && (
             <button

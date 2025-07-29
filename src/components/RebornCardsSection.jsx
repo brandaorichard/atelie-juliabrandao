@@ -1,73 +1,10 @@
 import { FaFilter, FaSortAmountDown } from "react-icons/fa";
-import imgBaby from "../assets/imgbaby.png";
-
-const babies = [
-  {
-    id: 1,
-    name: "Bebê Reborn Kit Quinlynn promoção",
-    price: 2199.99,
-    oldPrice: 2399.99,
-    discount: "-8%",
-    installment: "4x de R$550,00 sem juros",
-    img: imgBaby,
-  },
-  {
-    id: 2,
-    name: "Bebê Reborn Kit Raven",
-    price: 2499.99,
-    oldPrice: null,
-    discount: null,
-    installment: "4x de R$625,00 sem juros",
-    img: imgBaby,
-  },
-  {
-    id: 3,
-    name: "Bebê Reborn Kit Darren Versão...",
-    price: 2399.99,
-    oldPrice: null,
-    discount: null,
-    installment: "4x de R$600,00 sem juros",
-    img: imgBaby,
-  },
-  {
-    id: 4,
-    name: "Bebê Reborn Kit Cai Oriental",
-    price: 2499.99,
-    oldPrice: null,
-    discount: null,
-    installment: "4x de R$625,00 sem juros",
-    img: imgBaby,
-  },
-  {
-    id: 5,
-    name: "Bebê Reborn Kit Cai Oriental",
-    price: 2499.99,
-    oldPrice: null,
-    discount: null,
-    installment: "4x de R$625,00 sem juros",
-    img: imgBaby,
-  },
-  {
-    id: 6,
-    name: "Bebê Reborn Kit Cai Oriental",
-    price: 2499.99,
-    oldPrice: null,
-    discount: null,
-    installment: "4x de R$625,00 sem juros",
-    img: imgBaby,
-  },
-  {
-    id: 7,
-    name: "Bebê Reborn Kit Cai Oriental",
-    price: 2499.99,
-    oldPrice: null,
-    discount: null,
-    installment: "4x de R$625,00 sem juros",
-    img: imgBaby,
-  },
-];
+import babies from "../mocks/babiesMock"; // Importando do mock correto
+import { useNavigate } from "react-router-dom";
 
 export default function RebornCardsSection() {
+  const navigate = useNavigate();
+
   return (
     <section className="w-full bg-[#f9e7f6] py-6 px-2 mt-2">
       <div className="max-w-6xl mx-auto">
@@ -91,13 +28,23 @@ export default function RebornCardsSection() {
           {babies.map((baby) => (
             <div
               key={baby.id}
+              onClick={() => navigate(`/produto/${baby.id}`)}
               className="
                 bg-[#f3e3fa] rounded-md shadow-md overflow-hidden flex flex-col border-[1px] border-gray-400
                 mb-4
                 w-full
                 md:w-[200px]
                 h-[400px] md:h-[440px]
+                cursor-pointer
+                transition-transform
+                hover:scale-[1.03]
               "
+              tabIndex={0}
+              role="button"
+              aria-label={`Ver detalhes de ${baby.name}`}
+              onKeyDown={e => {
+                if (e.key === "Enter" || e.key === " ") navigate(`/produto/${baby.id}`);
+              }}
             >
               <div className="relative">
                 <img

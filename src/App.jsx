@@ -1,21 +1,31 @@
-import { useState } from 'react'
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Header from './components/Header'
 import Hero from './components/Hero'
 import RebornCardsSection from './components/RebornCardsSection'
 import SocialMediasSection from './components/SocialMediasSection'
+import ProductPage from './components/ProductPage' // Crie esse componente!
 
 import './index.css'
 
 function App() {
-
   return (
-    <div>
+    <BrowserRouter>
       <Header />
-      <Hero />
-      <RebornCardsSection />
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <>
+              <Hero />
+              <RebornCardsSection />
+            </>
+          }
+        />
+        <Route path="/produto/:id" element={<ProductPage />} />
+      </Routes>
       <SocialMediasSection />
-    </div>
-  )
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;
