@@ -4,19 +4,29 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import babies from "../mocks/babiesMock"; // Importa o mock unificado
 
+import mastercardIcon from "../assets/icons/mastercard_payment_icon.png";
+import visaIcon from "../assets/icons/visa_icon.png";
+import amexIcon from "../assets/icons/americanexpress.png";
+import eloIcon from "../assets/icons/elo_payment.png";
+import hipercardIcon from "../assets/icons/hiper_card.png";
+import pixIcon from "../assets/icons/pix_icon.png";
+import boletoIcon from "../assets/icons/boleto-logo.png";
+
 export default function ProductPage() {
   const { id } = useParams();
   const navigate = useNavigate();
 
   // Busca o bebê pelo id (lembrando que useParams retorna string)
-  const baby = babies.find(b => String(b.id) === String(id));
+  const baby = babies.find((b) => String(b.id) === String(id));
 
   // Se não encontrar, pode mostrar uma mensagem ou redirecionar
   if (!baby) {
     return (
       <section className="w-full bg-[#f9e7f6] min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl text-[#ae95d9] mb-4">Bebê não encontrado 😢</h2>
+          <h2 className="text-2xl text-[#ae95d9] mb-4">
+            Bebê não encontrado 😢
+          </h2>
           <button
             onClick={() => navigate("/")}
             className="text-[#7a4fcf] underline"
@@ -29,6 +39,7 @@ export default function ProductPage() {
   }
 
   const [current, setCurrent] = useState(0);
+  const [quantity, setQuantity] = useState(1);
 
   const handlePrev = () => {
     setCurrent((prev) => (prev === 0 ? baby.images.length - 1 : prev - 1));
@@ -98,28 +109,38 @@ export default function ProductPage() {
         </div>
 
         {/* Lado direito: infos do produto */}
-        <div className="flex-1 flex flex-col justify-start mt-6 md:mt-0">
+        <div className="flex-1 flex flex-col justify-start mt-2 md:mt-0">
           {/* Breadcrumb */}
           <nav className="mb-4 text-sm">
             <ol className="flex items-center gap-2 text-[#7a4fcf]">
               <li>
-                <a href="/" className="underline hover:text-[#ae95d9]">Home</a>
+                <a href="/" className="underline hover:text-[#ae95d9]">
+                  Home
+                </a>
               </li>
               <span className="text-[#ae95d9]">{" > "}</span>
               <li>
-                <a href="#" className="underline hover:text-[#ae95d9]">Bebês Reborn Por Encomenda</a>
+                <a href="#" className="underline hover:text-[#ae95d9]">
+                  Bebês Reborn Por Encomenda
+                </a>
               </li>
             </ol>
           </nav>
           {/* Título e preço */}
-          <h1 className="text-2xl md:text-3xl font-light text-[#616161] mb-2">{baby.name}</h1>
+          <h1 className="text-2xl md:text-3xl font-light text-black mb-2">
+            {baby.name}
+          </h1>
           <div className="flex items-end gap-3 mb-2">
-            <span className="text-2xl md:text-3xl font-bold text-[#7a4fcf]">
-              R${baby.price.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+            <span className="text-2xl md:text-3xl font-bold text-black">
+              R$
+              {baby.price.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
             </span>
             {baby.oldPrice && (
               <span className="text-base md:text-lg text-[#616161] line-through">
-                R${baby.oldPrice.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                R$
+                {baby.oldPrice.toLocaleString("pt-BR", {
+                  minimumFractionDigits: 2,
+                })}
               </span>
             )}
             {baby.discount && (
@@ -128,18 +149,79 @@ export default function ProductPage() {
               </span>
             )}
           </div>
-          <span className="text-sm text-[#ae95d9] mb-4">{baby.installment}</span>
+          <span className="text-sm text-[#7a4fcf]">
+            {baby.installment}
+          </span>
+          <span className="text-sm text-[#7a4fcf] mb-4">
+            10% de desconto no PIX
+          </span>
 
-          {/* Descrição curta */}
-          <p className="text-base text-[#616161] mb-4">{baby.description}</p>
+          {/* Bloco de quantidade e comprar */}
+          <div className="flex items-center gap-4 mb-6">
+            <div className="flex items-center border border-[#616161] rounded-full px-3 py-1">
+              <button
+                onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                className="w-7 h-7 flex items-center justify-center rounded-full bg-[#f3e6f3] text-[#616161] text-lg font-bold opacity-60"
+                aria-label="Diminuir"
+                disabled={quantity === 1}
+              >
+                –
+              </button>
+              <span className="mx-3 w-4 text-center text-[#616161] font-medium">
+                {quantity}
+              </span>
+              <button
+                onClick={() => setQuantity((q) => q + 1)}
+                className="w-7 h-7 flex items-center justify-center rounded-full bg-[#f3e6f3] text-[#616161] text-lg font-bold opacity-60"
+                aria-label="Aumentar"
+              >
+                +
+              </button>
+            </div>
+            <button className="bg-[#7a4fcf] hover:bg-[#ae95d9] cursor-pointer text-white text-lg font-medium rounded-full px-10 py-2 transition">
+              Comprar
+            </button>
+          </div>
+
+          {/* Formas de pagamento */}
+          <div className="mb-6 mt-4">
+            <h2 className="text-base font-semibold text-black mb-4">
+              Formas de pagamento
+            </h2>
+            <div className="flex items-center gap-3">
+              <img
+                src={mastercardIcon}
+                alt="Mastercard"
+                className="h-7 w-auto"
+              />
+              <img src={visaIcon} alt="Visa" className="h-7 w-auto" />
+              <img
+                src={amexIcon}
+                alt="American Express"
+                className="h-7 w-auto"
+              />
+              <img src={eloIcon} alt="Elo" className="h-7 w-auto" />
+              <img src={hipercardIcon} alt="Hipercard" className="h-7 w-auto" />
+              <img src={pixIcon} alt="Pix" className="h-7 w-auto" />
+              <img
+                src={boletoIcon}
+                alt="Boleto"
+                className="h-7 w-auto bg-white rounded"
+              />
+            </div>
+          </div>
 
           {/* Características */}
-          {baby.features && (
+          {baby.description && (
             <>
-              <h2 className="text-lg font-semibold text-[#7a4fcf] mt-6 mb-2">Características:</h2>
+              <h2 className="text-lg font-semibold text-black mt-6 mb-2">
+                Características
+              </h2>
               <ul className="list-disc pl-5 text-[#616161] mb-4">
                 {baby.features.map((item, idx) => (
-                  <li key={idx} className="mb-1">{item}</li>
+                  <li key={idx} className="mb-1">
+                    {item}
+                  </li>
                 ))}
               </ul>
             </>
@@ -148,10 +230,46 @@ export default function ProductPage() {
           {/* Itens do enxoval */}
           {baby.enxoval && (
             <>
-              <h2 className="text-lg font-semibold text-[#7a4fcf] mt-6 mb-2">Itens do enxoval:</h2>
+              <h2 className="text-lg font-semibold text-black mt-6 mb-2">
+                Itens do enxoval
+              </h2>
               <ul className="list-disc pl-5 text-[#616161]">
                 {baby.enxoval.map((item, idx) => (
-                  <li key={idx} className="mb-1">{item}</li>
+                  <li key={idx} className="mb-1">
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+
+          {/* Itens do tempo de entrega */}
+          {baby.deliveryTime && (
+            <>
+              <h2 className="text-lg font-semibold text-black mt-6 mb-2">
+                Prazo de entrega
+              </h2>
+              <ul className="list-disc pl-5 text-[#616161]">
+                {baby.deliveryTime.map((item, idx) => (
+                  <li key={idx} className="mb-1">
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+
+          {/* Itens do avisos e cuidados */}
+          {baby.warnings && (
+            <>
+              <h2 className="text-lg font-semibold text-black mt-6 mb-2">
+                Avisos e cuidados
+              </h2>
+              <ul className="list-disc pl-5 text-[#616161]">
+                {baby.warnings.map((item, idx) => (
+                  <li key={idx} className="mb-1">
+                    {item}
+                  </li>
                 ))}
               </ul>
             </>

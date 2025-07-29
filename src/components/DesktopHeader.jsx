@@ -11,7 +11,10 @@ export default function DesktopHeader({
 }) {
   return (
     <header className="fixed top-0 left-0 w-full z-50 bg-[#f9e7f6] hidden md:block">
-      <div className="h-[27px] bg-[#ae95d9] w-full" />
+      {/* Faixa roxa só aparece se não estiver scrolled */}
+      {!scrolled && (
+        <div className="h-[27px] bg-[#ae95d9] w-full transition-all duration-300" />
+      )}
       {/* Borda e sombra ocupando 100% da tela */}
       <div className="w-full border-b border-[#e5d3e9] shadow-[0_2px_8px_0_rgba(174,149,217,0.08)] bg-[#f9e7f6]">
         <div
