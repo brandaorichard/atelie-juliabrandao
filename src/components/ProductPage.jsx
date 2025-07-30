@@ -54,7 +54,7 @@ export default function ProductPage() {
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row gap-8">
         {/* Carousel de imagens */}
         <div className="w-full md:w-[420px] flex flex-col items-center">
-          <div className="relative w-full h-[340px] md:h-[420px] flex items-center justify-center">
+          <div className="relative w-full h-[460px] md:h-[520px] flex items-center justify-center">
             {/* Seta esquerda */}
             <button
               className="absolute left-2 top-1/2 -translate-y-1/2 z-10 rounded-full p-2 cursor-pointer shadow transition"
@@ -86,7 +86,7 @@ export default function ProductPage() {
             </button>
           </div>
           {/* Miniaturas */}
-          <div className="flex gap-2 mt-4">
+          <div className="flex gap-2 mt-4 flex-wrap">
             {baby.images.map((img, idx) => (
               <button
                 key={idx}
@@ -115,7 +115,7 @@ export default function ProductPage() {
             <ol className="flex items-center gap-2 text-[#7a4fcf]">
               <li>
                 <a href="/" className="underline hover:text-[#ae95d9]">
-                  Home
+                  Início
                 </a>
               </li>
               <span className="text-[#ae95d9]">{" > "}</span>
