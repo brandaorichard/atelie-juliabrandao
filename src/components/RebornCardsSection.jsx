@@ -52,7 +52,7 @@ export default function RebornCardsSection() {
                   alt={baby.name}
                   className="w-full object-cover h-[275px] md:h-[320px]"
                 />
-                {baby.discount && (
+                {baby.id === 1 && baby.discount && (
                   <span className="absolute top-2 left-2 bg-[#ae95d9] text-white text-xs font-bold px-2 py-1 rounded">
                     {baby.discount}
                   </span>
