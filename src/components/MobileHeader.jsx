@@ -1,3 +1,4 @@
+import { useNavigate, useLocation } from "react-router-dom";
 import { PiListLight } from "react-icons/pi";
 import { FaTimes } from "react-icons/fa";
 import { AnimatePresence, motion } from "framer-motion";
@@ -13,6 +14,18 @@ export default function MobileHeader({
   transition,
   categories
 }) {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleLogoClick = () => {
+    if (location.pathname === "/") {
+      window.location.reload();
+    } else {
+      navigate("/");
+    }
+    if (menuOpen) setMenuOpen(false);
+  };
+
   return (
     <header className="fixed top-0 left-0 w-full z-50 bg-[#f9e7f6] md:hidden">
       <div
@@ -33,13 +46,24 @@ export default function MobileHeader({
           )}
         </div>
         <div className="flex-1 flex justify-center">
-          <AnimatedLogo
-            variants={logoVariant}
-            animate={scrolled ? "scrolled" : "initial"}
-            transition={transition}
-            className="w-[150px] h-auto"
+          <div
+            onClick={handleLogoClick}
+            className="w-[150px] h-auto cursor-pointer"
+            tabIndex={0}
+            role="button"
+            aria-label="Ir para a página inicial"
+            onKeyDown={e => {
+              if (e.key === "Enter" || e.key === " ") handleLogoClick();
+            }}
             style={{ minWidth: 80, minHeight: 40 }}
-          />
+          >
+            <AnimatedLogo
+              variants={logoVariant}
+              animate={scrolled ? "scrolled" : "initial"}
+              transition={transition}
+              className="w-[150px] h-auto"
+            />
+          </div>
         </div>
         <div className="flex-1" />
         <div className="absolute right-0 top-0 h-full flex items-center pr-6">

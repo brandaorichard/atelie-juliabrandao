@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import AnimatedLogo from "./AnimatedLogo";
 import CartButton from "./CartButton";
 import CategoriesMenu from "./CategoriesMenu";
@@ -9,6 +10,17 @@ export default function DesktopHeader({
   headerHeight,
   categories
 }) {
+  const navigate = useNavigate();
+
+  const handleLogoClick = () => {
+    if (location.pathname === "/") {
+      // Força reload da página inicial
+      window.location.reload();
+    } else {
+      navigate("/");
+    }
+  };
+
   return (
     <header className="fixed top-0 left-0 w-full z-50 bg-[#f9e7f6] hidden md:block">
       {/* Faixa roxa só aparece se não estiver scrolled */}
@@ -22,12 +34,23 @@ export default function DesktopHeader({
           style={{ height: headerHeight }}
         >
           <div className="flex-1 flex justify-start">
-            <AnimatedLogo
-              variants={logoVariant}
-              animate={scrolled ? "scrolled" : "initial"}
-              transition={transition}
-              className="w-[220px] h-auto"
-            />
+            <div
+              onClick={handleLogoClick}
+              className="w-[220px] h-auto cursor-pointer"
+              tabIndex={0}
+              role="button"
+              aria-label="Ir para a página inicial"
+              onKeyDown={e => {
+                if (e.key === "Enter" || e.key === " ") navigate("/");
+              }}
+            >
+              <AnimatedLogo
+                variants={logoVariant}
+                animate={scrolled ? "scrolled" : "initial"}
+                transition={transition}
+                className="w-[220px] h-auto"
+              />
+            </div>
           </div>
           <nav className="flex-1 flex justify-center gap-8 text-large">
             <CategoriesMenu categories={categories} />
