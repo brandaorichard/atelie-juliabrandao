@@ -12,7 +12,7 @@ export default function SocialMediasSection() {
       >
         <FaWhatsapp className="text-white text-md" />
       </a>
-      <a
+      {/* <a
         href="https://instagram.com/seuusuario"
         target="_blank"
         rel="noopener noreferrer"
@@ -29,7 +29,7 @@ export default function SocialMediasSection() {
         className="bg-black rounded-full shadow-lg p-3 hover:scale-110 transition-transform"
       >
         <FaTiktok className="text-white text-md" />
-      </a>
+      </a> */}
     </div>
   );
 }
