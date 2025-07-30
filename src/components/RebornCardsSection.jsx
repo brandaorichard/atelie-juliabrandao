@@ -59,7 +59,7 @@ export default function RebornCardsSection() {
                 )}
               </div>
               <div className="p-3 flex flex-col flex-1">
-                <span className="text-xs md:text-sm font-semibold text-[#616161] mb-1">{baby.name}</span>
+                <span className="text-xs md:text-sm font-light text-black mb-1">{baby.name}</span>
                 <div className="flex items-end gap-2 mb-1">
                   <span className="text-base md:text-lg font-bold text-[#7a4fcf]">
                     R${baby.price.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
