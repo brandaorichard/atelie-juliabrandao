@@ -18,7 +18,7 @@ function App() {
           path="/"
           element={
             <>
-              <Hero />
+              {/* <Hero /> */}
               <RebornCardsSection />
             </>
           }
