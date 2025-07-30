@@ -129,14 +129,14 @@ export default function Hero() {
         {/* Setas */}
         <button
           onClick={prev}
-          className="absolute top-1/2 left-2 -translate-y-1/2 rounded-full p-2 shadow hover:bg-white transition z-20"
+          className="absolute top-1/2 left-2 -translate-y-1/2 rounded-full p-2 shadow cursor-pointer transition z-20"
           aria-label="Anterior"
         >
           <FaChevronLeft size={10} className="text-white" />
         </button>
         <button
           onClick={next}
-          className="absolute top-1/2 right-2 -translate-y-1/2 rounded-full p-2 shadow hover:bg-white transition z-20"
+          className="absolute top-1/2 right-2 -translate-y-1/2 rounded-full p-2 shadow cursor-pointer transition z-20"
           aria-label="Próxima"
         >
           <FaChevronRight size={10} className="text-white" />
