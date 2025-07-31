@@ -3,6 +3,13 @@ import { FaFilter, FaSortAmountDown } from "react-icons/fa";
 import babies from "../mocks/babiesMock";
 import { useNavigate } from "react-router-dom";
 import SortDrawer from "./SortDrawer";
+import FilterDrawer from "./FilterDrawer";
+
+// Função para converter "9.999,00" para número 9999.00
+function parseBRL(str) {
+  if (!str) return null;
+  return parseFloat(str.replace(/\./g, "").replace(",", "."));
+}
 
 const sortOptions = [
   { label: "Preço: Menor ao Maior", value: "price-asc" },
@@ -14,11 +21,20 @@ const sortOptions = [
 export default function RebornCardsSection() {
   const navigate = useNavigate();
   const [sortOpen, setSortOpen] = useState(false);
+  const [filterOpen, setFilterOpen] = useState(false);
   const [selectedSort, setSelectedSort] = useState("price-asc");
+  const [minValue, setMinValue] = useState("");
+  const [maxValue, setMaxValue] = useState("");
+  const [showWarning, setShowWarning] = useState(false);
 
-  // Ordenação memoizada para performance
-  const sortedBabies = useMemo(() => {
+  // Filtro e ordenação memoizados
+  const filteredBabies = useMemo(() => {
     let arr = [...babies];
+    const min = parseBRL(minValue);
+    const max = parseBRL(maxValue);
+    if (!isNaN(min) && min !== null) arr = arr.filter(b => b.price >= min);
+    if (!isNaN(max) && max !== null) arr = arr.filter(b => b.price <= max);
+    // Ordenação
     switch (selectedSort) {
       case "price-asc":
         arr.sort((a, b) => a.price - b.price);
@@ -40,7 +56,21 @@ export default function RebornCardsSection() {
         break;
     }
     return arr;
-  }, [selectedSort]);
+  }, [selectedSort, minValue, maxValue]);
+
+  // Mostra warning se não houver resultados
+  React.useEffect(() => {
+    if ((minValue || maxValue) && filteredBabies.length === 0) {
+      setShowWarning(true);
+    }
+  }, [filteredBabies.length, minValue, maxValue]);
+
+  // Função para resetar filtro
+  function resetFilter() {
+    setMinValue("");
+    setMaxValue("");
+    setShowWarning(false);
+  }
 
   return (
     <section className="w-full bg-[#f9e7f6] py-6 px-2 mt-2">
@@ -51,7 +81,10 @@ export default function RebornCardsSection() {
         {/* Linha de ações: Filtrar à esquerda, Ordenar à direita */}
         <div className="flex items-center justify-between mb-4 px-1 text-left mt-7">
           <div>
-            <button className="flex items-center gap-1 text-[#7a4fcf] text-sm font-medium hover:underline focus:outline-none cursor-pointer">
+            <button
+              className="flex items-center gap-1 text-[#7a4fcf] text-sm font-medium hover:underline focus:outline-none cursor-pointer"
+              onClick={() => setFilterOpen(true)}
+            >
               <FaFilter className="text-base" />
               Filtrar
             </button>
@@ -67,8 +100,22 @@ export default function RebornCardsSection() {
             </button>
           </div>
         </div>
+        {/* Warning */}
+        {showWarning && (
+          <div className="mb-4 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 rounded flex items-center justify-between">
+            <span>
+              Nenhum bebê encontrado para o valor informado. Tente outros valores ou remova o filtro.
+            </span>
+            <button
+              className="ml-4 px-3 py-1 bg-yellow-300 text-yellow-900 rounded hover:bg-yellow-400"
+              onClick={resetFilter}
+            >
+              Fechar
+            </button>
+          </div>
+        )}
         <div className="grid grid-cols-2 md:flex-wrap gap-x-4 gap-y-0 md:flex md:gap-6">
-          {sortedBabies.map((baby) => (
+          {(showWarning ? babies : filteredBabies).map((baby) => (
             <div
               key={baby.id}
               onClick={() => navigate(`/produto/${baby.id}`)}
@@ -136,6 +183,16 @@ export default function RebornCardsSection() {
         options={sortOptions}
         selected={selectedSort}
         onSelect={setSelectedSort}
+      />
+      <FilterDrawer
+        open={filterOpen}
+        onClose={() => setFilterOpen(false)}
+        onApply={(min, max) => {
+          setMinValue(min);
+          setMaxValue(max);
+        }}
+        minValue={minValue}
+        maxValue={maxValue}
       />
     </section>
   );
