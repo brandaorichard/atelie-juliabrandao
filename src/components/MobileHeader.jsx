@@ -14,7 +14,7 @@ export default function MobileHeader({
   scrolled,
   logoVariant,
   transition,
-  categories
+  categories,
 }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -55,7 +55,7 @@ export default function MobileHeader({
             tabIndex={0}
             role="button"
             aria-label="Ir para a página inicial"
-            onKeyDown={e => {
+            onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === " ") handleLogoClick();
             }}
             style={{ minWidth: 80, minHeight: 40 }}
@@ -82,26 +82,37 @@ export default function MobileHeader({
         {menuOpen && (
           <motion.div
             key="dropdown"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-50 bg-[#f9e7f6] flex flex-col"
+            className="
+  absolute left-1 top-[40px] z-50
+  bg-[#f9e7f6]
+  rounded-sm
+  shadow-xl
+  pb-10
+  border border-[#f9e7f6]/80
+  flex flex-col items-start
+  min-w-[150px]
+  max-w-[60vw]
+"
           >
-            <div
-              className="flex items-center border-t"
-              style={{ borderColor: "#616161", height: 56 }}
-            >
+            <div className="flex items-center w-full mb-2">
               <button
                 onClick={() => setMenuOpen(false)}
                 aria-label="Fechar menu"
-                className="p-4"
+                className="p-2"
               >
-                <FaTimes className="text-[#616161] text-xl" />
+                <FaTimes className="text-[#616161] text-base" />
               </button>
               <div className="flex-1" />
             </div>
-            <CategoriesMenu categories={categories} animated onCategoryClick={() => setMenuOpen(false)}/>
+            <CategoriesMenu
+              categories={categories}
+              animated
+              onCategoryClick={() => setMenuOpen(false)}
+            />
           </motion.div>
         )}
       </AnimatePresence>
