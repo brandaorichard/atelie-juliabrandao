@@ -168,37 +168,42 @@ export default function CartDrawer({ open, onClose }) {
                   ))
                 )}
               </div>
-              {/* Total, aviso e botão de finalizar */}
+              {/* Aviso e footer separados */}
               {items.length > 0 && (
-                <div className="px-3 md:px-6 py-4 border-t border-[#e5d3e9] bg-[#f9e7f6]">
-                  {/* Aviso WhatsApp */}
-                  <div className="mb-3 p-3 rounded bg-[#fffbe7] border border-[#ffe066]">
-                    <span className="text-sm text-[#616161]">
-                      <b>Atenção:</b> Ao clicar em <b>“Iniciar Compra”</b>, você
-                      será direcionado para o WhatsApp para finalizar seu pedido
-                      com nossa equipe. O pagamento será feito via link Mercado
-                      Pago, Pix ou boleto.
-                    </span>
+                <>
+                  {/* Aviso WhatsApp - FORA do footer */}
+                  <div className="px-3 md:px-6 mt-2">
+                    <div className="mb-3 p-3 rounded bg-[#fffbe7] border border-[#ffe066]">
+                      <span className="text-sm text-[#616161]">
+                        <b>Atenção:</b> Ao clicar em <b>“Iniciar Compra”</b>, você
+                        será direcionado para o WhatsApp para finalizar seu pedido
+                        com nossa equipe. O pagamento será feito via link Mercado
+                        Pago, Pix ou boleto.
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex justify-between items-center mb-3">
-                    <span className="font-bold text-lg">Total:</span>
-                    <span className="font-bold text-lg">
-                      R$
-                      {items
-                        .reduce(
-                          (sum, item) => sum + item.price * item.quantity,
-                          0
-                        )
-                        .toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-                    </span>
+                  {/* Footer do carrinho */}
+                  <div className="px-3 md:px-6 py-4 border-t border-[#e5d3e9] bg-[#f9e7f6]">
+                    <div className="flex justify-between items-center mb-3">
+                      <span className="font-bold text-lg">Total:</span>
+                      <span className="font-bold text-lg">
+                        R$
+                        {items
+                          .reduce(
+                            (sum, item) => sum + item.price * item.quantity,
+                            0
+                          )
+                          .toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                      </span>
+                    </div>
+                    <button
+                      className="w-full bg-[#7a4fcf] hover:bg-[#ae95d9] text-white rounded-full py-3 font-medium transition"
+                      onClick={handleWhatsAppCheckout}
+                    >
+                      Iniciar Compra
+                    </button>
                   </div>
-                  <button
-                    className="w-full bg-[#7a4fcf] hover:bg-[#ae95d9] text-white rounded-full py-3 font-medium transition"
-                    onClick={handleWhatsAppCheckout}
-                  >
-                    Iniciar Compra
-                  </button>
-                </div>
+                </>
               )}
             </div>
           </motion.div>
