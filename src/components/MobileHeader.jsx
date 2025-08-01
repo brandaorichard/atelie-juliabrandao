@@ -101,7 +101,7 @@ export default function MobileHeader({
               </button>
               <div className="flex-1" />
             </div>
-            <CategoriesMenu categories={categories} animated />
+            <CategoriesMenu categories={categories} animated onCategoryClick={() => setMenuOpen(false)}/>
           </motion.div>
         )}
       </AnimatePresence>
