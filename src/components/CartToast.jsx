@@ -13,7 +13,7 @@ export default function CartToast({ product, quantity, total, totalQuantity, onV
         <img
           src={product.img}
           alt={product.name}
-          className="w-12 h-12 rounded object-cover border"
+          className="w-14 h-16 rounded object-cover"
         />
         <div>
           <div className="font-medium">{product.name}</div>
