@@ -43,7 +43,7 @@ export default function ProductPage() {
             discount={baby.discount}
             installment={baby.installment}
           />
-          <QuantityBuy quantity={quantity} setQuantity={setQuantity} />
+          <QuantityBuy product={baby} quantity={quantity} setQuantity={setQuantity} />
           <PaymentMethods />
           <ProductSection title="Características" items={baby.features} />
           <ProductSection title="Itens do enxoval" items={baby.enxoval} />
