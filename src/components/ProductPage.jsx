@@ -45,9 +45,9 @@ export default function ProductPage() {
           />
           <QuantityBuy product={baby} quantity={quantity} setQuantity={setQuantity} />
           <PaymentMethods />
+          <ProductSection title="Prazo de entrega" items={baby.deliveryTime} />
           <ProductSection title="Características" items={baby.features} />
           <ProductSection title="Itens do enxoval" items={baby.enxoval} />
-          <ProductSection title="Prazo de entrega" items={baby.deliveryTime} />
           <ProductSection title="Avisos e cuidados" items={baby.warnings} />
         </div>
       </div>

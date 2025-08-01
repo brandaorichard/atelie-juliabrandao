@@ -3,7 +3,7 @@ import React from "react";
 
 export default function CartToast({ product, quantity, total, totalQuantity, onViewCart }) {
   return (
-    <div className=" bg-[#f9e7f6] rounded-lg">
+    <div className=" bg-[#f9e7f6] rounded-md">
       <div className="flex items-start gap-3">
         <img
           src={product.img}
