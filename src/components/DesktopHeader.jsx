@@ -1,7 +1,9 @@
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AnimatedLogo from "./AnimatedLogo";
 import CartButton from "./CartButton";
 import CategoriesMenu from "./CategoriesMenu";
+import CartDrawer from "./CartDrawer";
 
 export default function DesktopHeader({
   scrolled,
@@ -11,10 +13,10 @@ export default function DesktopHeader({
   categories
 }) {
   const navigate = useNavigate();
+  const [cartOpen, setCartOpen] = useState(false);
 
   const handleLogoClick = () => {
     if (location.pathname === "/") {
-      // Força reload da página inicial
       window.location.reload();
     } else {
       navigate("/");
@@ -57,10 +59,15 @@ export default function DesktopHeader({
           </nav>
           <div className="flex-1" />
           <div className="absolute right-0 top-0 h-full flex items-center pr-6">
-            <CartButton size={28} className="text-gray-700 cursor-pointer" />
+            <CartButton
+              size={28}
+              className="text-gray-700 cursor-pointer"
+              onClick={() => setCartOpen(true)}
+            />
           </div>
         </div>
       </div>
+      <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
     </header>
   );
 }
