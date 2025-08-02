@@ -62,7 +62,7 @@ export default function FilterDrawer({ open, onClose, onApply, minValue, maxValu
             animate={{ x: 0 }}
             exit={{ x: "-100%" }}
             transition={{ type: "tween", duration: 0.25 }}
-            className="fixed top-0 left-0 h-full z-60"
+            className="fixed top-0 left-0 h-full z-60 filter-drawer-custom"
             style={{
               width: "90vw",
               maxWidth: 350,
@@ -82,7 +82,7 @@ export default function FilterDrawer({ open, onClose, onApply, minValue, maxValu
                 }
               `}
             </style>
-            <div className="filter-drawer-custom h-full flex flex-col">
+            <div className="h-full flex flex-col">
               <div className="flex items-center justify-between px-6 py-5 border-b border-[#e5d3e9]">
                 <span className="text-lg font-light text-[#616161]">Filtrar</span>
                 <button
