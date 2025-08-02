@@ -21,26 +21,30 @@ export default function CartDrawer({ open, onClose }) {
 
   // Função para abrir o WhatsApp com o resumo do pedido
   function handleWhatsAppCheckout() {
-    const phone = "SEUNUMERO"; // Exemplo: 5511999999999
+    const phone = 5567992654151; // Seu número com DDI e DDD
     const itemsText = items
       .map(
         (item) =>
-          `• ${item.name} (Qtd: ${
-            item.quantity
-          }) - R$${item.price.toLocaleString("pt-BR", {
+          `• Modelo: ${
+            item.name
+          }\n  Valor unitário: R$${item.price.toLocaleString("pt-BR", {
+            minimumFractionDigits: 2,
+          })}\n  Quantidade: ${item.quantity}\n  Subtotal: R$${(
+            item.price * item.quantity
+          ).toLocaleString("pt-BR", {
             minimumFractionDigits: 2,
           })}`
       )
-      .join("\n");
+      .join("\n\n");
     const total = items.reduce(
       (sum, item) => sum + item.price * item.quantity,
       0
     );
     const message = encodeURIComponent(
-      `Olá! Gostaria de finalizar meu pedido:\n\n${itemsText}\n\nTotal: R$${total.toLocaleString(
+      `Olá! Estou interessado(a) em finalizar minha compra pelo site Atelie Júlia Brandão:\n\n${itemsText}\n\nTotal do pedido: R$${total.toLocaleString(
         "pt-BR",
         { minimumFractionDigits: 2 }
-      )}\n\nAguardo instruções de pagamento.`
+      )}\n\nAguardo as instruções para pagamento e envio.`
     );
     window.open(`https://wa.me/${phone}?text=${message}`, "_blank");
   }
@@ -175,10 +179,10 @@ export default function CartDrawer({ open, onClose }) {
                   <div className="px-3 md:px-6 mt-2">
                     <div className="mb-3 p-3 rounded bg-[#fffbe7] border border-[#ffe066]">
                       <span className="text-sm text-[#616161]">
-                        <b>Atenção:</b> Ao clicar em <b>“Iniciar Compra”</b>, você
-                        será direcionado para o WhatsApp para finalizar seu pedido
-                        com nossa equipe. O pagamento será feito via link Mercado
-                        Pago, Pix ou boleto.
+                        <b>Atenção:</b> Ao clicar em <b>“Iniciar Compra”</b>,
+                        você será direcionado para o WhatsApp para finalizar seu
+                        pedido com nossa equipe. O pagamento será feito via link
+                        Mercado Pago, Pix ou boleto.
                       </span>
                     </div>
                   </div>
@@ -193,7 +197,9 @@ export default function CartDrawer({ open, onClose }) {
                             (sum, item) => sum + item.price * item.quantity,
                             0
                           )
-                          .toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+                          .toLocaleString("pt-BR", {
+                            minimumFractionDigits: 2,
+                          })}
                       </span>
                     </div>
                     <button
