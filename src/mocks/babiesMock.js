@@ -74,7 +74,7 @@ const babies = [
     name: "Bebê Reborn Kit Quinlynn",
     price: 2199.99,
     discount: "-8%",
-    oldPrice: 2399.99,
+    // oldPrice: 2399.99,
     installment: "4x de R$550,00 sem juros",
     img: imgBaby1,
     images: [imgBaby1, imgBaby2, imgBaby3, imgBaby4],

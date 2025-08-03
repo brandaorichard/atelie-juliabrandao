@@ -3,6 +3,7 @@ import { FaFilter, FaSortAmountDown } from "react-icons/fa";
 import FilterDrawer from "./FilterDrawer";
 import SortDrawer from "./SortDrawer";
 import RebornCard from "./RebornCard";
+import Breadcrumb from "./Breadcrumb";
 
 function parseBRL(str) {
   if (!str) return null;
@@ -69,8 +70,9 @@ export default function CategoryCardsSection({
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-light text-[#616161] mb-6 mt-6">{title}</h1>
+    <div className="max-w-6xl mx-auto px-4 py-8 mt-4">
+      <Breadcrumb />
+      <h1 className="text-2xl font-light text-black mb-6 mt-6">{title}</h1>
       {/* Filtro e Ordenar */}
       {(showFilter || showSort) && (
         <div className="flex items-center gap-2 mb-4">
