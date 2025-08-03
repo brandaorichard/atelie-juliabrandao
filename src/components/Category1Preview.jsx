@@ -91,14 +91,14 @@ export default function Category1Preview() {
                 <AnimatePresence key={baby.id} mode="wait">
                   <motion.div
                     key={baby.id}
-                    initial={{ x: 80, opacity: 0 }}
+                    initial={{ x: 40, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     exit={{ x: -80, opacity: 0 }}
                     transition={{
                       type: "spring",
-                      stiffness: 300,
-                      damping: 30,
-                      duration: 0.4,
+                      stiffness: 400,
+                      damping: 40,
+                      duration: 0.5,
                     }}
                     className="w-[160px]"
                   >
