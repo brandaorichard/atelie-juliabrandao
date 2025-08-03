@@ -6,6 +6,7 @@ import ProductPage from "./components/ProductPage";
 import ScrollToTop from "./components/ScrollToTop";
 import ToastContainer from "./components/ToastContainer";
 import CartDrawer from "./components/CartDrawer";
+import Footer from "./components/Footer";
 
 // Importe as páginas
 import HomePage from "./pages/HomePage";
@@ -31,6 +32,8 @@ function App() {
         <Route path="/categoria3" element={<Category3Page />} />
         <Route path="/produto/:id" element={<ProductPage />} />
       </Routes>
+      <Footer />
+      {/* Seção de redes sociais */}
       <SocialMediasSection />
     </BrowserRouter>
   );
