@@ -119,12 +119,12 @@ export default function CartDrawer({ open, onClose }) {
                   items.map((item) => (
                     <div
                       key={item.id}
-                      className="flex items-center gap-3 border rounded-lg p-3 mb-4 bg-[#f9e7f6]"
+                      className="flex items-center gap-3 border border-neutral-300 rounded-lg p-3 mb-4 bg-[#f9e7f6]"
                     >
                       <img
                         src={item.img}
                         alt={item.name}
-                        className="w-16 h-16 rounded object-cover border"
+                        className="w-20 h-22 rounded object-cover border border-neutral-300"
                       />
                       <div className="flex-1">
                         <div className="font-medium">{item.name}</div>

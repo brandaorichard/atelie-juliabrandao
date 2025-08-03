@@ -33,7 +33,7 @@ export default function ToastContainer({ onViewCart }) {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, x: 200 }}
           transition={{ duration: 0.55, type: "spring" }}
-          className="fixed top-6 right-6 z-[100] bg-[#f9e7f6] border rounded-lg shadow-lg p-4 min-w-[320px] max-w-[95vw]"
+          className="fixed top-6 right-6 z-[100] bg-[#f9e7f6] border border-neutral-400 rounded-lg shadow-lg p-4 min-w-[320px] max-w-[95vw]"
         >
           <CartToast
             product={data.product}
