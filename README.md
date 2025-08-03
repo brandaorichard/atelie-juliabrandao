@@ -1,12 +1,76 @@
-# React + Vite
+# Ateliê Júlia Brandão
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Aplicação web para o Ateliê Júlia Brandão, especializada em bonecas reborn e produtos artesanais. O projeto oferece um catálogo interativo, carrosséis animados, visualização detalhada de produtos, carrinho de compras, layout responsivo e experiência otimizada para dispositivos móveis.
 
-Currently, two official plugins are available:
+## ✨ Funcionalidades
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Catálogo de produtos com filtros e busca
+- Carrosséis animados e com swipe no mobile
+- Visualização detalhada de cada produto
+- Carrinho de compras com badge dinâmico
+- Layout responsivo (desktop e mobile)
+- Footer com informações de contato, redes sociais e formas de pagamento
+- Animações com Framer Motion
+- Navegação entre categorias
+- Integração com React Router
 
-## Expanding the ESLint configuration
+## 🚀 Tecnologias Utilizadas
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- [React](https://reactjs.org/)
+- [React Router](https://reactrouter.com/)
+- [Framer Motion](https://www.framer.com/motion/)
+- [React Swipeable](https://www.npmjs.com/package/react-swipeable)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Redux Toolkit](https://redux-toolkit.js.org/) (para gerenciamento de estado do carrinho)
+- [React Icons](https://react-icons.github.io/react-icons/)
+
+## 📦 Instalação
+
+1. Clone este repositório:
+   ```bash
+   git clone https://github.com/seu-usuario/seu-repositorio.git
+   ```
+2. Acesse a pasta do projeto:
+   ```bash
+   cd seu-repositorio
+   ```
+3. Instale as dependências:
+   ```bash
+   npm install
+   ```
+4. Inicie o servidor de desenvolvimento:
+   ```bash
+   npm start
+   ```
+
+## 💻 Uso
+
+- Acesse [http://localhost:3000](http://localhost:3000) no seu navegador.
+- Navegue pelas categorias, visualize produtos, adicione ao carrinho e explore as animações.
+
+## 📁 Estrutura do Projeto
+
+```
+src/
+├── assets/            # Imagens e logos
+├── components/        # Componentes reutilizáveis (cards, carrosséis, footer, etc)
+├── hooks/             # Hooks customizados
+├── mocks/             # Dados mockados para produtos
+├── pages/             # Páginas principais (home, categorias, produto, etc)
+├── redux/             # Slices e store do Redux
+├── App.jsx            # Componente principal
+└── index.js           # Ponto de entrada
+```
+
+## 🤝 Contribuição
+
+Contribuições são bem-vindas!  
+Sinta-se à vontade para abrir issues, enviar pull requests ou sugerir melhorias.
+
+## 📄 Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+---
+
+Desenvolvido com 💜 por [Ateliê Júlia Brandão](https://instagram.com/ateliejuliabrandao)
