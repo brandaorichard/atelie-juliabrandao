@@ -99,7 +99,7 @@ export default function CartDrawer({ open, onClose }) {
                 <button
                   onClick={onClose}
                   aria-label="Fechar"
-                  className="text-[#616161] text-xl cursor-pointer"
+                  className="text-[#616161] text-4xl cursor-pointer"
                   style={{
                     lineHeight: 1,
                     padding: 0,

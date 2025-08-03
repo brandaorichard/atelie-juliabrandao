@@ -118,7 +118,7 @@ export default function MobileHeader({
                 aria-label="Fechar menu"
                 className="p-2"
               >
-                <FaTimes className="text-[#616161] text-base" />
+                <FaTimes className="text-[#616161] text-xl" />
               </button>
               <div className="flex-1" />
             </div>
