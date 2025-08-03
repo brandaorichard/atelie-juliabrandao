@@ -87,16 +87,16 @@ export default function MobileHeader({
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.2 }}
             className="
-  absolute left-1 top-[40px] z-50
-  bg-[#f9e7f6]
-  rounded-sm
-  shadow-xl
-  pb-10
-  border border-[#f9e7f6]/80
-  flex flex-col items-start
-  min-w-[150px]
-  max-w-[60vw]
-"
+              absolute left-1 top-[40px] z-50
+              bg-[#f9e7f6]
+              rounded-sm
+              shadow-xl
+              pb-10
+              border border-[#f9e7f6]/80
+              flex flex-col items-start
+              min-w-[150px]
+              max-w-[60vw]
+            "
           >
             <div className="flex items-center w-full mb-2">
               <button
@@ -111,7 +111,12 @@ export default function MobileHeader({
             <CategoriesMenu
               categories={categories}
               animated
-              onCategoryClick={() => setMenuOpen(false)}
+              onCategoryClick={idx => {
+                if (idx === 0) navigate("/categoria1");
+                if (idx === 1) navigate("/categoria2");
+                if (idx === 2) navigate("/categoria3");
+                setMenuOpen(false);
+              }}
             />
           </motion.div>
         )}

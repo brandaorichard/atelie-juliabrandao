@@ -16,7 +16,7 @@ export default function DesktopHeader({
   const [cartOpen, setCartOpen] = useState(false);
 
   const handleLogoClick = () => {
-    if (location.pathname === "/") {
+    if (window.location.pathname === "/") {
       window.location.reload();
     } else {
       navigate("/");
@@ -43,7 +43,7 @@ export default function DesktopHeader({
               role="button"
               aria-label="Ir para a página inicial"
               onKeyDown={e => {
-                if (e.key === "Enter" || e.key === " ") navigate("/");
+                if (e.key === "Enter" || e.key === " ") handleLogoClick();
               }}
             >
               <AnimatedLogo
@@ -55,7 +55,14 @@ export default function DesktopHeader({
             </div>
           </div>
           <nav className="flex-1 flex justify-center gap-8 text-large">
-            <CategoriesMenu categories={categories} />
+            <CategoriesMenu
+              categories={categories}
+              onCategoryClick={idx => {
+                if (idx === 0) navigate("/categoria1");
+                if (idx === 1) navigate("/categoria2");
+                if (idx === 2) navigate("/categoria3");
+              }}
+            />
           </nav>
           <div className="flex-1" />
           <div className="absolute right-0 top-0 h-full flex items-center pr-6">
