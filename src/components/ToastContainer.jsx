@@ -43,7 +43,7 @@ export default function ToastContainer({ onViewCart }) {
             onViewCart={handleViewCart}
           />
           <button
-            className="absolute top-2 right-2 text-xl text-gray-500"
+            className="absolute top-2 right-2 text-4xl text-gray-500"
             onClick={() => dispatch(hideToast())}
             aria-label="Fechar notificação"
             style={{ background: "none", border: "none", cursor: "pointer" }}
