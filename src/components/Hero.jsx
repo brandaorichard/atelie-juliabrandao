@@ -1,8 +1,10 @@
 import React, { useEffect, useState, useRef } from "react";
-import img1 from "../assets/img.png";
-import img2 from "../assets/imgbaby.png";
-import img3 from "../assets/image.png";
-import img4 from "../assets/image2.png";
+import img1 from "../assets/hero1.jpeg";
+import img2 from "../assets/hero2.jpeg";
+import img3 from "../assets/hero3.jpeg";
+import img4 from "../assets/img.png";
+import img5 from "../assets/babies/babylaura6.png"
+import img6 from "../assets/babies/babykylin8.png"
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { motion } from "framer-motion";
 
@@ -11,6 +13,8 @@ const images = [
   { src: img2, alt: "Imagem 2" },
   { src: img3, alt: "Imagem 3" },
   { src: img4, alt: "Imagem 4" },
+  { src: img5, alt: "Imagem 5" },
+  { src: img6, alt: "Imagem 6" },
 ];
 
 function useImagesPerSlide() {
@@ -87,7 +91,7 @@ export default function Hero() {
       </motion.div>
 
       <motion.section
-        className="w-full h-[26vh] md:h-[40vh] bg-no-repeat bg-cover bg-center relative overflow-hidden"
+        className="w-full h-[46vh] md:h-[50vh] bg-no-repeat bg-cover bg-center relative overflow-hidden"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1.1, ease: "easeOut" }}
