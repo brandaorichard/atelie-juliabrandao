@@ -64,7 +64,7 @@ export default function Category1Preview() {
           className="flex items-center gap-1 text-[#7a4fcf] text-sm md:text-base font-medium cursor-pointer underline hover:text-[#ae95d9] transition-colors focus:outline-none"
           style={{ WebkitTapHighlightColor: "transparent" }}
         >
-          Ver mais <FaArrowRight className="ml-1" />
+          Ver mais <IoIosArrowForward className="" />
         </motion.button>
       </div>
 
