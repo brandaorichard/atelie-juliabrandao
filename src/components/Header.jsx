@@ -20,7 +20,7 @@ export default function Header() {
   };
   const transition = { type: "spring", stiffness: 300, damping: 30 };
   const headerHeight = scrolled ? 144 : 160;
-  const categories = ["Por Encomenda", "Pronta Entrega", "Por Semelhança"];
+  const categories = ["POR ENCOMENDA", "PRONTA ENTREGA", "POR SEMELHANCA"];
 
   return (
     <>
@@ -39,7 +39,7 @@ export default function Header() {
         headerHeight={headerHeight}
         categories={categories}
       />
-      <div className="pt-20 md:pt-[171px]" />
+      <div className="pt-32 md:pt-[171px]" />
     </>
   );
 }

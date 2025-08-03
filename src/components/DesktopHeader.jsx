@@ -4,16 +4,21 @@ import AnimatedLogo from "./AnimatedLogo";
 import CartButton from "./CartButton";
 import CategoriesMenu from "./CategoriesMenu";
 import CartDrawer from "./CartDrawer";
+import { useSelector } from "react-redux";
 
 export default function DesktopHeader({
   scrolled,
   logoVariant,
   transition,
   headerHeight,
-  categories
+  categories,
 }) {
   const navigate = useNavigate();
   const [cartOpen, setCartOpen] = useState(false);
+
+  const cartCount = useSelector(
+  state => state.cart.items.reduce((sum, item) => sum + item.quantity, 0)
+);
 
   const handleLogoClick = () => {
     if (window.location.pathname === "/") {
@@ -27,7 +32,11 @@ export default function DesktopHeader({
     <header className="fixed top-0 left-0 w-full z-50 bg-[#f9e7f6] hidden md:block">
       {/* Faixa roxa só aparece se não estiver scrolled */}
       {!scrolled && (
-        <div className="h-[27px] bg-[#ae95d9] w-full transition-all duration-300" />
+        <div className="h-[30px] bg-[#ae95d9] w-full transition-all duration-300 flex items-center justify-center">
+          <span className="text-black text-[10px] font-light tracking-wide select-none">
+            ✈️ ENVIAMOS PARA TODO O BRASIL E EXTERIOR! ✈️
+          </span>
+        </div>
       )}
       {/* Borda e sombra ocupando 100% da tela */}
       <div className="w-full border-b border-[#e5d3e9] shadow-[0_2px_8px_0_rgba(174,149,217,0.08)] bg-[#f9e7f6]">
@@ -42,7 +51,7 @@ export default function DesktopHeader({
               tabIndex={0}
               role="button"
               aria-label="Ir para a página inicial"
-              onKeyDown={e => {
+              onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") handleLogoClick();
               }}
             >
@@ -57,7 +66,7 @@ export default function DesktopHeader({
           <nav className="flex-1 flex justify-center gap-8 text-large">
             <CategoriesMenu
               categories={categories}
-              onCategoryClick={idx => {
+              onCategoryClick={(idx) => {
                 if (idx === 0) navigate("/categoria1");
                 if (idx === 1) navigate("/categoria2");
                 if (idx === 2) navigate("/categoria3");
@@ -70,6 +79,7 @@ export default function DesktopHeader({
               size={28}
               className="text-gray-700 cursor-pointer"
               onClick={() => setCartOpen(true)}
+              badge={cartCount}
             />
           </div>
         </div>

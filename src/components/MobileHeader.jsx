@@ -7,6 +7,7 @@ import AnimatedLogo from "./AnimatedLogo";
 import CartButton from "./CartButton";
 import CategoriesMenu from "./CategoriesMenu";
 import CartDrawer from "./CartDrawer";
+import { useSelector } from "react-redux";
 
 export default function MobileHeader({
   menuOpen,
@@ -20,6 +21,10 @@ export default function MobileHeader({
   const location = useLocation();
   const [cartOpen, setCartOpen] = useState(false);
 
+  const cartCount = useSelector(
+  state => state.cart.items.reduce((sum, item) => sum + item.quantity, 0)
+);
+
   const handleLogoClick = () => {
     if (location.pathname === "/") {
       window.location.reload();
@@ -31,9 +36,17 @@ export default function MobileHeader({
 
   return (
     <header className="fixed top-0 left-0 w-full z-50 bg-[#f9e7f6] md:hidden">
+      {/* Faixa roxa só aparece se não estiver scrolled */}
+      {!scrolled && (
+        <div className="h-[25px] bg-[#c5adee] w-full transition-all duration-300 flex items-center justify-center">
+          <span className="text-black text-[10px] font-extralight tracking-wide select-none">
+            ✈️ ENVIAMOS PARA TODO O BRASIL E EXTERIOR! ✈️
+          </span>
+        </div>
+      )}
       <div
         className="
-          max-w-[1246px] px-[20px] mx-auto flex items-center justify-between h-25 relative
+          max-w-[1246px] px-[20px] mx-auto flex items-center justify-between h-28 relative
           border-b border-[#e5d3e9] shadow-[0_2px_8px_0_rgba(174,149,217,0.08)] bg-[#f9e7f6]
         "
       >
@@ -74,6 +87,7 @@ export default function MobileHeader({
             size={24}
             className="text-gray-500"
             onClick={() => setCartOpen(true)}
+            badge={cartCount}
           />
         </div>
       </div>
