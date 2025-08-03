@@ -1,13 +1,23 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { useSwipeable } from "react-swipeable";
 
 export default function ProductCarousel({ images, current, setCurrent, name }) {
   const handlePrev = () => setCurrent(prev => (prev === 0 ? images.length - 1 : prev - 1));
   const handleNext = () => setCurrent(prev => (prev === images.length - 1 ? 0 : prev + 1));
 
+  const swipeHandlers = useSwipeable({
+    onSwipedLeft: handleNext,
+    onSwipedRight: handlePrev,
+    trackMouse: false,
+  });
+
   return (
     <div className="w-full md:w-[420px] flex flex-col items-center">
-      <div className="relative w-full h-[460px] md:h-[520px] flex items-center justify-center">
+      <div
+        className="relative w-full h-[460px] md:h-[520px] flex items-center justify-center"
+        {...swipeHandlers}
+      >
         <button
           className="absolute left-2 top-1/2 -translate-y-1/2 z-10 rounded-full p-2 cursor-pointer shadow transition"
           onClick={handlePrev}

@@ -3,9 +3,10 @@ import img1 from "../assets/hero1.jpeg";
 import img2 from "../assets/hero2.jpeg";
 import img3 from "../assets/hero3.jpeg";
 import img4 from "../assets/img.png";
-import img5 from "../assets/babies/babylaura6.png"
-import img6 from "../assets/babies/babykylin8.png"
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import img5 from "../assets/babies/babylaura6.png";
+import img6 from "../assets/babies/babykylin8.png";
+// import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { useSwipeable } from "react-swipeable";
 import { motion } from "framer-motion";
 
 const images = [
@@ -47,7 +48,7 @@ export default function Hero() {
   useEffect(() => {
     intervalRef.current = setInterval(() => {
       setCurrent((prev) => (prev + 1) % totalSlides);
-    }, 3000);
+    }, 5000);
 
     return () => clearInterval(intervalRef.current);
   }, [totalSlides]);
@@ -57,11 +58,19 @@ export default function Hero() {
     clearInterval(intervalRef.current);
     intervalRef.current = setInterval(() => {
       setCurrent((prev) => (prev + 1) % totalSlides);
-    }, 3000);
+    }, 5000);
   };
 
   const prev = () => goTo((current - 1 + totalSlides) % totalSlides);
   const next = () => goTo((current + 1) % totalSlides);
+
+  // Swipe only on mobile (<1000px)
+  const isMobile = window.innerWidth < 1000;
+  const swipeHandlers = useSwipeable({
+    onSwipedLeft: () => isMobile && next(),
+    onSwipedRight: () => isMobile && prev(),
+    trackMouse: true,
+  });
 
   return (
     <div>
@@ -89,8 +98,8 @@ export default function Hero() {
           {/* Título acima do carousel */}
         </h1>
       </motion.div>
-
       <motion.section
+        {...(isMobile ? swipeHandlers : {})}
         className="w-full h-[46vh] md:h-[50vh] bg-no-repeat bg-cover bg-center relative overflow-hidden"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -131,7 +140,7 @@ export default function Hero() {
         </motion.div>
 
         {/* Setas */}
-        <button
+        {/* <button
           onClick={prev}
           className="absolute top-1/2 left-2 -translate-y-1/2 rounded-full p-2 shadow cursor-pointer transition z-20"
           aria-label="Anterior"
@@ -144,7 +153,7 @@ export default function Hero() {
           aria-label="Próxima"
         >
           <FaChevronRight size={10} className="text-white" />
-        </button>
+        </button> */}
 
         {/* Bolinhas */}
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">

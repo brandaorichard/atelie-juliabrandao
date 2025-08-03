@@ -32,7 +32,7 @@ export default function ProductPage() {
 
   return (
     <section className="w-full bg-[#f9e7f6] min-h-screen py-8 px-2">
-      <div className="max-w-6xl mx-auto flex flex-col md:flex-row gap-8">
+      <div className="max-w-6xl mx-auto flex flex-col md:flex-row gap-8 -mt-2 md:mt-5">
         <ProductCarousel images={baby.images} current={current} setCurrent={setCurrent} name={baby.name} />
         <div className="flex-1 flex flex-col justify-start mt-2 md:mt-0">
           <Breadcrumb />

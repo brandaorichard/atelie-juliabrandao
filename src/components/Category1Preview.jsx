@@ -1,10 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import babies from "../mocks/babiesMock";
 import RebornCard from "../components/RebornCard";
-import { FaArrowRight, FaArrowLeft } from "react-icons/fa";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
+import { useSwipeable } from "react-swipeable";
 
 export default function Category1Preview() {
   const navigate = useNavigate();
@@ -21,7 +21,7 @@ export default function Category1Preview() {
       setMobileIndex(
         (prev) => (prev + 1 < previewBabies.length - 1 ? prev + 1 : 0) // volta ao início
       );
-    }, 3000);
+    }, 5000);
 
     return () => clearInterval(interval);
   }, [isMobile, previewBabies.length]);
@@ -53,6 +53,13 @@ export default function Category1Preview() {
     setMobileIndex((prev) => Math.min(prev + 1, previewBabies.length - 2));
   };
 
+  // Swipe handlers para mobile
+  const swipeHandlers = useSwipeable({
+    onSwipedLeft: () => handleNext(),
+    onSwipedRight: () => handlePrev(),
+    trackMouse: false,
+  });
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 mt-4">
       <div className="flex items-center justify-between mb-6">
@@ -68,8 +75,8 @@ export default function Category1Preview() {
         </motion.button>
       </div>
 
-      {/* MOBILE: Carousel fake */}
-      <div className="block md:hidden relative">
+      {/* MOBILE: Carousel fake com swipe */}
+      <div className="block md:hidden relative" {...swipeHandlers}>
         <div className="flex items-center justify-between">
           {/* Seta esquerda */}
           <button
@@ -114,8 +121,8 @@ export default function Category1Preview() {
           </div>
           {/* Seta direita */}
           <button
-            onClick={handlePrev}
-            disabled={mobileIndex === 0}
+            onClick={handleNext}
+            disabled={mobileIndex >= previewBabies.length - 2}
             className="p-2 rounded-full !bg-transparent text-[#7a4fcf] shadow-none"
             style={{ zIndex: 10, background: "transparent" }}
           >
