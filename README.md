@@ -73,4 +73,4 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 
 ---
 
-Desenvolvido com 💜 por [Ateliê Júlia Brandão](https://instagram.com/ateliejuliabrandao)
+Desenvolvido com 💜 para [Ateliê Júlia Brandão](https://instagram.com/ateliejuliabrandao)
