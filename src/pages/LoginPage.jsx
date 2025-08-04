@@ -16,7 +16,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const response = await fetch("https://atelie-juliabrandao-backend.railway.com/api/auth/login", {
+      const response = await fetch("https://atelie-juliabrandao-backend-production.up.railway.app/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, senha }),
