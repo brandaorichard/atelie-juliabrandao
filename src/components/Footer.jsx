@@ -70,7 +70,7 @@ export default function Footer({ logoVariant, scrolled, transition }) {
             <a
               href="https://tiktok.com/ateliejuliabrandao/"
               aria-label="tiktok"
-              className="text-3xl transition"
+              className="text-3xl transition mt-0.5"
             >
               <FaTiktok />
             </a>

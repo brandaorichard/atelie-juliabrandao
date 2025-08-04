@@ -55,7 +55,7 @@ export default function UserButton({ mobileFaixa = false }) {
         {/* Ícone de usuário */}
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          className="h-4 w-4 -mr-1.5"
+          className="h-4 w-4 -mr-1.5 sm:-mr-1"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -70,7 +70,7 @@ export default function UserButton({ mobileFaixa = false }) {
         </svg>
         {isLoggedIn ? (
           <>
-            <span className="font-medium -mr-2.5">{`Olá, ${
+            <span className="font-medium -mr-2.5 sm:mr-4">{`Olá, ${
               user?.nome?.split(" ")[0] || "Usuário"
             }`}</span>
             <svg
@@ -90,7 +90,9 @@ export default function UserButton({ mobileFaixa = false }) {
             </svg>
           </>
         ) : (
-          <span className="font-semibold -mr-2 text-gray-700">Entrar</span>
+          <span className="font-semibold -mr-2 sm:mr-4 text-gray-700">
+            Entrar
+          </span>
         )}
       </button>
       {isLoggedIn && open && (
