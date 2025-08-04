@@ -71,7 +71,6 @@ export default function RegisterPage() {
         <BreadcrumbItens
           items={[
             { label: "Início", to: "/" },
-            { label: "Minha Conta" },
             { label: "Cadastre-se" }
           ]}
         />

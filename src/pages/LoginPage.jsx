@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { login } from "../redux/authSlice";
+import { showToast } from "../redux/toastSlice";
 import BreadcrumbItens from "../components/BreadcrumbItens";
 
 export default function LoginPage() {
@@ -9,6 +12,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState("");
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -16,11 +20,14 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const response = await fetch("https://atelie-juliabrandao-backend-production.up.railway.app/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, senha }),
-      });
+      const response = await fetch(
+        "https://atelie-juliabrandao-backend-production.up.railway.app/api/auth/login",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, senha }),
+        }
+      );
 
       const data = await response.json();
 
@@ -30,13 +37,24 @@ export default function LoginPage() {
         return;
       }
 
-      // Salve o token e dados do usuário (exemplo: localStorage)
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify({ nome: data.nome, email: data.email, _id: data._id }));
+      // Dispara o login no Redux (isso já salva no localStorage pelo slice)
+      dispatch(
+        login({
+          user: { nome: data.nome, email: data.email, _id: data._id },
+          token: data.token,
+        })
+      );
+
+      // Toast de sucesso
+      dispatch(
+        showToast({
+          message: "Login realizado com sucesso!",
+          iconType: "success",
+        })
+      );
 
       // Redirecione para a home ou dashboard
       navigate("/");
-
     } catch (err) {
       setErro("Erro de conexão com o servidor");
     } finally {
@@ -48,11 +66,7 @@ export default function LoginPage() {
     <div className="min-h-[55vh] flex flex-col bg-[#f9e7f6]">
       <div className="w-full max-w-2xl mx-auto pt-5 px-4">
         <BreadcrumbItens
-          items={[
-            { label: "Início", to: "/" },
-            { label: "Minha Conta" },
-            { label: "Login" }
-          ]}
+          items={[{ label: "Início", to: "/" }, { label: "Login" }]}
         />
         <h1 className="text-3xl md:text-4xl font-light text-gray-800 mb-8 tracking-wide">
           Iniciar sessão
@@ -73,7 +87,7 @@ export default function LoginPage() {
             type="email"
             className="w-full p-3 border border-[#e5d3e9] rounded-2xl focus:outline-none focus:border-[#ae95d9] transition"
             value={email}
-            onChange={e => setEmail(e.target.value)}
+            onChange={(e) => setEmail(e.target.value)}
             required
             autoFocus
           />
@@ -84,32 +98,67 @@ export default function LoginPage() {
             type={showSenha ? "text" : "password"}
             className="w-full p-3 border border-[#e5d3e9] rounded-2xl focus:outline-none focus:border-[#ae95d9] transition pr-10"
             value={senha}
-            onChange={e => setSenha(e.target.value)}
+            onChange={(e) => setSenha(e.target.value)}
             required
           />
           <button
             type="button"
             className="absolute right-3 top-9 text-[#ae95d9] hover:text-[#7a4fcf] transition"
-            onClick={() => setShowSenha(s => !s)}
+            onClick={() => setShowSenha((s) => !s)}
             tabIndex={-1}
             aria-label={showSenha ? "Ocultar senha" : "Mostrar senha"}
           >
             {showSenha ? (
               // Olho cortado
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-5.523 0-10-4.477-10-10 0-1.657.336-3.236.938-4.675M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3l18 18" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13.875 18.825A10.05 10.05 0 0112 19c-5.523 0-10-4.477-10-10 0-1.657.336-3.236.938-4.675M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M3 3l18 18"
+                />
               </svg>
             ) : (
               // Olho aberto
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-.274.832-.67 1.613-1.17 2.318M15.54 15.54A5.978 5.978 0 0112 17c-1.657 0-3.156-.672-4.24-1.76" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-.274.832-.67 1.613-1.17 2.318M15.54 15.54A5.978 5.978 0 0112 17c-1.657 0-3.156-.672-4.24-1.76"
+                />
               </svg>
             )}
           </button>
           <div className="flex justify-end mt-2">
-            <Link to="/esqueci-senha" className="text-xs text-[#7a4fcf] hover:underline">
+            <Link
+              to="/esqueci-senha"
+              className="text-xs text-[#7a4fcf] hover:underline"
+            >
               Esqueceu a senha?
             </Link>
           </div>
@@ -123,7 +172,10 @@ export default function LoginPage() {
         </button>
         <div className="text-center mt-6 text-gray-800">
           Não possui uma conta ainda?{" "}
-          <Link to="/register" className="text-[#7a4fcf] hover:underline font-medium">
+          <Link
+            to="/register"
+            className="text-[#7a4fcf] hover:underline font-medium"
+          >
             Criar uma conta
           </Link>
         </div>

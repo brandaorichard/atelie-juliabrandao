@@ -23,8 +23,9 @@ export default function MobileHeader({
   const [cartOpen, setCartOpen] = useState(false);
 
   const cartCount = useSelector(
-  state => state.cart.items.reduce((sum, item) => sum + item.quantity, 0)
-);
+    state => state.cart.items.reduce((sum, item) => sum + item.quantity, 0)
+  );
+  const isLoggedIn = useSelector(state => state.auth.isLoggedIn);
 
   const handleLogoClick = () => {
     if (location.pathname === "/") {
@@ -39,19 +40,22 @@ export default function MobileHeader({
     <header className="fixed top-0 left-0 w-full z-50 bg-[#f9e7f6] md:hidden">
       {/* Faixa roxa só aparece se não estiver scrolled */}
       {!scrolled && (
-        <div className="h-[25px] bg-[#c5adee] w-full transition-all duration-300 flex items-center justify-center">
-          <span className="text-black text-[10px] font-extralight tracking-wide select-none">
+        <div className="h-[25px] bg-[#c5adee] w-full transition-all duration-300 flex items-center justify-end px-2">
+          {/* <span className="text-black text-[9px] font-extralight tracking-wide select-none whitespace-nowrap overflow-hidden text-ellipsis max-w-[70vw]">
             ✈️ ENVIAMOS PARA TODO O BRASIL E EXTERIOR! ✈️
-          </span>
+          </span> */}
+          {/* UserButton só logado no mobile, na faixa roxa */}
+          {isLoggedIn && (
+            <div className="md:hidden flex items-center">
+              <UserButton mobileFaixa />
+            </div>
+          )}
         </div>
       )}
-      <div
-        className="
-          max-w-[1246px] px-[20px] mx-auto flex items-center justify-between h-28 relative
-          border-b border-[#e5d3e9] shadow-[0_2px_8px_0_rgba(174,149,217,0.08)] bg-[#f9e7f6]
-        "
-      >
-        <div className="flex flex-1">
+
+      <div className="relative flex items-center h-28 border-b border-[#e5d3e9] shadow-[0_2px_8px_0_rgba(174,149,217,0.08)] bg-[#f9e7f6] px-[20px] max-w-[1246px] mx-auto">
+        {/* Menu hamburguer à esquerda */}
+        <div className="flex-1 flex items-center">
           {!menuOpen && (
             <button
               className="mr-2"
@@ -62,7 +66,12 @@ export default function MobileHeader({
             </button>
           )}
         </div>
-        <div className="flex-1 flex justify-center">
+
+        {/* Logo centralizada absolutamente */}
+        <div
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex justify-center items-center"
+          style={{ minWidth: 80, minHeight: 40 }}
+        >
           <div
             onClick={handleLogoClick}
             className="w-[150px] h-auto cursor-pointer"
@@ -72,7 +81,6 @@ export default function MobileHeader({
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === " ") handleLogoClick();
             }}
-            style={{ minWidth: 80, minHeight: 40 }}
           >
             <AnimatedLogo
               variants={logoVariant}
@@ -82,9 +90,11 @@ export default function MobileHeader({
             />
           </div>
         </div>
-        <div className="flex-1" />
-        <div className="absolute right-0 top-0 h-full flex items-center pr-6">
-          <UserButton />
+
+        {/* UserButton + CartButton à direita */}
+        <div className="flex-1 flex justify-end items-center gap-3 -pr-15">
+          {/* UserButton só aparece aqui se NÃO estiver logado */}
+          {!isLoggedIn && <UserButton />}
           <CartButton
             size={24}
             className="text-gray-700"
@@ -93,7 +103,9 @@ export default function MobileHeader({
           />
         </div>
       </div>
+
       <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
+
       <AnimatePresence>
         {menuOpen && (
           <motion.div

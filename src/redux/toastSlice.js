@@ -1,20 +1,24 @@
-// redux/toastSlice.js
-import { createSlice } from "@reduxjs/toolkit";
+const initialState = {
+  visible: false,
+  data: null, // { message, iconType }
+};
 
-const toastSlice = createSlice({
-  name: "toast",
-  initialState: { data: null, visible: false },
-  reducers: {
-    showToast(state, action) {
-      state.data = action.payload; // só dados, não JSX!
-      state.visible = true;
-    },
-    hideToast(state) {
-      state.visible = false;
-      state.data = null;
-    }
+export default function toastReducer(state = initialState, action) {
+  switch (action.type) {
+    case "toast/showToast":
+      return { visible: true, data: action.payload };
+    case "toast/hideToast":
+      return { visible: false, data: null };
+    default:
+      return state;
   }
+}
+
+export const showToast = (payload) => ({
+  type: "toast/showToast",
+  payload,
 });
 
-export const { showToast, hideToast } = toastSlice.actions;
-export default toastSlice.reducer;
+export const hideToast = () => ({
+  type: "toast/hideToast",
+});
