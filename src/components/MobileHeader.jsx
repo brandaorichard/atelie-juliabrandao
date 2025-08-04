@@ -8,6 +8,7 @@ import CartButton from "./CartButton";
 import CategoriesMenu from "./CategoriesMenu";
 import CartDrawer from "./CartDrawer";
 import { useSelector } from "react-redux";
+import UserButton from "./UserButton";
 
 export default function MobileHeader({
   menuOpen,
@@ -83,9 +84,10 @@ export default function MobileHeader({
         </div>
         <div className="flex-1" />
         <div className="absolute right-0 top-0 h-full flex items-center pr-6">
+          <UserButton />
           <CartButton
             size={24}
-            className="text-gray-500"
+            className="text-gray-700"
             onClick={() => setCartOpen(true)}
             badge={cartCount}
           />

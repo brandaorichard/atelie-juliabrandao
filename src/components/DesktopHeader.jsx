@@ -5,6 +5,7 @@ import CartButton from "./CartButton";
 import CategoriesMenu from "./CategoriesMenu";
 import CartDrawer from "./CartDrawer";
 import { useSelector } from "react-redux";
+import UserButton from "./UserButton";
 
 export default function DesktopHeader({
   scrolled,
@@ -75,6 +76,7 @@ export default function DesktopHeader({
           </nav>
           <div className="flex-1" />
           <div className="absolute right-0 top-0 h-full flex items-center pr-6">
+            <UserButton />
             <CartButton
               size={28}
               className="text-gray-700 cursor-pointer"

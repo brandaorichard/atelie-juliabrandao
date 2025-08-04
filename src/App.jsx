@@ -8,11 +8,12 @@ import ToastContainer from "./components/ToastContainer";
 import CartDrawer from "./components/CartDrawer";
 import Footer from "./components/Footer";
 
-// Importe as páginas
 import HomePage from "./pages/HomePage";
 import Category1Page from "./pages/Category1Page";
 import Category2Page from "./pages/Category2Page";
 import Category3Page from "./pages/Category3Page";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
 
 import "./index.css";
 
@@ -31,6 +32,8 @@ function App() {
         <Route path="/categoria2" element={<Category2Page />} />
         <Route path="/categoria3" element={<Category3Page />} />
         <Route path="/produto/:id" element={<ProductPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
       </Routes>
       <Footer />
       {/* Seção de redes sociais */}
