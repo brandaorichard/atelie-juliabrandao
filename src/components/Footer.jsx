@@ -14,7 +14,7 @@ export default function Footer({ logoVariant, scrolled, transition }) {
     <footer className="bg-[#f9e7f6] border-t border-[#e5d3e9] pt-8 pb-4 mt-12">
       <div className="max-w-6xl mx-auto px-4 flex flex-col gap-8 md:grid md:grid-cols-4 md:gap-8">
         {/* Contato */}
-        <div className="flex flex-col items-start md:ml-4 order-2">
+        <div className="flex flex-col items-start md:ml-4 order-1 md:order-2">
           <h2 className="text-base font-light text-[#616161] mb-3">
             Entre em contato
           </h2>
@@ -40,11 +40,11 @@ export default function Footer({ logoVariant, scrolled, transition }) {
           </div>
         </div>
         {/* Formas de pagamento */}
-        <div className="flex flex-col items-start md:items-center md:justify-start order-3">
+        <div className="flex flex-col items-start md:items-center md:justify-start order-3 md:ml-[-4]">
           <PaymentMethods />
         </div>
         {/* Redes sociais */}
-        <div className="flex flex-col items-start md:items-start gap-3 md:ml-32 order-1 md:order-3">
+        <div className="flex flex-col items-start md:items-start gap-3 md:ml-32 order-2 md:order-1">
           <span className="text-[#616161] text-base font-light mb-1">
             Redes sociais
           </span>
@@ -77,7 +77,7 @@ export default function Footer({ logoVariant, scrolled, transition }) {
           </div>
         </div>
         {/* Logo - apenas no desktop */}
-        <div className="hidden md:flex justify-center md:justify-start items-center md:ml-5 md:items-start mb-2 md:mb-0 opacity-90 order-1 md:order-4">
+        <div className="hidden md:flex justify-center md:justify-start items-center md:ml-18 md:items-start mb-2 md:mb-0 opacity-80 order-3 md:order-4">
           <AnimatedLogo
             variants={logoVariant}
             animate={scrolled ? "scrolled" : "initial"}
