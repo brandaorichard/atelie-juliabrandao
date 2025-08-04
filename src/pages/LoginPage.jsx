@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
 import BreadcrumbItens from "../components/BreadcrumbItens";
 
 export default function LoginPage() {
@@ -17,31 +16,29 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const response = await axios.post(
-        "https://atelie-juliabrandao-backend-production.up.railway.app/api/auth/login",
-        { email, senha },
-        {
-          headers: { "Content-Type": "application/json" },
-          // Se usar cookies/sessão, descomente a linha abaixo:
-          // withCredentials: true,
-        }
-      );
+      const response = await fetch("https://atelie-juliabrandao-backend-production.up.railway.app/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, senha }),
+      });
 
-      // Se chegou aqui, login foi OK
-      const data = response.data;
+      const data = await response.json();
+
+      if (!response.ok) {
+        setErro(data.message || "Erro ao fazer login");
+        setLoading(false);
+        return;
+      }
+
+      // Salve o token e dados do usuário (exemplo: localStorage)
       localStorage.setItem("token", data.token);
-      localStorage.setItem(
-        "user",
-        JSON.stringify({ nome: data.nome, email: data.email, _id: data._id })
-      );
+      localStorage.setItem("user", JSON.stringify({ nome: data.nome, email: data.email, _id: data._id }));
+
+      // Redirecione para a home ou dashboard
       navigate("/");
 
     } catch (err) {
-      if (err.response && err.response.data && err.response.data.message) {
-        setErro(err.response.data.message);
-      } else {
-        setErro("Erro de conexão com o servidor");
-      }
+      setErro("Erro de conexão com o servidor");
     } finally {
       setLoading(false);
     }
