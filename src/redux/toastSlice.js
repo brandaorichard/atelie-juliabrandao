@@ -1,6 +1,6 @@
 const initialState = {
   visible: false,
-  data: null, // { message, iconType }
+  data: null,
 };
 
 export default function toastReducer(state = initialState, action) {

@@ -7,7 +7,7 @@ export default function CartToast({ product, quantity, total, totalQuantity, onV
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5, type: "spring" }}
-      className="bg-[#f9e7f6] rounded-md "
+      className="bg-[#f9e7f6] rounded-md w-full"
     >
       <div className="flex items-start gap-3">
         <img

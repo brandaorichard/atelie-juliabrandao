@@ -2,7 +2,6 @@ import React from "react";
 import { useDispatch } from "react-redux";
 import { addToCart } from "../redux/cartSlice";
 import { showToast } from "../redux/toastSlice";
-import store from "../redux/store"; // Importa o store para acessar o estado atualizado
 
 export default function QuantityBuy({ product }) {
   const [quantity, setQuantity] = React.useState(1);
@@ -11,21 +10,14 @@ export default function QuantityBuy({ product }) {
   const handleBuy = () => {
     dispatch(addToCart({ product, quantity }));
 
-    // Aguarda o próximo ciclo de event loop para garantir o estado atualizado
-    setTimeout(() => {
-      const updatedItems = store.getState().cart.items;
-      const total = updatedItems.reduce(
-        (sum, item) => sum + item.price * item.quantity,
-        0
-      );
-
-      dispatch(
-        showToast({
-          product,
-          quantity,
-        })
-      );
-    }, 0);
+    dispatch(showToast({
+      product: {
+        name: product.name,
+        img: product.img,
+        price: product.price,
+      },
+      quantity,
+    }));
   };
 
   return (
