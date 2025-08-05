@@ -70,7 +70,7 @@ export default function UserButton({ mobileFaixa = false }) {
         </svg>
         {isLoggedIn ? (
           <>
-            <span className="font-medium -mr-2.5 sm:mr-4">{`Olá, ${
+            <span className="font-medium -mr-2.5">{`Olá, ${
               user?.nome?.split(" ")[0] || "Usuário"
             }`}</span>
             <svg
