@@ -39,6 +39,21 @@ export default function DesktopHeader({
   // Empilha ícones em coluna entre 768px e 930px
   const stackIcons = windowWidth < 930 && windowWidth >= 768;
 
+  // Calcula escala entre 930 e 768 px para as categorias
+  const getScale = () => {
+    if (windowWidth >= 950) return 1;
+    if (windowWidth <= 768) return 0.8;
+    return 0.8 + ((windowWidth - 768) / (950 - 768)) * 0.2;
+  };
+
+  const scale = getScale();
+
+  // Variants para AnimatedLogo com escala dinâmica e scroll
+  const logoVariants = {
+    initial: { scale: scale },
+    scrolled: { scale: scale * 0.7 },
+  };
+
   return (
     <header className="fixed top-0 left-0 w-full z-50 bg-[#f9e7f6] hidden md:block">
       {!scrolled && (
@@ -54,7 +69,7 @@ export default function DesktopHeader({
           style={{ height: headerHeight }}
         >
           {/* Logo à esquerda */}
-          <div className="flex-1 flex justify-start">
+          <div className="flex-1 flex justify-start origin-center">
             <div
               onClick={handleLogoClick}
               className="w-[220px] h-auto cursor-pointer"
@@ -66,7 +81,7 @@ export default function DesktopHeader({
               }}
             >
               <AnimatedLogo
-                variants={logoVariant}
+                variants={logoVariants}
                 animate={scrolled ? "scrolled" : "initial"}
                 transition={transition}
                 className="w-[220px] h-auto"
@@ -74,8 +89,11 @@ export default function DesktopHeader({
             </div>
           </div>
 
-          {/* Categorias centralizadas */}
-          <nav className="flex-1 flex justify-center gap-8 text-large">
+          {/* Categorias centralizadas com escala */}
+          <nav
+            className="flex-1 flex justify-center gap-8 text-large origin-center"
+            style={{ transform: `scale(${scale})` }}
+          >
             <CategoriesMenu
               categories={categories}
               onCategoryClick={(idx) => {
