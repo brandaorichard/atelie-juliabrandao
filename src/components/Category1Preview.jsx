@@ -6,10 +6,23 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { useSwipeable } from "react-swipeable";
 
+function useWindowWidth() {
+  const [width, setWidth] = useState(window.innerWidth);
+  useEffect(() => {
+    const handleResize = () => setWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+  return width;
+}
+
 export default function Category1Preview() {
   const navigate = useNavigate();
-  const previewBabies = babies.slice(0, 8); // pelo menos 6 cards para o mobile
+  const previewBabies = babies.slice(0, 8); // pelo menos 8 cards para o mobile
   const [mobileIndex, setMobileIndex] = useState(0);
+
+  const width = useWindowWidth();
+  const isBetween768And1000 = width >= 768 && width <= 1100;
 
   // Detecta mobile
   const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
@@ -61,7 +74,7 @@ export default function Category1Preview() {
   });
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 mt-4">
+    <div className="max-w-6xl mx-auto px-4 mt-10 sm:px-6 lg:px-8">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-light text-black">Por Encomenda</h2>
         <motion.button
@@ -132,9 +145,16 @@ export default function Category1Preview() {
       </div>
 
       {/* DESKTOP: Grid */}
-      <div className="hidden md:grid grid-cols-2 gap-4 md:gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+      <div
+        className="hidden md:grid gap-6"
+        style={{
+          gridTemplateColumns: isBetween768And1000
+            ? "repeat(auto-fit, minmax(220px, 1fr))"
+            : "repeat(5, minmax(0, 1fr))",
+        }}
+      >
         {previewBabies.slice(0, 5).map((baby) => (
-          <div key={baby.id} className="w-[220px]">
+          <div key={baby.id} className="w-full">
             <RebornCard
               baby={baby}
               onClick={() => navigate(`/produto/${baby.id}`)}
