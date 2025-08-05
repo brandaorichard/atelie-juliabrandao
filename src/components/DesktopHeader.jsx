@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AnimatedLogo from "./AnimatedLogo";
 import CartButton from "./CartButton";
@@ -16,10 +16,17 @@ export default function DesktopHeader({
 }) {
   const navigate = useNavigate();
   const [cartOpen, setCartOpen] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const cartCount = useSelector(
-  state => state.cart.items.reduce((sum, item) => sum + item.quantity, 0)
-);
+    (state) => state.cart.items.reduce((sum, item) => sum + item.quantity, 0)
+  );
 
   const handleLogoClick = () => {
     if (window.location.pathname === "/") {
@@ -29,22 +36,24 @@ export default function DesktopHeader({
     }
   };
 
+  // Empilha ícones em coluna entre 768px e 930px
+  const stackIcons = windowWidth < 930 && windowWidth >= 768;
+
   return (
     <header className="fixed top-0 left-0 w-full z-50 bg-[#f9e7f6] hidden md:block">
-      {/* Faixa roxa só aparece se não estiver scrolled */}
       {!scrolled && (
         <div className="h-[30px] bg-[#ae95d9] w-full transition-all duration-300 flex items-center justify-center">
-          <span className="text-black text-[10px] font-light tracking-wide select-none">
+          <span className="text-black text-[12px] font-light tracking-wide select-none">
             ✈️ ENVIAMOS PARA TODO O BRASIL E EXTERIOR! ✈️
           </span>
         </div>
       )}
-      {/* Borda e sombra ocupando 100% da tela */}
       <div className="w-full border-b border-[#e5d3e9] shadow-[0_2px_8px_0_rgba(174,149,217,0.08)] bg-[#f9e7f6]">
         <div
-          className="max-w-[1246px] px-[35px] mx-auto flex items-center justify-between transition-all duration-300 relative"
+          className="flex items-center justify-between max-w-[1246px] mx-auto px-[35px] transition-all duration-300"
           style={{ height: headerHeight }}
         >
+          {/* Logo à esquerda */}
           <div className="flex-1 flex justify-start">
             <div
               onClick={handleLogoClick}
@@ -64,6 +73,8 @@ export default function DesktopHeader({
               />
             </div>
           </div>
+
+          {/* Categorias centralizadas */}
           <nav className="flex-1 flex justify-center gap-8 text-large">
             <CategoriesMenu
               categories={categories}
@@ -74,8 +85,13 @@ export default function DesktopHeader({
               }}
             />
           </nav>
-          <div className="flex-1" />
-          <div className="absolute right-0 top-0 h-full flex items-center pr-6">
+
+          {/* Ícones à direita */}
+          <div
+            className={`flex-1 flex justify-end items-center pr-6 ${
+              stackIcons ? "flex-col gap-2" : "flex-row gap-4"
+            }`}
+          >
             <UserButton />
             <CartButton
               size={28}
