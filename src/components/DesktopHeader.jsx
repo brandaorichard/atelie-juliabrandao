@@ -11,7 +11,7 @@ export default function DesktopHeader({
   scrolled,
   logoVariant,
   transition,
-  headerHeight,
+  headerHeight = 160, // valor padrão caso não receba prop
   categories,
 }) {
   const navigate = useNavigate();
@@ -39,11 +39,12 @@ export default function DesktopHeader({
   // Empilha ícones em coluna entre 768px e 930px
   const stackIcons = windowWidth < 930 && windowWidth >= 768;
 
-  // Calcula escala entre 930 e 768 px para as categorias
+  // Calcula escala entre 930 e 768 px para as categorias e logo
   const getScale = () => {
-    if (windowWidth >= 950) return 1;
-    if (windowWidth <= 768) return 0.8;
-    return 0.8 + ((windowWidth - 768) / (950 - 768)) * 0.2;
+    if (windowWidth >= 950) return scrolled ? 0.8 : 1;
+    if (windowWidth <= 768) return scrolled ? 0.64 : 0.8; // 0.8 * 0.8 = 0.64
+    const baseScale = 0.8 + ((windowWidth - 768) / (950 - 768)) * 0.2;
+    return scrolled ? baseScale * 0.8 : baseScale;
   };
 
   const scale = getScale();
@@ -53,6 +54,9 @@ export default function DesktopHeader({
     initial: { scale: scale },
     scrolled: { scale: scale * 0.7 },
   };
+
+  // Ajusta a altura do header em 20% quando scrolled
+  const adjustedHeaderHeight = scrolled ? headerHeight * 0.8 : headerHeight;
 
   return (
     <header className="fixed top-0 left-0 w-full z-50 bg-[#f9e7f6] hidden md:block">
@@ -66,7 +70,7 @@ export default function DesktopHeader({
       <div className="w-full border-b border-[#e5d3e9] shadow-[0_2px_8px_0_rgba(174,149,217,0.08)] bg-[#f9e7f6]">
         <div
           className="flex items-center justify-between max-w-[1246px] mx-auto px-[35px] transition-all duration-300"
-          style={{ height: headerHeight }}
+          style={{ height: adjustedHeaderHeight }}
         >
           {/* Logo à esquerda */}
           <div className="flex-1 flex justify-start origin-center">
