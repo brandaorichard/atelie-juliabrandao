@@ -22,10 +22,10 @@ export default function MobileHeader({
   const location = useLocation();
   const [cartOpen, setCartOpen] = useState(false);
 
-  const cartCount = useSelector(
-    state => state.cart.items.reduce((sum, item) => sum + item.quantity, 0)
+  const cartCount = useSelector((state) =>
+    state.cart.items.reduce((sum, item) => sum + item.quantity, 0)
   );
-  const isLoggedIn = useSelector(state => state.auth.isLoggedIn);
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
 
   const handleLogoClick = () => {
     if (location.pathname === "/") {
@@ -40,16 +40,10 @@ export default function MobileHeader({
     <header className="fixed top-0 left-0 w-full z-50 bg-[#f9e7f6] md:hidden">
       {/* Faixa roxa só aparece se não estiver scrolled */}
       {!scrolled && (
-        <div className="h-[30px] bg-[#c5adee] w-full transition-all duration-300 flex items-center justify-end px-2">
-          {/* <span className="text-black text-[9px] font-extralight tracking-wide select-none whitespace-nowrap overflow-hidden text-ellipsis max-w-[70vw]">
+        <div className="h-[30px] bg-[#c5adee] w-full transition-all duration-300 flex items-center justify-center px-2">
+          <span className="text-black text-[12px] font-extralight">
             ✈️ ENVIAMOS PARA TODO O BRASIL E EXTERIOR! ✈️
-          </span> */}
-          {/* UserButton só logado no mobile, na faixa roxa */}
-          {isLoggedIn && (
-            <div className="md:hidden flex items-center">
-              <UserButton mobileFaixa />
-            </div>
-          )}
+          </span>
         </div>
       )}
 
@@ -92,15 +86,32 @@ export default function MobileHeader({
         </div>
 
         {/* UserButton + CartButton à direita */}
-        <div className="flex-1 flex justify-end items-center gap-3 -pr-15">
-          {/* UserButton só aparece aqui se NÃO estiver logado */}
-          {!isLoggedIn && <UserButton />}
-          <CartButton
-            size={24}
-            className="text-gray-700"
-            onClick={() => setCartOpen(true)}
-            badge={cartCount}
-          />
+        <div
+          className={`flex-1 flex justify-end items-center gap-1.5 mt-2 ${
+            isLoggedIn ? "flex-col items-center -mr-15" : "flex-row"
+          }`}
+        >
+          {isLoggedIn ? (
+            <>
+              <CartButton
+                size={24}
+                className="text-gray-700"
+                onClick={() => setCartOpen(true)}
+                badge={cartCount}
+              />
+              <UserButton />
+            </>
+          ) : (
+            <>
+              <UserButton />
+              <CartButton
+                size={24}
+                className="text-gray-700"
+                onClick={() => setCartOpen(true)}
+                badge={cartCount}
+              />
+            </>
+          )}
         </div>
       </div>
 
@@ -139,7 +150,7 @@ export default function MobileHeader({
             <CategoriesMenu
               categories={categories}
               animated
-              onCategoryClick={idx => {
+              onCategoryClick={(idx) => {
                 if (idx === 0) navigate("/categoria1");
                 if (idx === 1) navigate("/categoria2");
                 if (idx === 2) navigate("/categoria3");
