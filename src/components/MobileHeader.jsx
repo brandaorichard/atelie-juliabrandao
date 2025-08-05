@@ -85,33 +85,19 @@ export default function MobileHeader({
           </div>
         </div>
 
-        {/* UserButton + CartButton à direita */}
+        {/* UserButton + CartButton à direita em coluna */}
         <div
-          className={`flex-1 flex justify-end items-center gap-1.5 mt-2 ${
-            isLoggedIn ? "flex-col items-center -mr-15" : "flex-row"
+          className={`flex flex-col items-center gap-2 mt-2 w-[80px] justify-end ${
+            isLoggedIn ? "-mr-0" : ""
           }`}
         >
-          {isLoggedIn ? (
-            <>
-              <CartButton
-                size={24}
-                className="text-gray-700"
-                onClick={() => setCartOpen(true)}
-                badge={cartCount}
-              />
-              <UserButton />
-            </>
-          ) : (
-            <>
-              <UserButton />
-              <CartButton
-                size={24}
-                className="text-gray-700"
-                onClick={() => setCartOpen(true)}
-                badge={cartCount}
-              />
-            </>
-          )}
+          <CartButton
+            size={24}
+            className="text-gray-700"
+            onClick={() => setCartOpen(true)}
+            badge={cartCount}
+          />
+          <UserButton />
         </div>
       </div>
 

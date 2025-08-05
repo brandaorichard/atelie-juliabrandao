@@ -84,7 +84,7 @@ export default function UserButton({ mobileFaixa = false }) {
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                strokeWidth={2}
+                strokeWidth={5}
                 d="M19 9l-7 7-7-7"
               />
             </svg>
