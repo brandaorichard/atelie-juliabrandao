@@ -17,6 +17,8 @@ import RegisterPage from "./pages/RegisterPage";
 
 import "./index.css";
 
+import ConfirmEmailPage from "./pages/ConfirmEmailPage"; // importe o componente
+
 function App() {
   const [cartOpen, setCartOpen] = React.useState(false);
 
@@ -34,9 +36,10 @@ function App() {
         <Route path="/produto/:id" element={<ProductPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        {/* Rota para confirmação de email */}
+        <Route path="/confirm-email/:token" element={<ConfirmEmailPage />} />
       </Routes>
       <Footer />
-      {/* Seção de redes sociais */}
       <SocialMediasSection />
     </BrowserRouter>
   );
