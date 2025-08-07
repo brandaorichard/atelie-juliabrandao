@@ -15,6 +15,8 @@ import Category3Page from "./pages/Category3Page";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import ConfirmEmailInstructionPage from "./pages/ConfirmEmailInstructionPage";
+import OrdersPage from "./pages/OrdersPage";
+import MinhaContaPage from "./pages/MinhaContaPage";
 
 import "./index.css";
 
@@ -40,6 +42,8 @@ function App() {
         {/* Rota para confirmação de email */}
         <Route path="/confirm-email/:token" element={<ConfirmEmailPage />} />
         <Route path="/confirm-email" element={<ConfirmEmailInstructionPage />} />
+        <Route path="/meus-pedidos" element={<OrdersPage />} />
+        <Route path="/minha-conta" element={<MinhaContaPage />} />
       </Routes>
       <Footer />
       <SocialMediasSection />
