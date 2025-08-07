@@ -29,7 +29,7 @@ export default function ConfirmEmailPage() {
           }));
           setTimeout(() => {
             navigate("/login");
-          }, 5000);
+          }, 10000);
         } else {
           setStatus("error");
           setMessage(data.message || "Erro ao confirmar email.");
