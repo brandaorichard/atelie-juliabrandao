@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import BreadcrumbItens from "../components/BreadcrumbItens";
+import { useDispatch } from "react-redux";
+import { showToast } from "../redux/toastSlice";
 
 export default function ConfirmEmailPage() {
   const { token } = useParams();
