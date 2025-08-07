@@ -45,19 +45,9 @@ export default function RegisterPage() {
         return;
       }
 
-      // Salve o token e dados do usuário
-      localStorage.setItem("token", data.token);
-      localStorage.setItem(
-        "user",
-        JSON.stringify({
-          nome: data.nome,
-          email: data.email,
-          _id: data._id,
-        })
-      );
-
-      // Redirecione para a home ou dashboard
-      navigate("/");
+      // Não salvar token e dados do usuário ainda, pois precisa confirmar email
+      // Redireciona para a página de confirmação de email
+      navigate("/confirm-email");
     } catch (err) {
       setErro("Erro de conexão com o servidor");
     } finally {
@@ -140,13 +130,11 @@ export default function RegisterPage() {
             aria-label={showSenha ? "Ocultar senha" : "Mostrar senha"}
           >
             {showSenha ? (
-              // Olho cortado
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-5.523 0-10-4.477-10-10 0-1.657.336-3.236.938-4.675M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3l18 18" />
               </svg>
             ) : (
-              // Olho aberto
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-.274.832-.67 1.613-1.17 2.318M15.54 15.54A5.978 5.978 0 0112 17c-1.657 0-3.156-.672-4.24-1.76" />
@@ -171,13 +159,11 @@ export default function RegisterPage() {
             aria-label={showConfirmarSenha ? "Ocultar senha" : "Mostrar senha"}
           >
             {showConfirmarSenha ? (
-              // Olho cortado
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-5.523 0-10-4.477-10-10 0-1.657.336-3.236.938-4.675M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3l18 18" />
               </svg>
             ) : (
-              // Olho aberto
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-.274.832-.67 1.613-1.17 2.318M15.54 15.54A5.978 5.978 0 0112 17c-1.657 0-3.156-.672-4.24-1.76" />
@@ -185,12 +171,6 @@ export default function RegisterPage() {
             )}
           </button>
         </div>
-        {/* Simulação do reCAPTCHA */}
-        {/* <div className="mb-6 flex justify-center">
-          <div className="bg-white border border-[#e5d3e9] rounded-lg p-4 w-full max-w-xs flex items-center justify-center">
-            <span className="text-gray-500 text-sm">[reCAPTCHA aqui]</span>
-          </div>
-        </div> */}
         <button
           type="submit"
           className="w-full mt-5 py-3 rounded-full bg-[#ae95d9] text-white text-lg font-base hover:bg-[#7a4fcf] transition disabled:opacity-60"

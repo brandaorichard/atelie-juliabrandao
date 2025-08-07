@@ -5,7 +5,8 @@ import BreadcrumbItens from "../components/BreadcrumbItens";
 export default function ConfirmEmailPage() {
   const { token } = useParams();
   const navigate = useNavigate();
-  const [status, setStatus] = useState("loading"); // loading, success, error
+  const dispatch = useDispatch();
+  const [status, setStatus] = useState("loading");
   const [message, setMessage] = useState("");
 
   useEffect(() => {
@@ -20,21 +21,33 @@ export default function ConfirmEmailPage() {
         if (response.ok) {
           setStatus("success");
           setMessage(data.message || "Email confirmado com sucesso!");
+          dispatch(showToast({
+            message: "Email confirmado com sucesso! Faça login para continuar.",
+            iconType: "success"
+          }));
           setTimeout(() => {
             navigate("/login");
           }, 5000);
         } else {
           setStatus("error");
           setMessage(data.message || "Erro ao confirmar email.");
+          dispatch(showToast({
+            message: data.message || "Erro ao confirmar email.",
+            iconType: "logout"
+          }));
         }
       } catch (error) {
         setStatus("error");
         setMessage("Erro de conexão com o servidor.");
+        dispatch(showToast({
+          message: "Erro de conexão com o servidor.",
+          iconType: "logout"
+        }));
       }
     }
 
     confirmEmail();
-  }, [token, navigate]);
+  }, [token, navigate, dispatch]);
 
   return (
     <div className="min-h-[55vh] flex flex-col bg-[#f9e7f6]">
