@@ -12,7 +12,7 @@ export default function ConfirmEmailPage() {
   useEffect(() => {
     async function confirmEmail() {
       try {
-        const response = await fetch(`https://atelie-juliabrandao-backend-production.up.railway.app/api/auth/confirm/${token}`, {
+        const response = await fetch(`https://atelie-juliabrandao-backend-production.up.railway.app/api/auth/confirm-email/${token}`, {
           method: "GET",
         });
 
