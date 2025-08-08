@@ -71,11 +71,10 @@ import {
 const babies = [
   {
     id: 1,
+    slug: "kit-quinlynn",
     name: "Bebê Reborn Kit Quinlynn",
-    price: 2199.99,
-    discount: "-8%",
-    // oldPrice: 2399.99,
-    installment: "4x de R$550,00 sem juros",
+    price: 2399.99,
+    installment: "4x de R$600,00 sem juros",
     img: imgBaby1,
     images: [imgBaby1, imgBaby2, imgBaby3, imgBaby4],
     description: "Uma linda bebê, feita a partir do Kit Quinlynn versão menina ou menino por encomenda.",
@@ -92,6 +91,7 @@ const babies = [
   },
   {
     id: 2,
+    slug: "kit-raven",
     name: "Bebê Reborn Kit Raven",
     price: 2499.99,
     installment: "4x de R$620,00 sem juros",
@@ -110,6 +110,7 @@ const babies = [
   },
   {
     id: 3,
+    slug: "kit-sandie",
     name: "Bebê Reborn Kit Sandie (Toddler)",
     price: 3399.99,
     installment: "4x de R$850,00 sem juros",
@@ -131,6 +132,7 @@ const babies = [
   },
   {
     id: 4,
+    slug: "kit-isabela",
     name: "Bebê reborn Kit Isabela",
     price: 2699.99,
     installment: "4x de R$675,00 sem juros",
@@ -149,6 +151,7 @@ const babies = [
   },
   {
     id: 5,
+    slug: "kit-avelee",
     name: "Bebê reborn Kit Avelee",
     price: 2399.99,
     installment: "4x de R$600,00 sem juros",
@@ -167,6 +170,7 @@ const babies = [
   },
   {
     id: 6,
+    slug: "kit-delilah",
     name: "Bebê Reborn Kit Delilah",
     price: 2399.99,
     installment: "4x de R$600,00 sem juros",
@@ -188,6 +192,7 @@ const babies = [
   },
   {
     id: 7,
+    slug: "kit-laura",
     name: "Bebê Reborn kit Laura",
     price: 2399.99,
     installment: "4x de R$600,00 sem juros",
@@ -210,6 +215,7 @@ const babies = [
   },
   {
     id: 8,
+    slug: "kit-kylin",
     name: "Bebê reborn kit Kylin",
     price: 2499.99,
     installment: "4x de R$625,00 sem juros",

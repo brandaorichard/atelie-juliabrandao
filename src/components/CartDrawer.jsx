@@ -1,10 +1,12 @@
 import { AnimatePresence, motion } from "framer-motion";
 import React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { removeFromCart, setQuantity } from "../redux/cartSlice";
+import { removeFromCart, setQuantity, clearCart } from "../redux/cartSlice";
+import { showToast } from "../redux/toastSlice";
 
 export default function CartDrawer({ open, onClose }) {
   const items = useSelector((state) => state.cart.items);
+  const token = useSelector((state) => state.auth.token);
   const dispatch = useDispatch();
 
   // Remove uma unidade ou o item inteiro se só houver uma
@@ -19,34 +21,99 @@ export default function CartDrawer({ open, onClose }) {
   const handleQuantity = (id, quantity) =>
     dispatch(setQuantity({ id, quantity }));
 
-  // Função para abrir o WhatsApp com o resumo do pedido
-  function handleWhatsAppCheckout() {
-    const phone = 5567992654151; // Seu número com DDI e DDD
-    const itemsText = items
-      .map(
-        (item) =>
-          `• Modelo: ${
-            item.name
-          }\n  Valor unitário: R$${item.price.toLocaleString("pt-BR", {
-            minimumFractionDigits: 2,
-          })}\n  Quantidade: ${item.quantity}\n  Subtotal: R$${(
-            item.price * item.quantity
-          ).toLocaleString("pt-BR", {
-            minimumFractionDigits: 2,
-          })}`
-      )
-      .join("\n\n");
-    const total = items.reduce(
-      (sum, item) => sum + item.price * item.quantity,
-      0
-    );
-    const message = encodeURIComponent(
-      `Olá! Estou interessado(a) em finalizar minha compra pelo site Atelie Júlia Brandão:\n\n${itemsText}\n\nTotal do pedido: R$${total.toLocaleString(
-        "pt-BR",
-        { minimumFractionDigits: 2 }
-      )}\n\nAguardo as instruções para pagamento e envio.`
-    );
-    window.open(`https://wa.me/${phone}?text=${message}`, "_blank");
+  // Função para criar pedido e abrir WhatsApp
+  async function handleCreateOrderAndCheckout() {
+    if (!token) {
+      dispatch(
+        showToast({
+          type: "error",
+          message: "Você precisa estar logado para finalizar a compra.",
+        })
+      );
+      return;
+    }
+
+    if (items.length === 0) {
+      dispatch(
+        showToast({
+          type: "error",
+          message: "Seu carrinho está vazio.",
+        })
+      );
+      return;
+    }
+
+    const orderPayload = {
+      items: items.map(({ id, slug, quantity, price }) => ({
+        slug, // ou id, conforme backend
+        quantity,
+        price,
+      })),
+      total: items.reduce((sum, item) => sum + item.price * item.quantity, 0),
+      paymentMethod: "WhatsApp",
+      deliveryAddress: "Endereço padrão ou coletar do usuário", // ajuste conforme seu fluxo
+    };
+
+    try {
+      const response = await fetch("http://localhost:4000/api/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(orderPayload),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        dispatch(
+          showToast({
+            type: "error",
+            message: errorData.message || "Erro ao criar pedido.",
+          })
+        );
+        return;
+      }
+
+      // Pedido criado com sucesso, limpar carrinho
+      dispatch(clearCart());
+
+      // abrir WhatsApp
+      const phone = 5567992654151;
+      const itemsText = items
+        .map(
+          (item) =>
+            `• Modelo: ${item.name}\n  Valor unitário: R$${item.price.toLocaleString(
+              "pt-BR",
+              {
+                minimumFractionDigits: 2,
+              }
+            )}\n  Quantidade: ${item.quantity}\n  Subtotal: R$${(
+              item.price * item.quantity
+            ).toLocaleString("pt-BR", {
+              minimumFractionDigits: 2,
+            })}`
+        )
+        .join("\n\n");
+      const total = items.reduce(
+        (sum, item) => sum + item.price * item.quantity,
+        0
+      );
+      const message = encodeURIComponent(
+        `Olá! Estou interessado(a) em finalizar minha compra pelo site Atelie Júlia Brandão:\n\n${itemsText}\n\nTotal do pedido: R$${total.toLocaleString(
+          "pt-BR",
+          { minimumFractionDigits: 2 }
+        )}\n\nAguardo as instruções para pagamento e envio.`
+      );
+      window.open(`https://wa.me/${phone}?text=${message}`, "_blank");
+    } catch (error) {
+      dispatch(
+        showToast({
+          type: "error",
+          message: "Erro ao conectar com o servidor.",
+        })
+      );
+    }
   }
 
   return (
@@ -204,7 +271,7 @@ export default function CartDrawer({ open, onClose }) {
                     </div>
                     <button
                       className="w-full bg-[#7a4fcf] hover:bg-[#ae95d9] text-white rounded-full py-3 font-medium transition"
-                      onClick={handleWhatsAppCheckout}
+                      onClick={handleCreateOrderAndCheckout}
                     >
                       Iniciar Compra
                     </button>

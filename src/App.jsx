@@ -17,6 +17,7 @@ import RegisterPage from "./pages/RegisterPage";
 import ConfirmEmailInstructionPage from "./pages/ConfirmEmailInstructionPage";
 import OrdersPage from "./pages/OrdersPage";
 import MinhaContaPage from "./pages/MinhaContaPage";
+import OrderDetailPage from "./pages/OrderDetailPage";
 
 import "./index.css";
 
@@ -44,6 +45,7 @@ function App() {
         <Route path="/confirm-email" element={<ConfirmEmailInstructionPage />} />
         <Route path="/meus-pedidos" element={<OrdersPage />} />
         <Route path="/minha-conta" element={<MinhaContaPage />} />
+        <Route path="/pedido/:id" element={<OrderDetailPage />} />
       </Routes>
       <Footer />
       <SocialMediasSection />
