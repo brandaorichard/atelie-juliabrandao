@@ -24,7 +24,7 @@ export default function OrderDetailPage() {
 
     async function fetchOrder() {
       try {
-        const res = await fetch(`http://localhost:4000/api/orders/${id}`, {
+        const res = await fetch(`https://atelie-juliabrandao-backend-production.up.railway.app/api/orders/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
