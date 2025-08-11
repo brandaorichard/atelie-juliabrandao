@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import React from "react";
 
 export default function CartToast({ product, quantity, total, totalQuantity, onViewCart }) {
   return (
@@ -10,11 +11,6 @@ export default function CartToast({ product, quantity, total, totalQuantity, onV
       className="bg-[#f9e7f6] rounded-md w-full"
     >
       <div className="flex items-start gap-3">
-        <img
-          src={product.img}
-          alt={product.name}
-          className="w-14 h-16 rounded object-cover"
-        />
         <div>
           <div className="font-medium">{product.name}</div>
           <div className="text-sm text-gray-600">
