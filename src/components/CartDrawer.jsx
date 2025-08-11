@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { removeFromCart, setQuantity, clearCart } from "../redux/cartSlice";
 import { showToast } from "../redux/toastSlice";
-import { setFreteSelecionado } from "../redux/freteSlice";
+import { setFreteSelecionado, setCep, setFretes } from "../redux/freteSlice";
 import { FaExclamationTriangle } from "react-icons/fa";
 
 export default function CartDrawer({ open, onClose }) {
@@ -13,8 +13,8 @@ export default function CartDrawer({ open, onClose }) {
 
   // Estado global do frete
   const cep = useSelector(state => state.frete.cep);
+  const fretes = useSelector(state => state.frete.fretes); // array de opções
   const freteSelecionado = useSelector(state => state.frete.freteSelecionado);
-  const fretes = useSelector(state => state.frete.fretes);
 
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
@@ -22,11 +22,18 @@ export default function CartDrawer({ open, onClose }) {
   const [images, setImages] = useState({}); // { slug: url }
   const [enderecos, setEnderecos] = useState({}); // { cep: endereco }
 
-  // Estado local para CEP digitado no carrinho (independente do Redux)
-  const [cepInput, setCepInput] = useState("");
-  const [fretesLocal, setFretesLocal] = useState([]);
+  // Estado local para CEP digitado no carrinho (sincronizado com Redux)
+  const [cepInput, setCepInput] = useState(cep || "");
   const [loadingFrete, setLoadingFrete] = useState(false);
   const [erroFrete, setErroFrete] = useState("");
+
+  // Sincroniza input local com Redux ao abrir o drawer ou mudar o cep global
+  useEffect(() => {
+    setCepInput(cep || "");
+  }, [cep, open]);
+
+  // Usa sempre as opções globais do Redux
+  const opcoesFrete = fretes && fretes.length > 0 ? fretes : [];
 
   // Buscar imagens dos produtos do carrinho pelo slug
   useEffect(() => {
@@ -95,7 +102,7 @@ export default function CartDrawer({ open, onClose }) {
     dispatch(showToast({
       type: "cart",
       data: {
-        product: { ...item, img: images[item.slug] }, // <-- aqui está o segredo!
+        product: { ...item, img: images[item.slug] },
         quantity: item.quantity,
         total: subtotal,
         totalQuantity: items.reduce((sum, i) => sum + i.quantity, 0),
@@ -123,9 +130,8 @@ export default function CartDrawer({ open, onClose }) {
     }
     setLoadingFrete(true);
     setErroFrete("");
-    setFretesLocal([]);
     try {
-      const res = await fetch("http://localhost:4000/api/frete/calcular", {
+      const res = await fetch("https://atelie-juliabrandao-backend-production.up.railway.app/api/frete/calcular", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -143,12 +149,25 @@ export default function CartDrawer({ open, onClose }) {
           company: s.company?.name,
           logo: s.company?.picture,
         }));
-      setFretesLocal(services);
+      dispatch(setFretes(services));
+      dispatch(setCep(cepInput));
       if (services.length === 0) setErroFrete("Nenhuma opção de frete encontrada para este CEP.");
     } catch (err) {
       setErroFrete("Não foi possível calcular o frete. Verifique o CEP.");
     } finally {
       setLoadingFrete(false);
+    }
+  }
+
+  // Ao trocar o CEP, limpa endereço, opções e seleção de frete
+  function handleCepInputChange(e) {
+    const value = e.target.value.replace(/\D/g, "").slice(0, 8);
+    setCepInput(value);
+    if (value.length < 8) {
+      dispatch(setCep(""));
+      dispatch(setFretes([]));
+      dispatch(setFreteSelecionado(null));
+      setEnderecos(prev => ({ ...prev, [cep]: undefined }));
     }
   }
 
@@ -395,16 +414,7 @@ export default function CartDrawer({ open, onClose }) {
                         type="text"
                         placeholder="Digite seu CEP"
                         value={cepInput}
-                        onChange={e => {
-                          const value = e.target.value.replace(/\D/g, "").slice(0, 8);
-                          setCepInput(value);
-                          // Limpa endereço e frete selecionado se o usuário apagar o CEP
-                          if (value.length < 8) {
-                            setEnderecos(prev => ({ ...prev, [cepInput]: undefined }));
-                            setFretesLocal([]);
-                            dispatch(setFreteSelecionado(null));
-                          }
-                        }}
+                        onChange={handleCepInputChange}
                         className="border border-[#616161] rounded-3xl px-3 py-2 w-32"
                       />
                       <button
@@ -422,9 +432,9 @@ export default function CartDrawer({ open, onClose }) {
                     {erroFrete && <div className="text-red-500 mb-2">{erroFrete}</div>}
 
                     {/* Opções de frete */}
-                    {fretesLocal.length > 0 && (
+                    {opcoesFrete.length > 0 && (
                       <div className="space-y-2 mb-2">
-                        {fretesLocal.map(frete => (
+                        {opcoesFrete.map(frete => (
                           <label key={frete.name} className="flex items-center gap-2 cursor-pointer">
                             <input
                               type="radio"
@@ -515,7 +525,7 @@ export default function CartDrawer({ open, onClose }) {
                       onClick={handleCreateOrderAndCheckout}
                       disabled={!freteSelecionado}
                     >
-                      Iniciar Compra
+                      Iniciar Compra PROD
                     </button>
                   </div>
                 </>
