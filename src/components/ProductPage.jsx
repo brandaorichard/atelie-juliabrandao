@@ -27,7 +27,7 @@ export default function ProductPage() {
   useEffect(() => {
     async function fetchBaby() {
       try {
-        const res = await fetch(`http://localhost:4000/api/babies/slug/${slug}`);
+        const res = await fetch(`https://atelie-juliabrandao-backend-production.up.railway.app/api/babies/slug/${slug}`);
         if (!res.ok) throw new Error("Bebê não encontrado");
         const data = await res.json();
         setBaby(data);
