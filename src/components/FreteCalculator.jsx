@@ -18,7 +18,7 @@ export default function FreteCalculator({ items }) {
     setErro("");
     setFretes([]);
     try {
-      const res = await axios.post("http://localhost:4000/api/frete/calcular", {
+      const res = await axios.post("https://atelie-juliabrandao-backend-production.up.railway.app/api/frete/calcular", {
         cepDestino: cep,
         items,
       });
