@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import babies from "../mocks/babiesMock";
+// import babies from "../mocks/babiesMock"; // Remover import do mock
 import SortDrawer from "./SortDrawer";
 import FilterDrawer from "./FilterDrawer";
 import RebornSection from "./RebornSection";
@@ -36,7 +36,28 @@ export default function RebornCardsSection() {
   const [maxValue, setMaxValue] = useState("");
   const [showWarning, setShowWarning] = useState(false);
 
-  // Filtro e ordenação só para "Por Encomenda"
+  const [babies, setBabies] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Buscar bebês do backend ao montar o componente
+  useEffect(() => {
+    async function fetchBabies() {
+      try {
+        const res = await fetch("http://localhost:4000/api/babies");
+        if (!res.ok) throw new Error("Erro ao buscar bebês");
+        const data = await res.json();
+        setBabies(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchBabies();
+  }, []);
+
+  // Filtrar e ordenar só os bebês "Por Encomenda"
   const filteredBabies = useFilteredBabies(
     babies.filter(categories[0].filter),
     selectedSort,
@@ -48,6 +69,8 @@ export default function RebornCardsSection() {
   React.useEffect(() => {
     if ((minValue || maxValue) && filteredBabies.length === 0) {
       setShowWarning(true);
+    } else {
+      setShowWarning(false);
     }
   }, [filteredBabies.length, minValue, maxValue]);
 
@@ -55,6 +78,14 @@ export default function RebornCardsSection() {
     setMinValue("");
     setMaxValue("");
     setShowWarning(false);
+  }
+
+  if (loading) {
+    return <p>Carregando bebês...</p>;
+  }
+
+  if (error) {
+    return <p className="text-red-600">Erro: {error}</p>;
   }
 
   return (
@@ -98,7 +129,7 @@ export default function RebornCardsSection() {
         )}
         <RebornCardList
           babies={showWarning ? babies.filter(categories[0].filter) : filteredBabies}
-          onCardClick={baby => navigate(`/produto/${baby.id}`)}
+          onCardClick={baby => navigate(`/produto/${baby.slug}`)} // Usar slug para navegação
         />
         <SortDrawer
           open={sortOpen}

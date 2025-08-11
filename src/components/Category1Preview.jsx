@@ -124,7 +124,7 @@ export default function Category1Preview() {
                   >
                     <RebornCard
                       baby={baby}
-                      onClick={() => navigate(`/produto/${baby.id}`)}
+                      onClick={() => navigate(`/produto/${baby.slug}`)}
                       mini
                     />
                   </motion.div>
@@ -157,7 +157,7 @@ export default function Category1Preview() {
           <div key={baby.id} className="w-full">
             <RebornCard
               baby={baby}
-              onClick={() => navigate(`/produto/${baby.id}`)}
+              onClick={() => navigate(`/produto/${baby.slug}`)}
               mini
             />
           </div>

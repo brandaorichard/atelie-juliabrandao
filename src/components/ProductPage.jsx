@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import babies from "../mocks/babiesMock";
 
 import ProductCarousel from "./ProductCarousel";
 import Breadcrumb from "./Breadcrumb";
@@ -9,13 +8,46 @@ import QuantityBuy from "./QuantityBuy";
 import PaymentMethods from "./PaymentMethods";
 import ProductSection from "./ProductSection";
 
+import {
+  featuresPadrao,
+  enxovalPadrao,
+  prazoPadrao,
+  avisosPadrao
+} from "../mocks/babyTexts";
+
 export default function ProductPage() {
-  const { id } = useParams();
+  const { slug } = useParams();
   const navigate = useNavigate();
 
-  const baby = babies.find((b) => String(b.id) === String(id));
-  const [current, setCurrent] = useState(0);
+  const [baby, setBaby] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
+  const [current, setCurrent] = useState(0);
+
+  useEffect(() => {
+    async function fetchBaby() {
+      try {
+        const res = await fetch(`http://localhost:4000/api/babies/slug/${slug}`);
+        if (!res.ok) throw new Error("Bebê não encontrado");
+        const data = await res.json();
+        setBaby(data);
+      } catch (error) {
+        setBaby(null);
+        console.error("Erro ao buscar o bebê:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchBaby();
+  }, [slug]);
+
+  if (loading) {
+    return (
+      <section className="w-full bg-[#f9e7f6] min-h-screen flex items-center justify-center">
+        <p>Carregando...</p>
+      </section>
+    );
+  }
 
   if (!baby) {
     return (
@@ -45,10 +77,10 @@ export default function ProductPage() {
           />
           <QuantityBuy product={baby} quantity={quantity} setQuantity={setQuantity} />
           <PaymentMethods />
-          <ProductSection title="Prazo de entrega" items={baby.deliveryTime} />
-          <ProductSection title="Características" items={baby.features} />
-          <ProductSection title="Itens do enxoval" items={baby.enxoval} />
-          <ProductSection title="Avisos e cuidados" items={baby.warnings} />
+          <ProductSection title="Prazo de entrega" items={prazoPadrao} />
+          <ProductSection title="Características" items={featuresPadrao} />
+          <ProductSection title="Itens do enxoval" items={enxovalPadrao} />
+          <ProductSection title="Avisos e cuidados" items={avisosPadrao} />
         </div>
       </div>
     </section>

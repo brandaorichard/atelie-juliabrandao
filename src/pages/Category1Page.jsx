@@ -9,7 +9,7 @@ function Category1Page() {
     <CategoryCardsSection
       title="Por Encomenda"
       babies={babies}
-      onCardClick={baby => navigate(`/produto/${baby.id}`)}
+      onCardClick={baby => navigate(`/produto/${baby.slug}`)}
       showFilter
       showSort
     />

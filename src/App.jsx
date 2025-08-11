@@ -37,7 +37,6 @@ function App() {
         <Route path="/categoria1" element={<Category1Page />} />
         <Route path="/categoria2" element={<Category2Page />} />
         <Route path="/categoria3" element={<Category3Page />} />
-        <Route path="/produto/:id" element={<ProductPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         {/* Rota para confirmação de email */}
@@ -46,6 +45,7 @@ function App() {
         <Route path="/meus-pedidos" element={<OrdersPage />} />
         <Route path="/minha-conta" element={<MinhaContaPage />} />
         <Route path="/pedido/:id" element={<OrderDetailPage />} />
+        <Route path="/produto/:slug" element={<ProductPage />} />
       </Routes>
       <Footer />
       <SocialMediasSection />

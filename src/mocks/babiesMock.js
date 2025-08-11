@@ -77,14 +77,16 @@ const babies = [
     installment: "4x de R$600,00 sem juros",
     img: imgBaby1,
     images: [imgBaby1, imgBaby2, imgBaby3, imgBaby4],
-    description: "Uma linda bebê, feita a partir do Kit Quinlynn versão menina ou menino por encomenda.",
+    description: "Uma linda bebê, feita a partir do Kit Quinlynn versão menina ou menino por encomenda. Cerca de 48cm e aproximadamente 2kgs",
     features: [
       "Cabelo implantado fio a fio com mohair, veias e micro veias, vasos sanguíneos, efeito de unhas crescidas, pelos nas têmporas, manchinhas, marca de vacina, teste do pezinho, manchinhas de frio, cílios micro implantados, arranhões de unha, sobrancelhas 3D, lábios umedecidos.",
       "Com todas as características de um bebê real! São molinhos e sua cabeça tomba pra trás e pros lados.",
-      "Feito com corpinho de tecido para deixar bem maleável e molinho.",
-      "Cerca de 47cm.",
-      "Aproximadamente 2kg."
+      "Feito com corpinho de tecido para deixar bem maleável e molinho."
     ],
+    dimensions: {
+      height: "47cm",
+      weight: "Aproximadamente 2kg"
+    },
     enxoval: [...enxovalPadrao],
     deliveryTime: [...prazoPadrao],
     warnings: [...avisosPadrao]
@@ -100,10 +102,12 @@ const babies = [
     description: "Uma linda bebê, feita a partir do Kit Quinlynn versão menina ou menino por encomenda.",
     features: [
       "Voce pode escolher a cor do cabelo, o tipo de cabelo, cor dos olhos. Para tonalidade de pele, o preço é alterado.",
-      ...featuresPadrao,
-      "Cerca de 47cm.",
-      "Aproximadamente 2kg."
+      ...featuresPadrao
     ],
+    dimensions: {
+      height: "47cm",
+      weight: "Aproximadamente 2kg"
+    },
     enxoval: [...enxovalPadrao],
     deliveryTime: [...prazoPadrao],
     warnings: [...avisosPadrao]
@@ -123,9 +127,12 @@ const babies = [
       "Nas fotos ilustrativas temos 2 tipos de cabelo, na ruiva é a fibra beautex sintética de alta qualidade, não embola com o tempo, imita cabelo humano adulto, usada para ter cabelos longos e lisos e super fácil de cuidar.",
       "Já nas fotos de cabelo curto, foi utilizado o mohair premium, é um fio natural derivado da cabra, um cabelo extremamente macio e fino, imita muito um cabelo de bebê e é mais realista, por ser natural, porém ele tem um cuidado maior para mantê-lo.",
       "Todos os bebês São molinhos e sua cabeça tomba pra trás e pros lados.",
-      "Feito com corpinho de tecido para deixar bem maleavel e molinho.",
-      "Cerca de 65 a 68cm.",
+      "Feito com corpinho de tecido para deixar bem maleavel e molinho."
     ],
+    dimensions: {
+      height: "65 a 68cm",
+      weight: "N/A"
+    },
     enxoval: [...enxovalPadrao],
     deliveryTime: [...prazoPadrao],
     warnings: [...avisosPadrao]
@@ -142,9 +149,12 @@ const babies = [
     features: [
       ...featuresPadrao,
       "Todos os bebês São molinhos e sua cabeça tomba pra trás e pros lados.",
-      "Feito com corpinho de tecido para deixar bem maleavel e molinho.",
-      "Cerca de 49cm.",
+      "Feito com corpinho de tecido para deixar bem maleavel e molinho."
     ],
+    dimensions: {
+      height: "49cm",
+      weight: "N/A"
+    },
     enxoval: [...enxovalPadrao],
     deliveryTime: [...prazoPadrao],
     warnings: [...avisosPadrao]
@@ -161,9 +171,12 @@ const babies = [
     features: [
       ...featuresPadrao,
       "Todos os bebês São molinhos e sua cabeça tomba pra trás e pros lados.",
-      "Feito com corpinho de tecido para deixar bem maleavel e molinho.",
-      "Cerca de 50cm.",
+      "Feito com corpinho de tecido para deixar bem maleavel e molinho."
     ],
+    dimensions: {
+      height: "50cm",
+      weight: "N/A"
+    },
     enxoval: [...enxovalPadrao],
     deliveryTime: [...prazoPadrao],
     warnings: [...avisosPadrao]
@@ -183,9 +196,12 @@ const babies = [
     features: [
       ...featuresPadrao,
       "Todos os bebês São molinhos e sua cabeça tomba pra trás e pros lados.",
-      "Feito com corpinho de tecido para deixar bem maleavel e molinho.",
-      "Cerca de 44 a 46cm.",
+      "Feito com corpinho de tecido para deixar bem maleavel e molinho."
     ],
+    dimensions: {
+      height: "44 a 46cm",
+      weight: "N/A"
+    },
     enxoval: [...enxovalPadrao],
     deliveryTime: [...prazoPadrao],
     warnings: [...avisosPadrao]
@@ -206,9 +222,12 @@ const babies = [
       "Você pode escolher a cor dos cabelos.",
       ...featuresPadrao,
       "Todos os bebês São molinhos e sua cabeça tomba pra trás e pros lados.",
-      "Feito com corpinho de tecido para deixar bem maleavel e molinho.",
-      "Cerca de 50 a 52cm.",
+      "Feito com corpinho de tecido para deixar bem maleavel e molinho."
     ],
+    dimensions: {
+      height: "50 a 52cm",
+      weight: "N/A"
+    },
     enxoval: [...enxovalPadrao],
     deliveryTime: [...prazoPadrao],
     warnings: [...avisosPadrao]
@@ -229,9 +248,12 @@ const babies = [
       "Você pode escolher a cor dos cabelos.",
       ...featuresPadrao,
       "Todos os bebês São molinhos e sua cabeça tomba pra trás e pros lados.",
-      "Feito com corpinho de tecido para deixar bem maleavel e molinho.",
-      "Cerca de 51cm.",
+      "Feito com corpinho de tecido para deixar bem maleavel e molinho."
     ],
+    dimensions: {
+      height: "51cm",
+      weight: "N/A"
+    },
     enxoval: [...enxovalPadrao],
     deliveryTime: [...prazoPadrao],
     warnings: [...avisosPadrao]
