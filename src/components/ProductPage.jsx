@@ -7,6 +7,7 @@ import ProductTitlePrice from "./ProductTitlePrice";
 import QuantityBuy from "./QuantityBuy";
 import PaymentMethods from "./PaymentMethods";
 import ProductSection from "./ProductSection";
+import FreteCalculator from "./FreteCalculator";
 
 import {
   featuresPadrao,
@@ -23,6 +24,7 @@ export default function ProductPage() {
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [current, setCurrent] = useState(0);
+  const [freteSelecionado, setFreteSelecionado] = useState(null);
 
   useEffect(() => {
     async function fetchBaby() {
@@ -76,6 +78,19 @@ export default function ProductPage() {
             installment={baby.installment}
           />
           <QuantityBuy product={baby} quantity={quantity} setQuantity={setQuantity} />
+          <FreteCalculator
+            items={[{ slug: baby.slug, quantity }]}
+            onFreteSelecionado={setFreteSelecionado}
+          />
+          {/* Exemplo de exibição do total */}
+          {freteSelecionado && (
+            <div className="mt-2 text-lg font-semibold text-[#7a4fcf]">
+              Total: {(baby.price * quantity + Number(freteSelecionado.price)).toLocaleString("pt-BR", {
+                style: "currency",
+                currency: "BRL",
+              })}
+            </div>
+          )}
           <PaymentMethods />
           <ProductSection title="Prazo de entrega" items={prazoPadrao} />
           <ProductSection title="Características" items={featuresPadrao} />
