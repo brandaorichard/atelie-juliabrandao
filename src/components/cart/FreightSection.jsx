@@ -11,28 +11,33 @@ export function FreightSection({
   freteSelecionado,
   onSelectFrete,
   endereco,
+  showCepInput = true, // <-- novo prop
 }) {
   return (
     <div className="px-3 md:px-6 mb-2">
-      <div className="mb-2 text-sm text-[#616161]">
-        <span>Calcule o frete para sua região:</span>
-      </div>
-      <div className="flex items-center gap-2 mb-2">
-        <input
-          type="text"
-          placeholder="Digite seu CEP"
-            value={cepInput}
-          onChange={onCepChange}
-          className="border border-[#616161] rounded-3xl px-3 py-2 w-32"
-        />
-        <button
-          onClick={onCalcular}
-          disabled={loadingFrete || cepInput.length !== 8}
-          className="bg-[#7a4fcf] text-white px-4 py-2 rounded-3xl disabled:opacity-50 cursor-pointer"
-        >
-          {loadingFrete ? "Calculando..." : "Calcular frete"}
-        </button>
-      </div>
+      {showCepInput && (
+        <>
+          <div className="mb-2 text-sm text-[#616161]">
+            <span>Calcule o frete para sua região:</span>
+          </div>
+          <div className="flex items-center gap-2 mb-2">
+            <input
+              type="text"
+              placeholder="Digite seu CEP"
+              value={cepInput}
+              onChange={onCepChange}
+              className="border border-[#616161] rounded-3xl px-3 py-2 w-32"
+            />
+            <button
+              onClick={onCalcular}
+              disabled={loadingFrete || cepInput.length !== 8}
+              className="bg-[#7a4fcf] text-white px-4 py-2 rounded-3xl disabled:opacity-50 cursor-pointer"
+            >
+              {loadingFrete ? "Calculando..." : "Calcular frete"}
+            </button>
+          </div>
+        </>
+      )}
       <div className="flex items-center gap-2 border border-[#e6a04e] rounded px-3 py-2 text-[#e6a04e] text-sm mb-2">
         <FaExclamationTriangle className="mr-1" />
         O prazo da sua entrega deve ser somado com o prazo da confecção do bebê + o envio dos correios.

@@ -63,7 +63,7 @@ export default function FreteCalculator({ items }) {
           disabled={loading || cep.length !== 8}
           className="bg-[#7a4fcf] text-white px-4 py-2 rounded-3xl disabled:opacity-50 cursor-pointer"
         >
-          Calcular frete
+          {loading ? "Calculando..." : "Calcular frete"}
         </button>
       </div>
       <div className="mt-2 flex items-center gap-2  border border-[#e6a04e] rounded px-3 py-2 text-[#e6a04e] text-sm">

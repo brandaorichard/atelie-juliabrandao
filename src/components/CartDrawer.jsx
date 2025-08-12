@@ -13,8 +13,8 @@ import { useFrete } from "../hooks/useFrete";
 
 export default function CartDrawer({ open, onClose }) {
   const dispatch = useDispatch();
-  const items = useSelector(s => s.cart.items);
-  const token = useSelector(s => s.auth.token);
+  const items = useSelector((s) => s.cart.items);
+  const token = useSelector((s) => s.auth.token);
 
   const images = useCartImages(items);
   const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
@@ -35,66 +35,110 @@ export default function CartDrawer({ open, onClose }) {
 
   const opcoesFrete = fretes || [];
 
-  const handleQuantity = useCallback((id, quantity) => {
-    dispatch(setQuantity({ id, quantity }));
-  }, [dispatch]);
+  const showCepInput = !cep || cep.length !== 8; // se já veio da product page (cep completo), esconde input
 
-  const handleRemoveOne = useCallback((item) => {
-    if (item.quantity > 1) {
-      dispatch(setQuantity({ id: item.id, quantity: item.quantity - 1 }));
-    } else {
-      dispatch(removeFromCart(item.id));
-    }
-    dispatch(showToast({
-      type: "cart",
-      data: {
-        product: { ...item, img: images[item.slug] },
-        quantity: item.quantity,
-        total: subtotal,
-        totalQuantity: items.reduce((sum, i) => sum + i.quantity, 0),
+  const handleQuantity = useCallback(
+    (id, quantity) => {
+      dispatch(setQuantity({ id, quantity }));
+    },
+    [dispatch]
+  );
+
+  const handleRemoveOne = useCallback(
+    (item) => {
+      if (item.quantity > 1) {
+        dispatch(setQuantity({ id: item.id, quantity: item.quantity - 1 }));
+      } else {
+        dispatch(removeFromCart(item.id));
       }
-    }));
-  }, [dispatch, images, subtotal, items]);
+      dispatch(
+        showToast({
+          type: "cart",
+          data: {
+            product: { ...item, img: images[item.slug] },
+            quantity: item.quantity,
+            total: subtotal,
+            totalQuantity: items.reduce((sum, i) => sum + i.quantity, 0),
+          },
+        })
+      );
+    },
+    [dispatch, images, subtotal, items]
+  );
 
   const handleCreateOrderAndCheckout = useCallback(async () => {
     if (!token) {
-      dispatch(showToast({ type: "error", message: "Você precisa estar logado para finalizar a compra." }));
+      dispatch(
+        showToast({
+          type: "error",
+          message: "Você precisa estar logado para finalizar a compra.",
+        })
+      );
       return;
     }
     if (!items.length) {
-      dispatch(showToast({ type: "error", message: "Seu carrinho está vazio." }));
+      dispatch(
+        showToast({ type: "error", message: "Seu carrinho está vazio." })
+      );
       return;
     }
     if (!freteSelecionado) {
-      dispatch(showToast({ type: "error", message: "Selecione uma opção de frete para continuar." }));
+      dispatch(
+        showToast({
+          type: "error",
+          message: "Selecione uma opção de frete para continuar.",
+        })
+      );
       return;
     }
 
     const orderPayload = {
-      items: items.map(({ slug, quantity, price }) => ({ slug, quantity, price })),
+      items: items.map(({ slug, quantity, price }) => ({
+        slug,
+        quantity,
+        price,
+      })),
       total: subtotal,
       paymentMethod: "MercadoPago",
       deliveryAddress: "Coletar do usuário",
     };
 
     try {
-      const res = await fetch("https://atelie-juliabrandao-backend-production.up.railway.app/api/orders", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(orderPayload),
-      });
+      const res = await fetch(
+        "https://atelie-juliabrandao-backend-production.up.railway.app/api/orders",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(orderPayload),
+        }
+      );
       if (!res.ok) {
         const err = await res.json();
-        dispatch(showToast({ type: "error", message: err.message || "Erro ao criar pedido." }));
+        dispatch(
+          showToast({
+            type: "error",
+            message: err.message || "Erro ao criar pedido.",
+          })
+        );
         return;
       }
       dispatch(clearCart());
-      dispatch(showToast({ type: "success", message: "Pedido criado! Pagamento Mercado Pago em breve." }));
+      dispatch(
+        showToast({
+          type: "success",
+          message: "Pedido criado! Pagamento Mercado Pago em breve.",
+        })
+      );
     } catch {
-      dispatch(showToast({ type: "error", message: "Erro ao conectar com o servidor." }));
+      dispatch(
+        showToast({
+          type: "error",
+          message: "Erro ao conectar com o servidor.",
+        })
+      );
     }
   }, [token, items, freteSelecionado, subtotal, dispatch]);
 
@@ -120,10 +164,10 @@ export default function CartDrawer({ open, onClose }) {
           >
             <style>
               {`
-               .cart-drawer-custom { width:100vw;max-width:100vw;}
-               @media (min-width:768px){
-                 .cart-drawer-custom { width:30vw!important;min-width:320px!important;max-width:420px!important;}
-               }
+              .cart-drawer-custom { width:100vw;max-width:100vw;}
+              @media (min-width:768px){
+              .cart-drawer-custom { width:30vw!important;min-width:320px!important;max-width:420px!important;}
+              }
               `}
             </style>
             <div className="h-full flex flex-col">
@@ -132,7 +176,9 @@ export default function CartDrawer({ open, onClose }) {
                 <CartItems
                   items={items}
                   images={images}
-                  onDec={(item) => handleQuantity(item.id, Math.max(1, item.quantity - 1))}
+                  onDec={(item) =>
+                    handleQuantity(item.id, Math.max(1, item.quantity - 1))
+                  }
                   onInc={(item) => handleQuantity(item.id, item.quantity + 1)}
                   onRemove={handleRemoveOne}
                 />
@@ -148,7 +194,10 @@ export default function CartDrawer({ open, onClose }) {
                     opcoesFrete={opcoesFrete}
                     freteSelecionado={freteSelecionado}
                     onSelectFrete={handleFreteChange}
-                    endereco={cepInput.length === 8 ? enderecos?.[cepInput] : null}
+                    endereco={
+                      cepInput.length === 8 ? enderecos?.[cepInput] : null
+                    }
+                    showCepInput={showCepInput}
                   />
                   <CartSummary
                     subtotal={subtotal}
