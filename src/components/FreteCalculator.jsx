@@ -18,13 +18,26 @@ export default function FreteCalculator({ items }) {
     setErro("");
     setFretes([]);
     try {
-      const res = await axios.post("https://atelie-juliabrandao-backend-production.up.railway.app/api/frete/calcular", {
-        cepDestino: cep,
-        items,
-      });
+      // Garante o formato do CEP com hífen
+      const cepFormatado =
+        cep.length === 8 ? cep.replace(/(\d{5})(\d{3})/, "$1-$2") : cep;
+
+      // Garante que items estejam no formato [{ slug, quantity }]
+      const itemsFormatados = (items || []).map((item) => ({
+        slug: item.slug,
+        quantity: item.quantity,
+      }));
+
+      const res = await axios.post(
+        "https://atelie-juliabrandao-backend-production.up.railway.app/api/frete/calcular",
+        {
+          cepDestino: cepFormatado,
+          items: itemsFormatados,
+        }
+      );
       const services = (Array.isArray(res.data) ? res.data : res.data.services || [])
-        .filter(s => !s.has_error && s.price)
-        .map(s => ({
+        .filter((s) => !s.has_error && s.price)
+        .map((s) => ({
           name: s.name,
           price: s.price,
           deadline: s.delivery_time || (s.delivery_range && s.delivery_range.max) || null,
