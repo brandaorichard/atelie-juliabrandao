@@ -5,8 +5,15 @@ import { login } from "../redux/authSlice";
 import { showToast } from "../redux/toastSlice";
 import BreadcrumbItens from "../components/BreadcrumbItens";
 
+// Função para formatar CPF para 000.000.000-00
+function formatCpf(cpf) {
+  const digits = cpf.replace(/\D/g, "").slice(0, 11);
+  if (digits.length !== 11) return cpf;
+  return digits.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
+}
+
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
+  const [identificador, setIdentificador] = useState(""); // email ou cpf
   const [senha, setSenha] = useState("");
   const [showSenha, setShowSenha] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -14,10 +21,25 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  const handleIdentificadorChange = (e) => {
+    let value = e.target.value;
+    // Se for CPF só números, formata para 000.000.000-00
+    if (/^\d{11}$/.test(value)) {
+      value = formatCpf(value);
+    }
+    setIdentificador(value);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErro("");
     setLoading(true);
+
+    // Se for CPF só números, formata para 000.000.000-00
+    let identificadorFormatado = identificador;
+    if (/^\d{11}$/.test(identificador)) {
+      identificadorFormatado = formatCpf(identificador);
+    }
 
     try {
       const response = await fetch(
@@ -25,7 +47,7 @@ export default function LoginPage() {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, senha }),
+          body: JSON.stringify({ identificador: identificadorFormatado, senha }),
         }
       );
 
@@ -40,7 +62,7 @@ export default function LoginPage() {
       // Dispara o login no Redux (isso já salva no localStorage pelo slice)
       dispatch(
         login({
-          user: { nome: data.nome, email: data.email, _id: data._id },
+          user: { nome: data.nome, email: data.email, _id: data._id, cpf: data.cpf, telefone: data.telefone },
           token: data.token,
         })
       );
@@ -82,14 +104,17 @@ export default function LoginPage() {
           <div className="mb-4 text-red-600 text-sm text-center">{erro}</div>
         )}
         <div className="mb-4">
-          <label className="block mb-2 text-base text-gray-800">E-mail</label>
+          <label className="block mb-2 text-base text-gray-800">
+            E-mail ou CPF
+          </label>
           <input
-            type="email"
+            type="text"
             className="w-full p-3 border border-[#e5d3e9] rounded-2xl focus:outline-none focus:border-[#ae95d9] transition"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={identificador}
+            onChange={handleIdentificadorChange}
             required
             autoFocus
+            placeholder="Digite seu e-mail ou CPF"
           />
         </div>
         <div className="mb-2 relative">
