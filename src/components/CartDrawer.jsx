@@ -171,7 +171,7 @@ export default function CartDrawer({ open, onClose }) {
     }
   }
 
-  // Função para criar pedido e abrir WhatsApp
+  // Função para criar pedido (sem WhatsApp)
   async function handleCreateOrderAndCheckout() {
     if (!token) {
       dispatch(
@@ -210,7 +210,7 @@ export default function CartDrawer({ open, onClose }) {
         price,
       })),
       total: items.reduce((sum, item) => sum + item.price * item.quantity, 0),
-      paymentMethod: "WhatsApp",
+      paymentMethod: "MercadoPago", // ou deixe em branco para implementar depois
       deliveryAddress: "Endereço padrão ou coletar do usuário",
     };
 
@@ -236,38 +236,13 @@ export default function CartDrawer({ open, onClose }) {
       }
 
       dispatch(clearCart());
-
-      // abrir WhatsApp
-      const phone = 5567992654151;
-      const itemsText = items
-        .map(
-          (item) =>
-            `• Modelo: ${item.name}\n  Valor unitário: R$${item.price.toLocaleString(
-              "pt-BR",
-              {
-                minimumFractionDigits: 2,
-              }
-            )}\n  Quantidade: ${item.quantity}\n  Subtotal: R$${(
-              item.price * item.quantity
-            ).toLocaleString("pt-BR", {
-              minimumFractionDigits: 2,
-            })}`
-        )
-        .join("\n\n");
-      const total = items.reduce(
-        (sum, item) => sum + item.price * item.quantity,
-        0
+      dispatch(
+        showToast({
+          type: "success",
+          message: "Pedido criado com sucesso! Em breve você poderá pagar pelo Mercado Pago.",
+        })
       );
-      const freteText = freteSelecionado
-        ? `\nFrete (${freteSelecionado.name}): R$${Number(freteSelecionado.price).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`
-        : "";
-      const message = encodeURIComponent(
-        `Olá! Estou interessado(a) em finalizar minha compra pelo site Atelie Júlia Brandão:\n\n${itemsText}${freteText}\n\nTotal do pedido: R$${(total + (freteSelecionado ? Number(freteSelecionado.price) : 0)).toLocaleString(
-          "pt-BR",
-          { minimumFractionDigits: 2 }
-        )}\n\nAguardo as instruções para pagamento e envio.`
-      );
-      window.open(`https://wa.me/${phone}?text=${message}`, "_blank");
+      // Aqui você pode redirecionar para a tela de pagamento do Mercado Pago quando implementar
     } catch (error) {
       dispatch(
         showToast({
@@ -525,7 +500,7 @@ export default function CartDrawer({ open, onClose }) {
                       onClick={handleCreateOrderAndCheckout}
                       disabled={!freteSelecionado}
                     >
-                      Iniciar Compra PROD
+                      Iniciar Compra
                     </button>
                   </div>
                 </>
