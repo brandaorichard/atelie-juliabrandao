@@ -2,10 +2,26 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import BreadcrumbItens from "../components/BreadcrumbItens";
 
+// Máscaras e validações simples
+const onlyDigits = (v) => v.replace(/\D/g, "");
+const maskPhone = (v) => {
+  const d = onlyDigits(v).slice(0, 11);
+  if (d.length <= 10) return d.replace(/(\d{2})(\d{4})(\d{0,4})/, "($1) $2-$3");
+  return d.replace(/(\d{2})(\d{1})(\d{4})(\d{4})/, "($1) $2 $3-$4");
+};
+const maskCPF = (v) =>
+  onlyDigits(v)
+    .slice(0, 11)
+    .replace(/(\d{3})(\d{3})(\d{3})(\d{0,2})/, (_, a, b, c, d) =>
+      d ? `${a}.${b}.${c}-${d}` : `${a}.${b}.${c}`
+    );
+
 export default function RegisterPage() {
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
+  const [confirmarEmail, setConfirmarEmail] = useState("");
   const [telefone, setTelefone] = useState("");
+  const [cpf, setCpf] = useState("");
   const [senha, setSenha] = useState("");
   const [confirmarSenha, setConfirmarSenha] = useState("");
   const [showSenha, setShowSenha] = useState(false);
@@ -14,12 +30,34 @@ export default function RegisterPage() {
   const [erro, setErro] = useState("");
   const navigate = useNavigate();
 
+  // Validações
+  const emailMatch = email && confirmarEmail && email === confirmarEmail;
+  const senhaMatch = senha && confirmarSenha && senha === confirmarSenha;
+  const telefoneValido = /^\(\d{2}\) \d \d{4}-\d{4}$/.test(telefone);
+  const cpfValido = /^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(cpf);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErro("");
 
-    if (senha !== confirmarSenha) {
+    if (!nome.trim() || !email || !confirmarEmail || !telefone || !cpf || !senha || !confirmarSenha) {
+      setErro("Preencha todos os campos obrigatórios.");
+      return;
+    }
+    if (!emailMatch) {
+      setErro("Os e-mails não coincidem.");
+      return;
+    }
+    if (!senhaMatch) {
       setErro("As senhas não coincidem.");
+      return;
+    }
+    if (!telefoneValido) {
+      setErro("Telefone inválido. Use o formato (00) 0 0000-0000.");
+      return;
+    }
+    if (!cpfValido) {
+      setErro("CPF inválido. Use o formato 000.000.000-00.");
       return;
     }
 
@@ -33,7 +71,9 @@ export default function RegisterPage() {
           nome,
           email,
           senha,
+          confirmarSenha,
           telefone,
+          cpf,
         }),
       });
 
@@ -45,8 +85,6 @@ export default function RegisterPage() {
         return;
       }
 
-      // Não salvar token e dados do usuário ainda, pois precisa confirmar email
-      // Redireciona para a página de confirmação de email
       navigate("/confirm-email");
     } catch (err) {
       setErro("Erro de conexão com o servidor");
@@ -81,7 +119,7 @@ export default function RegisterPage() {
           <div className="mb-4 text-red-600 text-sm text-center">{erro}</div>
         )}
         <div className="mb-4">
-          <label className="block mb-2 text-base text-gray-800">Nome completo</label>
+          <label className="block mb-2 text-base text-gray-800">Nome completo *</label>
           <input
             type="text"
             className="w-full p-3 border border-[#e5d3e9] rounded-2xl focus:outline-none focus:border-[#ae95d9] transition placeholder:text-gray-400"
@@ -93,10 +131,14 @@ export default function RegisterPage() {
           />
         </div>
         <div className="mb-4">
-          <label className="block mb-2 text-base text-gray-800">E-mail</label>
+          <label className="block mb-2 text-base text-gray-800">E-mail *</label>
           <input
             type="email"
-            className="w-full p-3 border border-[#e5d3e9] rounded-2xl focus:outline-none focus:border-[#ae95d9] transition placeholder:text-gray-400"
+            className={`w-full p-3 border rounded-2xl focus:outline-none transition placeholder:text-gray-400 ${
+              email && confirmarEmail && !emailMatch
+                ? "border-red-500 focus:border-red-500"
+                : "border-[#e5d3e9] focus:border-[#ae95d9]"
+            }`}
             placeholder="ex.: seunome@email.com.br"
             value={email}
             onChange={e => setEmail(e.target.value)}
@@ -104,17 +146,54 @@ export default function RegisterPage() {
           />
         </div>
         <div className="mb-4">
-          <label className="block mb-2 text-base text-gray-800">Telefone (opcional)</label>
+          <label className="block mb-2 text-base text-gray-800">Confirmar e-mail *</label>
+          <input
+            type="email"
+            className={`w-full p-3 border rounded-2xl focus:outline-none transition placeholder:text-gray-400 ${
+              email && confirmarEmail && !emailMatch
+                ? "border-red-500 focus:border-red-500"
+                : "border-[#e5d3e9] focus:border-[#ae95d9]"
+            }`}
+            placeholder="Confirme seu e-mail"
+            value={confirmarEmail}
+            onChange={e => setConfirmarEmail(e.target.value)}
+            required
+          />
+        </div>
+        <div className="mb-4">
+          <label className="block mb-2 text-base text-gray-800">Telefone *</label>
           <input
             type="tel"
-            className="w-full p-3 border border-[#e5d3e9] rounded-2xl focus:outline-none focus:border-[#ae95d9] transition placeholder:text-gray-400"
-            placeholder="ex.: 11971923030"
+            className={`w-full p-3 border rounded-2xl focus:outline-none transition placeholder:text-gray-400 ${
+              telefone && !telefoneValido
+                ? "border-red-500 focus:border-red-500"
+                : "border-[#e5d3e9] focus:border-[#ae95d9]"
+            }`}
+            placeholder="ex.: (11) 9 1234-5678"
             value={telefone}
-            onChange={e => setTelefone(e.target.value)}
+            onChange={e => setTelefone(maskPhone(e.target.value))}
+            required
+            maxLength={16}
+          />
+        </div>
+        <div className="mb-4">
+          <label className="block mb-2 text-base text-gray-800">CPF *</label>
+          <input
+            type="text"
+            className={`w-full p-3 border rounded-2xl focus:outline-none transition placeholder:text-gray-400 ${
+              cpf && !cpfValido
+                ? "border-red-500 focus:border-red-500"
+                : "border-[#e5d3e9] focus:border-[#ae95d9]"
+            }`}
+            placeholder="000.000.000-00"
+            value={cpf}
+            onChange={e => setCpf(maskCPF(e.target.value))}
+            required
+            maxLength={14}
           />
         </div>
         <div className="mb-4 relative">
-          <label className="block mb-2 text-base text-gray-800">Senha</label>
+          <label className="block mb-2 text-base text-gray-800">Senha *</label>
           <input
             type={showSenha ? "text" : "password"}
             className="w-full p-3 border border-[#e5d3e9] rounded-2xl focus:outline-none focus:border-[#ae95d9] transition pr-10"
@@ -129,24 +208,18 @@ export default function RegisterPage() {
             tabIndex={-1}
             aria-label={showSenha ? "Ocultar senha" : "Mostrar senha"}
           >
-            {showSenha ? (
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-5.523 0-10-4.477-10-10 0-1.657.336-3.236.938-4.675M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3l18 18" />
-              </svg>
-            ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-.274.832-.67 1.613-1.17 2.318M15.54 15.54A5.978 5.978 0 0112 17c-1.657 0-3.156-.672-4.24-1.76" />
-              </svg>
-            )}
+            {showSenha ? "🙈" : "👁️"}
           </button>
         </div>
         <div className="mb-4 relative">
-          <label className="block mb-2 text-base text-gray-800">Confirmar senha</label>
+          <label className="block mb-2 text-base text-gray-800">Confirmar senha *</label>
           <input
             type={showConfirmarSenha ? "text" : "password"}
-            className="w-full p-3 border border-[#e5d3e9] rounded-2xl focus:outline-none focus:border-[#ae95d9] transition pr-10"
+            className={`w-full p-3 border rounded-2xl focus:outline-none transition pr-10 ${
+              senha && confirmarSenha && !senhaMatch
+                ? "border-red-500 focus:border-red-500"
+                : "border-[#e5d3e9] focus:border-[#ae95d9]"
+            }`}
             value={confirmarSenha}
             onChange={e => setConfirmarSenha(e.target.value)}
             required
@@ -158,17 +231,7 @@ export default function RegisterPage() {
             tabIndex={-1}
             aria-label={showConfirmarSenha ? "Ocultar senha" : "Mostrar senha"}
           >
-            {showConfirmarSenha ? (
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-5.523 0-10-4.477-10-10 0-1.657.336-3.236.938-4.675M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3l18 18" />
-              </svg>
-            ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-.274.832-.67 1.613-1.17 2.318M15.54 15.54A5.978 5.978 0 0112 17c-1.657 0-3.156-.672-4.24-1.76" />
-              </svg>
-            )}
+            {showConfirmarSenha ? "🙈" : "👁️"}
           </button>
         </div>
         <button
