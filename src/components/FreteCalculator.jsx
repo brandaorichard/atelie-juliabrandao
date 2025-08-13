@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import axios from "axios";
 import { FaExclamationTriangle } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
-import { setCep, setFreteSelecionado } from "../redux/freteSlice";
+import { setCep, setFreteSelecionado, setFreteData } from "../redux/freteSlice";
 
-export default function FreteCalculator({ items }) {
+export default function FreteCalculator({ items, onFreteSelecionado }) {
   const dispatch = useDispatch();
   const cep = useSelector(state => state.frete.cep);
   const freteSelecionado = useSelector(state => state.frete.freteSelecionado);
@@ -45,6 +45,28 @@ export default function FreteCalculator({ items }) {
           logo: s.company?.picture,
         }));
       setFretes(services);
+
+      // Busca o endereço do CEP via ViaCEP
+      let enderecoViaCep = null;
+      const via = await fetch(`https://viacep.com.br/ws/${cep.replace(/\D/g, "")}/json/`);
+      if (via.ok) {
+        const addr = await via.json();
+        if (!addr.erro) {
+          enderecoViaCep = addr;
+        }
+      }
+
+      // Dispatch the frete data, sempre usando o ViaCEP
+      dispatch(setFreteData({
+        cep: cepFormatado,
+        fretes: services,
+        enderecoCep: enderecoViaCep,
+      }));
+
+      // Optionally call onFreteSelecionado
+      if (onFreteSelecionado) {
+        onFreteSelecionado(services[0]);
+      }
     } catch (err) {
       console.log(err);
       setErro("Não foi possível calcular o frete. Verifique o CEP.");
