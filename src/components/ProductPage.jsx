@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { addToCart } from "../redux/cartSlice";
 
 import ProductCarousel from "./ProductCarousel";
 import Breadcrumb from "./Breadcrumb";
@@ -19,6 +21,7 @@ import {
 export default function ProductPage() {
   const { slug } = useParams();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const [baby, setBaby] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -82,7 +85,6 @@ export default function ProductPage() {
             items={[{ slug: baby.slug, quantity }]}
             onFreteSelecionado={setFreteSelecionado}
           />
-          {/* Exemplo de exibição do total */}
           {freteSelecionado && (
             <div className="mt-2 text-lg font-semibold text-[#7a4fcf]">
               Total: {(baby.price * quantity + Number(freteSelecionado.price)).toLocaleString("pt-BR", {
@@ -91,6 +93,12 @@ export default function ProductPage() {
               })}
             </div>
           )}
+          {/* <button
+            className="mt-4 px-6 py-3 rounded bg-purple-600 text-white font-semibold"
+            onClick={handleAddToCart}
+          >
+            Adicionar ao carrinho
+          </button> */}
           <PaymentMethods />
           <ProductSection title="Prazo de entrega" items={prazoPadrao} />
           <ProductSection title="Características" items={featuresPadrao} />

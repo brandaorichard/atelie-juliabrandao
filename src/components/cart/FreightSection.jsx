@@ -2,6 +2,7 @@ import React from "react";
 import { FaExclamationTriangle } from "react-icons/fa";
 
 export function FreightSection({
+  fullWidth = false,
   cepInput,
   onCepChange,
   onCalcular,
@@ -11,82 +12,83 @@ export function FreightSection({
   freteSelecionado,
   onSelectFrete,
   endereco,
-  showCepInput = true, // <-- novo prop
+  showCepInput,
 }) {
   return (
-    <div className="px-3 md:px-6 mb-2">
+    <section
+      className={`${
+        fullWidth ? "w-full" : ""
+      } bg-[#f9e7f6] border border-[#e5d6f1] rounded p-4 flex flex-col gap-3`}
+    >
+      {/* Linha CEP */}
       {showCepInput && (
-        <>
-          <div className="mb-2 text-sm text-[#616161]">
-            <span>Calcule o frete para sua região:</span>
-          </div>
-          <div className="flex items-center gap-2 mb-2">
-            <input
-              type="text"
-              placeholder="Digite seu CEP"
-              value={cepInput}
-              onChange={onCepChange}
-              className="border border-[#616161] rounded-3xl px-3 py-2 w-32"
-            />
-            <button
-              onClick={onCalcular}
-              disabled={loadingFrete || cepInput.length !== 8}
-              className="bg-[#7a4fcf] text-white px-4 py-2 rounded-3xl disabled:opacity-50 cursor-pointer"
-            >
-              {loadingFrete ? "Calculando..." : "Calcular frete"}
-            </button>
-          </div>
-        </>
-      )}
-      <div className="flex items-center gap-2 border border-[#e6a04e] rounded px-3 py-2 text-[#e6a04e] text-sm mb-2">
-        <FaExclamationTriangle className="mr-1" />
-        O prazo da sua entrega deve ser somado com o prazo da confecção do bebê + o envio dos correios.
-      </div>
-      {erroFrete && <div className="text-red-500 mb-2">{erroFrete}</div>}
-      {opcoesFrete.length > 0 && (
-        <div className="space-y-2 mb-2">
-          {opcoesFrete.map(frete => (
-            <label key={frete.name} className="flex items-center gap-2 cursor-pointer">
-              <input
-                type="radio"
-                name="frete"
-                checked={freteSelecionado?.name === frete.name}
-                onChange={() => onSelectFrete(frete)}
-              />
-              <span>
-                {frete.name} - {frete.deadline} dias úteis -{" "}
-                <strong>
-                  {Number(frete.price).toLocaleString("pt-BR", {
-                    style: "currency",
-                    currency: "BRL",
-                  })}
-                </strong>
-              </span>
-            </label>
-          ))}
+        <div className="flex gap-2 w-full">
+          <input
+            className="flex-1 border border-gray-300 rounded px-3 py-2 text-xs"
+            placeholder="Digite o CEP"
+            value={cepInput}
+            onChange={onCepChange}
+            maxLength={8}
+          />
+          <button
+            type="button"
+            onClick={onCalcular}
+            disabled={loadingFrete || cepInput.length !== 8}
+            className="px-4 py-2 text-xs rounded bg-purple-600 text-white disabled:opacity-50"
+          >
+            {loadingFrete ? "..." : "Calcular"}
+          </button>
         </div>
       )}
+
+      {erroFrete && (
+        <p className="text-[11px] text-red-600">{erroFrete}</p>
+      )}
+
+      {/* Opções de frete */}
+      {opcoesFrete?.length > 0 && (
+        <div className="flex flex-col gap-2 w-full">
+          {opcoesFrete.map((f) => {
+            const selected = freteSelecionado?.name === f.name;
+            return (
+              <button
+                key={f.name}
+                type="button"
+                onClick={() => onSelectFrete(f)}
+                className={`text-left border rounded px-3 py-2 text-xs w-full transition ${
+                  selected
+                    ? "border-purple-600 bg-[#f9e7f6] shadow"
+                    : "border-gray-300 bg-[#f9e7f6] hover:bg-[#f3e1f0]"
+                }`}
+              >
+                <div className="flex justify-between">
+                  <span className="font-medium">{f.name}</span>
+                  <span className="font-semibold">
+                    {f.price.toLocaleString("pt-BR", {
+                      style: "currency",
+                      currency: "BRL",
+                    })}
+                  </span>
+                </div>
+                <div className="text-[11px] text-gray-600">
+                  {f.deadline
+                    ? `${f.deadline} dias úteis`
+                    : "Prazo não informado"}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Aviso frete selecionado */}
       {freteSelecionado && (
-        <div className="mb-3 px-3 md:px-4 py-3 rounded bg-[#f3e6f3] border border-[#e5d3e9]">
-          {endereco && (
-            <div className="text-sm text-[#616161] mb-2">
-              <b>Endereço:</b> {endereco}
-            </div>
-          )}
-          <div className="text-sm text-[#616161] mb-1">
-            <b>Frete selecionado:</b> {freteSelecionado.name} - {freteSelecionado.deadline} dias úteis -{" "}
-            <strong>
-              {Number(freteSelecionado.price).toLocaleString("pt-BR", {
-                style: "currency",
-                currency: "BRL",
-              })}
-            </strong>
-          </div>
-          <div className="text-sm text-[#616161]">
-            <b>CEP:</b> {freteSelecionado.cep}
-          </div>
+        <div className="text-[11px] mt-1 p-2 border border-purple-200 rounded bg-[#f9e7f6]">
+          Frete selecionado:{" "}
+          <strong>{freteSelecionado.name}</strong>{" "}
+          {freteSelecionado.deadline && `- ${freteSelecionado.deadline} dias úteis`}
         </div>
       )}
-    </div>
+    </section>
   );
 }
