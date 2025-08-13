@@ -10,11 +10,14 @@ import { CartSummary } from "./cart/CartSummary";
 import { useCartImages } from "../hooks/useCartImages";
 import { useFrete } from "../hooks/useFrete";
 import { createOrderAndCheckout } from "../services/orderCheckout";
+import { useNavigate } from "react-router-dom";
+import MercadoPagoIcon from "../assets/icons/mercadopago2.png"
 
 export default function CartDrawer({ open, onClose }) {
   const dispatch = useDispatch();
   const items = useSelector((s) => s.cart.items);
   const token = useSelector((s) => s.auth.token);
+  const navigate = useNavigate();
 
   const [numeroCasa, setNumeroCasa] = useState("");
   const [complemento, setComplemento] = useState("");
@@ -38,8 +41,7 @@ export default function CartDrawer({ open, onClose }) {
 
   const canCheckout =
     !!freteSelecionado &&
-    numeroCasa.trim().length > 0 &&
-    complemento.trim().length > 0;
+    numeroCasa.trim().length > 0; // complemento agora opcional
 
   const handleQuantity = useCallback(
     (id, quantity) => {
@@ -76,7 +78,7 @@ export default function CartDrawer({ open, onClose }) {
       dispatch(
         showToast({
           type: "error",
-          message: "Preencha número e complemento para continuar.",
+          message: "Preencha o número da casa para continuar.",
         })
       );
       return;
@@ -95,11 +97,14 @@ export default function CartDrawer({ open, onClose }) {
         cidade: enderecoCep?.localidade || "",
         uf: enderecoCep?.uf || "",
         numero: numeroCasa,
-        complemento,
+        complemento, // opcional
       },
     });
 
-    if (result.ok) onClose?.();
+    if (result.ok && result.order?._id) {
+      onClose?.();
+      navigate(`/pedido/${result.order._id}`);
+    }
   }, [
     token,
     items,
@@ -113,6 +118,7 @@ export default function CartDrawer({ open, onClose }) {
     enderecoCep,
     canCheckout,
     onClose,
+    navigate,
   ]);
 
   return (
@@ -168,33 +174,25 @@ export default function CartDrawer({ open, onClose }) {
                       opcoesFrete={fretes || []}
                       freteSelecionado={freteSelecionado}
                       onSelectFrete={handleFreteChange}
-                      endereco={null}
+                      endereco={enderecoCep}
                       showCepInput={!cep || cep.length !== 8}
                     />
                   </div>
                 )}
 
-                {items.length > 0 && freteSelecionado && (
+                {items.length > 0 && enderecoCep && (
                   <section className="mt-6">
                     <h3 className="text-sm font-semibold mb-2">
                       Dados da entrega
                     </h3>
-
                     <div className="border border-gray-300 rounded bg-[#f9e7f6] px-3 py-2 text-xs mb-3 leading-snug">
-                      {enderecoCep ? (
-                        <>
-                          <div>{enderecoCep.logradouro}</div>
-                          <div>
-                            {enderecoCep.bairro} - {enderecoCep.localidade}/
-                            {enderecoCep.uf}
-                          </div>
-                          <div>CEP: {enderecoCep.cep}</div>
-                        </>
-                      ) : (
-                        "Endereço não identificado."
-                      )}
+                      <div>{enderecoCep.logradouro}</div>
+                      <div>
+                        {enderecoCep.bairro} - {enderecoCep.localidade}/{enderecoCep.uf}
+                      </div>
+                      <div>CEP: {enderecoCep.cep}</div>
                     </div>
-
+                    {/* inputs de número e complemento */}
                     <div className="grid gap-3">
                       <div>
                         <label className="block text-xs font-medium mb-1">
@@ -210,28 +208,24 @@ export default function CartDrawer({ open, onClose }) {
                           onChange={(e) => setNumeroCasa(e.target.value)}
                           placeholder="Ex: 123"
                         />
+                        {touched && !canCheckout && (
+                          <p className="text-[11px] text-red-600 mt-2">
+                            Preencha o número da casa.
+                          </p>
+                        )}
                       </div>
                       <div>
                         <label className="block text-xs font-medium mb-1">
-                          Complemento *
+                          Complemento
                         </label>
                         <input
-                          className={`w-full border rounded px-3 py-2 text-xs ${
-                            touched && !complemento.trim()
-                              ? "border-red-500"
-                              : "border-gray-300"
-                          }`}
+                          className="w-full border border-gray-300 rounded px-3 py-2 text-xs"
                           value={complemento}
                           onChange={(e) => setComplemento(e.target.value)}
                           placeholder="Ex: Apto 01 / Bloco B"
                         />
                       </div>
                     </div>
-                    {touched && !canCheckout && (
-                      <p className="text-[11px] text-red-600 mt-2">
-                        Preencha todos os campos obrigatórios.
-                      </p>
-                    )}
                   </section>
                 )}
               </div>
@@ -241,8 +235,27 @@ export default function CartDrawer({ open, onClose }) {
                   subtotal={subtotal}
                   freteSelecionado={freteSelecionado}
                   onCheckout={handleCreateOrderAndCheckout}
-                  disabled={!canCheckout}
-                  checkoutLabel="Iniciar Compra"
+                  disabled={false} // <-- sempre habilitado!
+                  checkoutLabel={
+                    canCheckout
+                      ? (
+                        <span className="flex items-center justify-center gap-2">
+                          Prosseguir para o Mercado Pago
+                          <img
+                            src={MercadoPagoIcon}
+                            alt="Mercado Pago"
+                            className="h-6 w-auto"
+                            style={{
+                              display: "inline-block",
+                              verticalAlign: "middle",
+                              background: "transparent",
+                            }}
+                          />
+                        </span>
+                      )
+                      : "Iniciar Compra"
+                  }
+                  showMercadoPagoInfo={canCheckout}
                 />
               )}
             </div>
