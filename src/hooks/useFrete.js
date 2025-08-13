@@ -1,17 +1,17 @@
 import { useCallback, useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setFreteSelecionado, setCep, setFretes } from "../redux/freteSlice";
+import { setFreteSelecionado, setCep, setFretes, setFreteData } from "../redux/freteSlice";
 
 export function useFrete(items) {
   const dispatch = useDispatch();
   const cep = useSelector((s) => s.frete.cep);
   const fretes = useSelector((s) => s.frete.fretes);
   const freteSelecionado = useSelector((s) => s.frete.freteSelecionado);
+  const enderecoCep = useSelector((s) => s.frete.enderecoCep);
 
   const [cepInput, setCepInput] = useState(cep || "");
   const [loadingFrete, setLoadingFrete] = useState(false);
   const [erroFrete, setErroFrete] = useState("");
-  const [enderecoCep, setEnderecoCep] = useState(null);
 
   useEffect(() => {
     setCepInput(cep || "");
@@ -21,7 +21,6 @@ export function useFrete(items) {
     dispatch(setCep(""));
     dispatch(setFretes([]));
     dispatch(setFreteSelecionado(null));
-    setEnderecoCep(null);
   }, [dispatch]);
 
   const handleCepInputChange = useCallback(
@@ -70,7 +69,13 @@ export function useFrete(items) {
       const via = await fetch(`https://viacep.com.br/ws/${cepInput}/json/`);
       if (via.ok) {
         const addr = await via.json();
-        if (!addr.erro) setEnderecoCep(addr);
+        if (!addr.erro) {
+          dispatch(setFreteData({
+            cep: cepInput,
+            fretes: services,
+            enderecoCep: addr,
+          }));
+        }
       }
     } catch {
       setErroFrete("Não foi possível calcular o frete. Verifique o CEP.");
