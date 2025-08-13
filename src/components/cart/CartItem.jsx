@@ -1,6 +1,24 @@
 import React from "react";
+import { useDispatch } from "react-redux";
+import { removeFromCart, setQuantity } from "../../redux/cartSlice";
 
-export function CartItem({ item, img, onDec, onInc, onRemove }) {
+export function CartItem({ item, img }) {
+  const dispatch = useDispatch();
+
+  function handleDec() {
+    if (item.quantity > 1) {
+      dispatch(setQuantity({ uniqueKey: item.uniqueKey, quantity: item.quantity - 1 }));
+    }
+  }
+
+  function handleInc() {
+    dispatch(setQuantity({ uniqueKey: item.uniqueKey, quantity: item.quantity + 1 }));
+  }
+
+  function handleRemove() {
+    dispatch(removeFromCart(item.uniqueKey));
+  }
+
   return (
     <div className="flex items-center gap-3 border border-neutral-300 rounded-lg p-3 mb-4 bg-[#f9e7f6]">
       <img
@@ -18,18 +36,18 @@ export function CartItem({ item, img, onDec, onInc, onRemove }) {
         </div>
         <div className="flex items-center gap-2 mt-2">
           <button
-            onClick={onDec}
+            onClick={handleDec}
             className="w-7 h-7 flex items-center justify-center rounded-full bg-[#f3e6f3] text-[#616161] text-lg font-bold opacity-60 cursor-pointer"
             aria-label="Diminuir"
             disabled={item.quantity === 1}
           >
             –
           </button>
-            <span className="mx-2 w-4 text-center">
-              {item.quantity}
-            </span>
+          <span className="mx-2 w-4 text-center">
+            {item.quantity}
+          </span>
           <button
-            onClick={onInc}
+            onClick={handleInc}
             className="w-7 h-7 flex items-center justify-center rounded-full bg-[#f3e6f3] text-[#616161] text-lg font-bold opacity-60 cursor-pointer"
             aria-label="Aumentar"
           >
@@ -37,7 +55,7 @@ export function CartItem({ item, img, onDec, onInc, onRemove }) {
           </button>
         </div>
         <button
-          onClick={onRemove}
+          onClick={handleRemove}
           className="text-xs text-[#7a4fcf] underline mt-2 cursor-pointer"
         >
           Remover

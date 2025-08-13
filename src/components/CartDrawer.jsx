@@ -1,14 +1,13 @@
 import { AnimatePresence, motion } from "framer-motion";
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { removeFromCart, setQuantity, clearCart } from "../redux/cartSlice";
+import { removeFromCart, setQuantity } from "../redux/cartSlice";
 import { showToast } from "../redux/toastSlice";
 import { CartHeader } from "./cart/CartHeader";
 import { CartItems } from "./cart/CartItems";
 import { FreightSection } from "./cart/FreightSection";
 import { CartSummary } from "./cart/CartSummary";
 import { useCartImages } from "../hooks/useCartImages";
-import { useEnderecoCep } from "../hooks/useEnderecoCep";
 import { useFrete } from "../hooks/useFrete";
 import { createOrderAndCheckout } from "../services/orderCheckout";
 
@@ -16,6 +15,10 @@ export default function CartDrawer({ open, onClose }) {
   const dispatch = useDispatch();
   const items = useSelector((s) => s.cart.items);
   const token = useSelector((s) => s.auth.token);
+
+  const [numeroCasa, setNumeroCasa] = useState("");
+  const [complemento, setComplemento] = useState("");
+  const [touched, setTouched] = useState(false);
 
   const images = useCartImages(items);
   const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
@@ -30,13 +33,13 @@ export default function CartDrawer({ open, onClose }) {
     handleCepInputChange,
     calcularFrete,
     handleFreteChange,
+    enderecoCep,
   } = useFrete(items);
 
-  const { enderecos } = useEnderecoCep(cep);
-
-  const opcoesFrete = fretes || [];
-
-  const showCepInput = !cep || cep.length !== 8; // se já veio da product page (cep completo), esconde input
+  const canCheckout =
+    !!freteSelecionado &&
+    numeroCasa.trim().length > 0 &&
+    complemento.trim().length > 0;
 
   const handleQuantity = useCallback(
     (id, quantity) => {
@@ -68,14 +71,49 @@ export default function CartDrawer({ open, onClose }) {
   );
 
   const handleCreateOrderAndCheckout = useCallback(async () => {
+    setTouched(true);
+    if (!canCheckout) {
+      dispatch(
+        showToast({
+          type: "error",
+          message: "Preencha número e complemento para continuar.",
+        })
+      );
+      return;
+    }
+
     const result = await createOrderAndCheckout({
       token,
       items,
       freteSelecionado,
       subtotal,
       dispatch,
+      address: {
+        cep: enderecoCep?.cep || cepInput || cep,
+        logradouro: enderecoCep?.logradouro || "",
+        bairro: enderecoCep?.bairro || "",
+        cidade: enderecoCep?.localidade || "",
+        uf: enderecoCep?.uf || "",
+        numero: numeroCasa,
+        complemento,
+      },
     });
-  }, [token, items, freteSelecionado, subtotal, dispatch]);
+
+    if (result.ok) onClose?.();
+  }, [
+    token,
+    items,
+    freteSelecionado,
+    subtotal,
+    dispatch,
+    numeroCasa,
+    complemento,
+    cepInput,
+    cep,
+    enderecoCep,
+    canCheckout,
+    onClose,
+  ]);
 
   return (
     <AnimatePresence>
@@ -101,7 +139,7 @@ export default function CartDrawer({ open, onClose }) {
               {`
               .cart-drawer-custom { width:100vw;max-width:100vw;}
               @media (min-width:768px){
-              .cart-drawer-custom { width:30vw!important;min-width:320px!important;max-width:420px!important;}
+                .cart-drawer-custom { width:30vw!important;min-width:320px!important;max-width:420px!important;}
               }
               `}
             </style>
@@ -117,30 +155,94 @@ export default function CartDrawer({ open, onClose }) {
                   onInc={(item) => handleQuantity(item.id, item.quantity + 1)}
                   onRemove={handleRemoveOne}
                 />
+                {items.length > 0 && (
+                  <div className="mt-4">
+                    <FreightSection
+                      fullWidth
+                      cepInput={cepInput}
+                      onCepChange={handleCepInputChange}
+                      onCalcular={calcularFrete}
+                      loadingFrete={loadingFrete}
+                      erroFrete={erroFrete}
+                      opcoesFrete={fretes || []}
+                      freteSelecionado={freteSelecionado}
+                      onSelectFrete={handleFreteChange}
+                      endereco={null}
+                      showCepInput={!cep || cep.length !== 8}
+                    />
+                  </div>
+                )}
+
+                {freteSelecionado && (
+                  <section className="mt-6">
+                    <h3 className="text-sm font-semibold mb-2">
+                      Dados da entrega
+                    </h3>
+
+                    <div className="border border-gray-300 rounded bg-[#f9e7f6] px-3 py-2 text-xs mb-3 leading-snug">
+                      {enderecoCep ? (
+                        <>
+                          <div>{enderecoCep.logradouro}</div>
+                          <div>
+                            {enderecoCep.bairro} - {enderecoCep.localidade}/
+                            {enderecoCep.uf}
+                          </div>
+                          <div>CEP: {enderecoCep.cep}</div>
+                        </>
+                      ) : (
+                        "Endereço não identificado."
+                      )}
+                    </div>
+
+                    <div className="grid gap-3">
+                      <div>
+                        <label className="block text-xs font-medium mb-1">
+                          Número *
+                        </label>
+                        <input
+                          className={`w-full border rounded px-3 py-2 text-xs ${
+                            touched && !numeroCasa.trim()
+                              ? "border-red-500"
+                              : "border-gray-300"
+                          }`}
+                          value={numeroCasa}
+                          onChange={(e) => setNumeroCasa(e.target.value)}
+                          placeholder="Ex: 123"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium mb-1">
+                          Complemento *
+                        </label>
+                        <input
+                          className={`w-full border rounded px-3 py-2 text-xs ${
+                            touched && !complemento.trim()
+                              ? "border-red-500"
+                              : "border-gray-300"
+                          }`}
+                          value={complemento}
+                          onChange={(e) => setComplemento(e.target.value)}
+                          placeholder="Ex: Apto 01 / Bloco B"
+                        />
+                      </div>
+                    </div>
+                    {touched && !canCheckout && (
+                      <p className="text-[11px] text-red-600 mt-2">
+                        Preencha todos os campos obrigatórios.
+                      </p>
+                    )}
+                  </section>
+                )}
               </div>
+
               {items.length > 0 && (
-                <>
-                  <FreightSection
-                    cepInput={cepInput}
-                    onCepChange={handleCepInputChange}
-                    onCalcular={calcularFrete}
-                    loadingFrete={loadingFrete}
-                    erroFrete={erroFrete}
-                    opcoesFrete={opcoesFrete}
-                    freteSelecionado={freteSelecionado}
-                    onSelectFrete={handleFreteChange}
-                    endereco={
-                      cepInput.length === 8 ? enderecos?.[cepInput] : null
-                    }
-                    showCepInput={showCepInput}
-                  />
-                  <CartSummary
-                    subtotal={subtotal}
-                    freteSelecionado={freteSelecionado}
-                    onCheckout={handleCreateOrderAndCheckout}
-                    disabled={!freteSelecionado}
-                  />
-                </>
+                <CartSummary
+                  subtotal={subtotal}
+                  freteSelecionado={freteSelecionado}
+                  onCheckout={handleCreateOrderAndCheckout}
+                  disabled={!canCheckout}
+                  checkoutLabel="Iniciar Compra"
+                />
               )}
             </div>
           </motion.div>
