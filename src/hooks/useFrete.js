@@ -4,13 +4,14 @@ import { setFreteSelecionado, setCep, setFretes } from "../redux/freteSlice";
 
 export function useFrete(items) {
   const dispatch = useDispatch();
-  const cep = useSelector(s => s.frete.cep);
-  const fretes = useSelector(s => s.frete.fretes);
-  const freteSelecionado = useSelector(s => s.frete.freteSelecionado);
+  const cep = useSelector((s) => s.frete.cep);
+  const fretes = useSelector((s) => s.frete.fretes);
+  const freteSelecionado = useSelector((s) => s.frete.freteSelecionado);
 
   const [cepInput, setCepInput] = useState(cep || "");
   const [loadingFrete, setLoadingFrete] = useState(false);
   const [erroFrete, setErroFrete] = useState("");
+  const [enderecoCep, setEnderecoCep] = useState(null);
 
   useEffect(() => {
     setCepInput(cep || "");
@@ -20,13 +21,17 @@ export function useFrete(items) {
     dispatch(setCep(""));
     dispatch(setFretes([]));
     dispatch(setFreteSelecionado(null));
+    setEnderecoCep(null);
   }, [dispatch]);
 
-  const handleCepInputChange = useCallback((e) => {
-    const value = e.target.value.replace(/\D/g, "").slice(0, 8);
-    setCepInput(value);
-    if (value.length < 8) limparFrete();
-  }, [limparFrete]);
+  const handleCepInputChange = useCallback(
+    (e) => {
+      const value = e.target.value.replace(/\D/g, "").slice(0, 8);
+      setCepInput(value);
+      if (value.length < 8) limparFrete();
+    },
+    [limparFrete]
+  );
 
   const calcularFrete = useCallback(async () => {
     if (cepInput.length !== 8) {
@@ -36,27 +41,37 @@ export function useFrete(items) {
     setLoadingFrete(true);
     setErroFrete("");
     try {
-      const res = await fetch("https://atelie-juliabrandao-backend-production.up.railway.app/api/frete/calcular", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          cepDestino: cepInput,
-          items: items.map(i => ({ slug: i.slug, quantity: i.quantity })),
-        }),
-      });
+      const res = await fetch(
+        "https://atelie-juliabrandao-backend-production.up.railway.app/api/frete/calcular",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            cepDestino: cepInput,
+            items: items.map((i) => ({ slug: i.slug, quantity: i.quantity })),
+          }),
+        }
+      );
       const data = await res.json();
       const services = (Array.isArray(data) ? data : data.services || [])
-        .filter(s => !s.has_error && s.price)
-        .map(s => ({
+        .filter((s) => !s.has_error && s.price)
+        .map((s) => ({
           name: s.name,
           price: s.price,
-          deadline: s.delivery_time || (s.delivery_range && s.delivery_range.max) || null,
+          deadline:
+            s.delivery_time || (s.delivery_range && s.delivery_range.max) || null,
           company: s.company?.name,
           logo: s.company?.picture,
         }));
       dispatch(setFretes(services));
       dispatch(setCep(cepInput));
       if (!services.length) setErroFrete("Nenhuma opção de frete encontrada para este CEP.");
+
+      const via = await fetch(`https://viacep.com.br/ws/${cepInput}/json/`);
+      if (via.ok) {
+        const addr = await via.json();
+        if (!addr.erro) setEnderecoCep(addr);
+      }
     } catch {
       setErroFrete("Não foi possível calcular o frete. Verifique o CEP.");
     } finally {
@@ -64,13 +79,20 @@ export function useFrete(items) {
     }
   }, [cepInput, items, dispatch]);
 
-  const handleFreteChange = useCallback((frete) => {
-    if (freteSelecionado && freteSelecionado.name === frete.name) {
-      dispatch(setFreteSelecionado(null));
-    } else {
-      dispatch(setFreteSelecionado({ ...frete, cep: cepInput || freteSelecionado?.cep || cep }));
-    }
-  }, [dispatch, freteSelecionado, cepInput, cep]);
+  const handleFreteChange = useCallback(
+    (frete) => {
+      // Agora não é mais possível "desselecionar".
+      // Se clicar novamente no mesmo, não faz nada.
+      if (freteSelecionado?.name === frete.name) return;
+      dispatch(
+        setFreteSelecionado({
+          ...frete,
+          cep: cepInput || freteSelecionado?.cep || cep,
+        })
+      );
+    },
+    [dispatch, freteSelecionado, cepInput, cep]
+  );
 
   return {
     cep,
@@ -82,6 +104,7 @@ export function useFrete(items) {
     handleCepInputChange,
     calcularFrete,
     handleFreteChange,
-    setErroFrete
+    setErroFrete,
+    enderecoCep,
   };
 }
