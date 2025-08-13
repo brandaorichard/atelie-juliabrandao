@@ -10,6 +10,7 @@ import { CartSummary } from "./cart/CartSummary";
 import { useCartImages } from "../hooks/useCartImages";
 import { useEnderecoCep } from "../hooks/useEnderecoCep";
 import { useFrete } from "../hooks/useFrete";
+import { createOrderAndCheckout } from "../services/orderCheckout";
 
 export default function CartDrawer({ open, onClose }) {
   const dispatch = useDispatch();
@@ -67,79 +68,13 @@ export default function CartDrawer({ open, onClose }) {
   );
 
   const handleCreateOrderAndCheckout = useCallback(async () => {
-    if (!token) {
-      dispatch(
-        showToast({
-          type: "error",
-          message: "Você precisa estar logado para finalizar a compra.",
-        })
-      );
-      return;
-    }
-    if (!items.length) {
-      dispatch(
-        showToast({ type: "error", message: "Seu carrinho está vazio." })
-      );
-      return;
-    }
-    if (!freteSelecionado) {
-      dispatch(
-        showToast({
-          type: "error",
-          message: "Selecione uma opção de frete para continuar.",
-        })
-      );
-      return;
-    }
-
-    const orderPayload = {
-      items: items.map(({ slug, quantity, price }) => ({
-        slug,
-        quantity,
-        price,
-      })),
-      total: subtotal,
-      paymentMethod: "MercadoPago",
-      deliveryAddress: "Coletar do usuário",
-    };
-
-    try {
-      const res = await fetch(
-        "https://atelie-juliabrandao-backend-production.up.railway.app/api/orders",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(orderPayload),
-        }
-      );
-      if (!res.ok) {
-        const err = await res.json();
-        dispatch(
-          showToast({
-            type: "error",
-            message: err.message || "Erro ao criar pedido.",
-          })
-        );
-        return;
-      }
-      dispatch(clearCart());
-      dispatch(
-        showToast({
-          type: "success",
-          message: "Pedido criado! Pagamento Mercado Pago em breve.",
-        })
-      );
-    } catch {
-      dispatch(
-        showToast({
-          type: "error",
-          message: "Erro ao conectar com o servidor.",
-        })
-      );
-    }
+    const result = await createOrderAndCheckout({
+      token,
+      items,
+      freteSelecionado,
+      subtotal,
+      dispatch,
+    });
   }, [token, items, freteSelecionado, subtotal, dispatch]);
 
   return (
