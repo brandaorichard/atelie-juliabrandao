@@ -155,6 +155,7 @@ export default function CartDrawer({ open, onClose }) {
                   onInc={(item) => handleQuantity(item.id, item.quantity + 1)}
                   onRemove={handleRemoveOne}
                 />
+                {/* Só mostra frete/endereço se houver itens */}
                 {items.length > 0 && (
                   <div className="mt-4">
                     <FreightSection
@@ -173,7 +174,7 @@ export default function CartDrawer({ open, onClose }) {
                   </div>
                 )}
 
-                {freteSelecionado && (
+                {items.length > 0 && freteSelecionado && (
                   <section className="mt-6">
                     <h3 className="text-sm font-semibold mb-2">
                       Dados da entrega

@@ -26,8 +26,8 @@ export function CartItems({ items, images }) {
     <div className="flex flex-col gap-3">
       {items.map((item) => (
         <div
-          key={item.id || item.slug}
-          className="flex gap-3 items-start rounded p-3 bg-[#f9e7f6]"
+          key={item.uniqueKey}
+          className="flex gap-3 items-start rounded p-3 bg-[#f9e7f6] w-full"
         >
           <CartItem
             item={item}

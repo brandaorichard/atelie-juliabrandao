@@ -20,7 +20,7 @@ export function CartItem({ item, img }) {
   }
 
   return (
-    <div className="flex items-center gap-3 border border-neutral-300 rounded-lg p-3 mb-4 bg-[#f9e7f6]">
+    <div className="flex items-center gap-3 border border-neutral-300 rounded-lg p-3 bg-[#f9e7f6] w-full">
       <img
         src={img || "/placeholder.jpg"}
         alt={item.name}
