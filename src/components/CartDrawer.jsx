@@ -224,6 +224,7 @@ export default function CartDrawer({ open, onClose }) {
                           onChange={(e) => setComplemento(e.target.value)}
                           placeholder="Ex: Apto 01 / Bloco B"
                         />
+                        {/* Nenhum aviso de erro aqui! */}
                       </div>
                     </div>
                   </section>
