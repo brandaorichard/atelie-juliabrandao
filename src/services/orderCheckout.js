@@ -30,8 +30,8 @@ export async function createOrderAndCheckout({
     dispatch(showToast({ type: "error", message: "Selecione um frete." }));
     return { ok: false };
   }
-  if (!address || !address.numero?.trim() || !address.complemento?.trim()) {
-    dispatch(showToast({ type: "error", message: "Preencha número e complemento." }));
+  if (!address || !address.numero?.trim()) {
+    dispatch(showToast({ type: "error", message: "Insira o número da casa." }));
     return { ok: false };
   }
 
