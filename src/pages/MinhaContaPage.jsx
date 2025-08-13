@@ -1,102 +1,343 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { logout } from "../redux/authSlice";
 import { showToast } from "../redux/toastSlice";
 import { useNavigate } from "react-router-dom";
 
 export default function MinhaContaPage() {
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.auth.user);
-  const [showEditPassword, setShowEditPassword] = useState(false);
   const navigate = useNavigate();
+  const user = useSelector((s) => s.auth.user) || {};
 
-  const handleLogout = () => {
-    dispatch(logout());
-  };
+  // Perfil state
+  const [isEditingPerfil, setIsEditingPerfil] = useState(false);
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
+  const [perfil, setPerfil] = useState({
+    nome: user.nome || "",
+    email: user.email || "",
+    telefone: user.telefone || "",
+    cpf: user.cpf || "",
+    dataNascimento: "",
+    genero: "",
+  });
 
-  const handleResendConfirmation = () => {
-    // Aqui futuramente chamaremos API para reenviar e-mail
-    dispatch(
-      showToast({
-        message: "E-mail de confirmação reenviado!",
-        iconType: "success",
-      })
-    );
-  };
+  // Endereço único
+  const [isEditingEndereco, setIsEditingEndereco] = useState(false);
+  const [endereco, setEndereco] = useState({
+    cep: "",
+    logradouro: "",
+    numero: "",
+    complemento: "",
+    bairro: "",
+    cidade: "",
+    uf: "",
+    referencia: "",
+  });
+
+  function handleSavePerfil(e) {
+    e.preventDefault();
+    setIsEditingPerfil(false);
+    dispatch(showToast({ message: "Perfil salvo (mock).", iconType: "info" }));
+  }
+
+  function handleChangePassword(e) {
+    e.preventDefault();
+    setShowPasswordForm(false);
+    dispatch(showToast({ message: "Senha alterada (mock).", iconType: "info" }));
+  }
+
+  function handleSaveEndereco(e) {
+    e.preventDefault();
+    setIsEditingEndereco(false);
+    dispatch(showToast({ message: "Endereço salvo (mock).", iconType: "info" }));
+  }
+
+  // Utilitário para exibir valor ou placeholder
+  const show = (val, placeholder = "-") => val ? val : placeholder;
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
+    <div className="p-6 max-w-2xl mx-auto mt-8">
       {/* Breadcrumb */}
-      <nav className="flex mb-4 text-sm mt-5 items-center gap-2 text-[#7a4fcf]">
-        <span
-          className="cursor-pointer hover:underline underline"
-          onClick={() => navigate("/")}
-        >
+      <nav className="flex mb-6 text-sm items-center gap-2 text-[#7a4fcf] font-normal">
+        <span className="cursor-pointer underline" onClick={() => navigate("/")}>
           Início
-        </span>{" "}
-        &gt; <span className="font-light underline">Minha Conta</span>
+        </span>
+        <span>&gt;</span>
+        <span className="underline">Minha Conta</span>
       </nav>
-      <h1 className="text-2xl font-light mb-6">Minha Conta</h1>
 
-      <section className="mb-8">
-        <h2 className="text-xl font-light mb-4">Informações do Usuário</h2>
-        <p>
-          <strong>Nome:</strong> {user?.nome || "Não informado"}
-        </p>
-        <p>
-          <strong>E-mail:</strong> {user?.email || "Não informado"}
-        </p>
-        <p>
-          <strong>Telefone:</strong> {user?.telefone || "Não informado"}
-        </p>
-        <p>
-          <strong>Status do E-mail:</strong>{" "}
-          {user?.isConfirmed ? (
-            <span className="text-green-600 font-semibold">Confirmado</span>
-          ) : (
-            <>
-              <span className="text-red-600 font-semibold">Não confirmado</span>{" "}
-              <button
-                onClick={handleResendConfirmation}
-                className="text-purple-700 hover:underline ml-2"
-              >
-                Reenviar e-mail
-              </button>
-            </>
-          )}
-        </p>
-      </section>
-
-      <section className="mb-8">
-        <h2 className="text-xl font-light mb-4 cursor-pointer">Segurança</h2>
-        <button
-          onClick={() => setShowEditPassword(true)}
-          className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
-        >
-          Editar senha
-        </button>
-
-        {showEditPassword && (
-          <div className="mt-4 p-4 border border-gray-300 rounded">
-            {/* Aqui futuramente o formulário para alterar senha */}
-            <p>Funcionalidade em desenvolvimento...</p>
+      {/* Meus dados */}
+      <section className="mb-10">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold">Meus dados</h2>
+          {!isEditingPerfil && (
             <button
-              onClick={() => setShowEditPassword(false)}
-              className="mt-2 text-purple-700 hover:underline"
+              onClick={() => setIsEditingPerfil(true)}
+              className="text-sm text-[#7a4fcf] underline"
             >
-              Cancelar
+              Editar informações
             </button>
-          </div>
+          )}
+        </div>
+        {!isEditingPerfil ? (
+          <ul className="text-sm space-y-1 mb-2">
+            <li><b>Nome:</b> {show(perfil.nome)}</li>
+            <li><b>E-mail:</b> {show(perfil.email)}</li>
+            <li><b>Telefone:</b> {show(perfil.telefone)}</li>
+            <li><b>CPF:</b> {show(perfil.cpf)}</li>
+            <li><b>Data de nascimento:</b> {show(perfil.dataNascimento)}</li>
+          </ul>
+        ) : (
+          <form onSubmit={handleSavePerfil} className="grid gap-4 sm:grid-cols-2 text-sm">
+            <div className="sm:col-span-2">
+              <label className="block mb-1 font-medium">Nome completo *</label>
+              <input
+                className="w-full border rounded px-3 py-2"
+                value={perfil.nome}
+                onChange={(e) => setPerfil({ ...perfil, nome: e.target.value })}
+                required
+              />
+            </div>
+            <div>
+              <label className="block mb-1 font-medium">E-mail *</label>
+              <input
+                className="w-full border rounded px-3 py-2 bg-gray-100"
+                value={perfil.email}
+                disabled
+              />
+            </div>
+            <div>
+              <label className="block mb-1 font-medium">Telefone *</label>
+              <input
+                className="w-full border rounded px-3 py-2"
+                value={perfil.telefone}
+                onChange={(e) =>
+                  setPerfil({ ...perfil, telefone: e.target.value })
+                }
+              />
+            </div>
+            <div>
+              <label className="block mb-1 font-medium">CPF *</label>
+              <input
+                className="w-full border rounded px-3 py-2"
+                value={perfil.cpf}
+                onChange={(e) => setPerfil({ ...perfil, cpf: e.target.value })}
+              />
+            </div>
+            <div>
+              <label className="block mb-1 font-medium">Data de nascimento</label>
+              <input
+                type="date"
+                className="w-full border rounded px-3 py-2"
+                value={perfil.dataNascimento}
+                onChange={(e) =>
+                  setPerfil({ ...perfil, dataNascimento: e.target.value })
+                }
+              />
+            </div>
+            <div className="sm:col-span-2 flex gap-3 pt-2">
+              <button className="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded text-sm">
+                Salvar alterações
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsEditingPerfil(false)}
+                className="text-sm underline text-gray-600"
+              >
+                Cancelar
+              </button>
+            </div>
+          </form>
         )}
       </section>
 
+      {/* Endereço */}
       <section>
-        <button
-          onClick={handleLogout}
-          className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-        >
-          Sair da conta
-        </button>
+        <div className="flex items-center justify-between mb-4 mt-15">
+          <h2 className="text-lg font-semibold">Endereço para entrega</h2>
+          {!isEditingEndereco && (
+            <button
+              onClick={() => setIsEditingEndereco(true)}
+              className="text-sm text-[#7a4fcf] underline"
+            >
+              {endereco.cep ? "Editar endereço" : "Adicionar endereço"}
+            </button>
+          )}
+        </div>
+        {!isEditingEndereco ? (
+          endereco.cep ? (
+            <ul className="text-sm space-y-1 mb-2">
+              <li><b>CEP:</b> {show(endereco.cep)}</li>
+              <li><b>Logradouro:</b> {show(endereco.logradouro)}</li>
+              <li><b>Número:</b> {show(endereco.numero)}</li>
+              <li><b>Complemento:</b> {show(endereco.complemento)}</li>
+              <li><b>Bairro:</b> {show(endereco.bairro)}</li>
+              <li><b>Cidade:</b> {show(endereco.cidade)}</li>
+              <li><b>UF:</b> {show(endereco.uf)}</li>
+              <li><b>Referência:</b> {show(endereco.referencia)}</li>
+            </ul>
+          ) : (
+            <div className="text-sm text-gray-500 mb-2">Nenhum endereço cadastrado.</div>
+          )
+        ) : (
+          <form onSubmit={handleSaveEndereco} className="grid gap-4 sm:grid-cols-2 text-sm">
+            <div>
+              <label className="block mb-1">CEP *</label>
+              <input
+                className="w-full border rounded px-3 py-2"
+                value={endereco.cep}
+                onChange={(e) =>
+                  setEndereco({ ...endereco, cep: e.target.value })
+                }
+                maxLength={9}
+                required
+              />
+            </div>
+            <div className="sm:col-span-2">
+              <label className="block mb-1">Logradouro *</label>
+              <input
+                className="w-full border rounded px-3 py-2"
+                value={endereco.logradouro}
+                onChange={(e) =>
+                  setEndereco({ ...endereco, logradouro: e.target.value })
+                }
+                required
+              />
+            </div>
+            <div>
+              <label className="block mb-1">Número *</label>
+              <input
+                className="w-full border rounded px-3 py-2"
+                value={endereco.numero}
+                onChange={(e) =>
+                  setEndereco({ ...endereco, numero: e.target.value })
+                }
+                required
+              />
+            </div>
+            <div>
+              <label className="block mb-1">Complemento</label>
+              <input
+                className="w-full border rounded px-3 py-2"
+                value={endereco.complemento}
+                onChange={(e) =>
+                  setEndereco({ ...endereco, complemento: e.target.value })
+                }
+              />
+            </div>
+            <div>
+              <label className="block mb-1">Bairro *</label>
+              <input
+                className="w-full border rounded px-3 py-2"
+                value={endereco.bairro}
+                onChange={(e) =>
+                  setEndereco({ ...endereco, bairro: e.target.value })
+                }
+                required
+              />
+            </div>
+            <div>
+              <label className="block mb-1">Cidade *</label>
+              <input
+                className="w-full border rounded px-3 py-2"
+                value={endereco.cidade}
+                onChange={(e) =>
+                  setEndereco({ ...endereco, cidade: e.target.value })
+                }
+                required
+              />
+            </div>
+            <div>
+              <label className="block mb-1">UF *</label>
+              <input
+                className="w-full border rounded px-3 py-2"
+                value={endereco.uf}
+                onChange={(e) =>
+                  setEndereco({
+                    ...endereco,
+                    uf: e.target.value.toUpperCase().slice(0, 2),
+                  })
+                }
+                maxLength={2}
+                required
+              />
+            </div>
+            <div className="sm:col-span-2">
+              <label className="block mb-1">Referência</label>
+              <input
+                className="w-full border rounded px-3 py-2"
+                value={endereco.referencia}
+                onChange={(e) =>
+                  setEndereco({ ...endereco, referencia: e.target.value })
+                }
+              />
+            </div>
+            <div className="sm:col-span-2 flex gap-3 pt-2">
+              <button className="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded text-sm">
+                Salvar endereço
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsEditingEndereco(false)}
+                className="text-sm underline text-gray-600"
+              >
+                Cancelar
+              </button>
+            </div>
+          </form>
+        )}
+      </section>
+
+      {/* Segurança */}
+      <section>
+        <h2 className="text-lg font-semibold mb-4 mt-15">Segurança</h2>
+        {!showPasswordForm && (
+          <button
+            className="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded text-sm mb-4"
+            onClick={() => setShowPasswordForm(true)}
+          >
+            Alterar senha
+          </button>
+        )}
+        {showPasswordForm && (
+          <form
+            onSubmit={handleChangePassword}
+            className="grid gap-2 max-w-xs"
+          >
+            <input
+              type="password"
+              placeholder="Senha atual"
+              className="border rounded px-3 py-2"
+              required
+            />
+            <input
+              type="password"
+              placeholder="Nova senha"
+              className="border rounded px-3 py-2"
+              required
+            />
+            <input
+              type="password"
+              placeholder="Confirmar nova senha"
+              className="border rounded px-3 py-2"
+              required
+            />
+            <div className="flex gap-3">
+              <button
+                className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded"
+                type="submit"
+              >
+                Salvar senha
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowPasswordForm(false)}
+                className="text-purple-700 hover:underline"
+              >
+                Cancelar
+              </button>
+            </div>
+          </form>
+        )}
       </section>
     </div>
   );
