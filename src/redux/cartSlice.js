@@ -1,7 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 function getUniqueKey(product) {
-  // Use os campos que tornam o item único no carrinho
   return [
     product.slug,
     product.name,
@@ -11,9 +10,19 @@ function getUniqueKey(product) {
   ].join("_");
 }
 
+// Recupera o carrinho do localStorage ao iniciar
+function getInitialCart() {
+  try {
+    const saved = localStorage.getItem("cart");
+    return saved ? JSON.parse(saved) : [];
+  } catch {
+    return [];
+  }
+}
+
 const cartSlice = createSlice({
   name: "cart",
-  initialState: { items: [] },
+  initialState: { items: getInitialCart() },
   reducers: {
     addToCart(state, action) {
       const { product, quantity } = action.payload;
@@ -25,12 +34,15 @@ const cartSlice = createSlice({
       } else {
         state.items.push({ ...product, quantity, uniqueKey });
       }
+      localStorage.setItem("cart", JSON.stringify(state.items));
     },
     removeFromCart(state, action) {
       state.items = state.items.filter(item => item.uniqueKey !== action.payload);
+      localStorage.setItem("cart", JSON.stringify(state.items));
     },
     clearCart(state) {
       state.items = [];
+      localStorage.removeItem("cart");
     },
     setQuantity(state, action) {
       const { uniqueKey, quantity } = action.payload;
@@ -38,6 +50,7 @@ const cartSlice = createSlice({
       if (idx !== -1) {
         state.items[idx].quantity = quantity;
       }
+      localStorage.setItem("cart", JSON.stringify(state.items));
     }
   }
 });
