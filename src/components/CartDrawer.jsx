@@ -12,6 +12,8 @@ import { useFrete } from "../hooks/useFrete";
 import { createOrderAndCheckout } from "../services/orderCheckout";
 import { useNavigate } from "react-router-dom";
 import MercadoPagoIcon from "../assets/icons/mercadopago2.png"
+import LoginPreview from "./LoginPreview"; // importe o componente
+import { login } from "../redux/authSlice"; // ajuste o caminho se necessário
 
 export default function CartDrawer({ open, onClose }) {
   const dispatch = useDispatch();
@@ -22,6 +24,7 @@ export default function CartDrawer({ open, onClose }) {
   const [numeroCasa, setNumeroCasa] = useState("");
   const [complemento, setComplemento] = useState("");
   const [touched, setTouched] = useState(false);
+  const [showLoginPreview, setShowLoginPreview] = useState(false);
 
   const images = useCartImages(items);
   const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
@@ -75,12 +78,23 @@ export default function CartDrawer({ open, onClose }) {
   const handleCreateOrderAndCheckout = useCallback(async () => {
     setTouched(true);
     if (!canCheckout) {
+      // dispatch(
+      //   showToast({
+      //     type: "error",
+      //     message: "Preencha o número da casa para continuar.",
+      //   })
+      // );
+      return;
+    }
+
+    if (!token) {
       dispatch(
         showToast({
           type: "error",
-          message: "Preencha o número da casa para continuar.",
+          message: "Você precisa estar logado para finalizar a compra.",
         })
       );
+      setShowLoginPreview(true); // exibe o preview do login
       return;
     }
 
@@ -331,9 +345,8 @@ export default function CartDrawer({ open, onClose }) {
                   <button
                     className={`w-full rounded-full py-3 font-medium transition flex items-center justify-center gap-2
                       bg-[#7a4fcf] hover:bg-[#ae95d9] text-white
-                      ${!canCheckout ? "opacity-50 cursor-not-allowed" : "opacity-100 cursor-pointer"}`}
+                      ${!canCheckout ? "opacity-50" : "opacity-100"}`}
                     onClick={handleCreateOrderAndCheckout}
-                    disabled={!canCheckout}
                   >
                     Prosseguir para o Mercado Pago
                   </button>
@@ -341,6 +354,25 @@ export default function CartDrawer({ open, onClose }) {
               )}
             </div>
           </motion.div>
+          <LoginPreview
+            open={showLoginPreview}
+            onClose={() => setShowLoginPreview(false)}
+            onLogin={async ({ user, token }) => {
+              // Recebe user e token do LoginPreview
+              dispatch(login({ user, token }));
+              setShowLoginPreview(false);
+              dispatch(
+                showToast({
+                  message: "Login realizado com sucesso!",
+                  iconType: "success",
+                })
+              );
+            }}
+            onCreateAccount={() => {
+              setShowLoginPreview(false);
+              navigate("/register");
+            }}
+          />
         </>
       )}
     </AnimatePresence>
