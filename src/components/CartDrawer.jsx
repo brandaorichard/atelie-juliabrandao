@@ -358,7 +358,6 @@ export default function CartDrawer({ open, onClose }) {
             open={showLoginPreview}
             onClose={() => setShowLoginPreview(false)}
             onLogin={async ({ user, token }) => {
-              // Recebe user e token do LoginPreview
               dispatch(login({ user, token }));
               setShowLoginPreview(false);
               dispatch(
@@ -369,8 +368,9 @@ export default function CartDrawer({ open, onClose }) {
               );
             }}
             onCreateAccount={() => {
-              setShowLoginPreview(false);
-              navigate("/register");
+              setShowLoginPreview(false); // fecha o preview de login
+              onClose?.(); // minimiza/retrai o carrinho
+              navigate("/register"); // mostra a página de cadastro
             }}
           />
         </>
