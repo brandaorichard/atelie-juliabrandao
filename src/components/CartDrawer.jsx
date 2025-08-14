@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import React, { useCallback, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { removeFromCart, setQuantity } from "../redux/cartSlice";
+import { removeFromCart, setQuantity, clearCart } from "../redux/cartSlice";
 import { showToast } from "../redux/toastSlice";
 import { CartHeader } from "./cart/CartHeader";
 import { CartItems } from "./cart/CartItems";
@@ -102,6 +102,7 @@ export default function CartDrawer({ open, onClose }) {
     });
 
     if (result.ok && result.order?._id) {
+      dispatch(clearCart()); // limpa o carrinho após a compra
       onClose?.();
       navigate(`/pedido/${result.order._id}`);
     }
@@ -150,20 +151,45 @@ export default function CartDrawer({ open, onClose }) {
               `}
             </style>
             <div className="h-full flex flex-col">
-              <CartHeader onClose={onClose} />
-              <div className="flex-1 overflow-y-auto px-3 md:px-6 py-4">
-                <CartItems
-                  items={items}
-                  images={images}
-                  onDec={(item) =>
-                    handleQuantity(item.id, Math.max(1, item.quantity - 1))
-                  }
-                  onInc={(item) => handleQuantity(item.id, item.quantity + 1)}
-                  onRemove={handleRemoveOne}
-                />
-                {/* Só mostra frete/endereço se houver itens */}
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                <CartHeader onClose={onClose} />
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
+                transition={{ duration: 0.3 }}
+                className="flex-1 overflow-y-auto px-3 md:px-6 py-4"
+              >
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <CartItems
+                    items={items}
+                    images={images}
+                    onDec={(item) =>
+                      handleQuantity(item.id, Math.max(1, item.quantity - 1))
+                    }
+                    onInc={(item) => handleQuantity(item.id, item.quantity + 1)}
+                    onRemove={handleRemoveOne}
+                  />
+                </motion.div>
                 {items.length > 0 && (
-                  <div className="mt-4">
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    transition={{ duration: 0.3 }}
+                    className="mt-4"
+                  >
                     <FreightSection
                       fullWidth
                       cepInput={cepInput}
@@ -177,11 +203,17 @@ export default function CartDrawer({ open, onClose }) {
                       endereco={enderecoCep}
                       showCepInput={!cep || cep.length !== 8}
                     />
-                  </div>
+                  </motion.div>
                 )}
 
                 {items.length > 0 && enderecoCep && (
-                  <section className="mt-6">
+                  <motion.section
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    transition={{ duration: 0.3 }}
+                    className="mt-6"
+                  >
                     <h3 className="text-sm font-semibold mb-2">
                       Dados da entrega
                     </h3>
@@ -227,37 +259,44 @@ export default function CartDrawer({ open, onClose }) {
                         {/* Nenhum aviso de erro aqui! */}
                       </div>
                     </div>
-                  </section>
+                  </motion.section>
                 )}
-              </div>
+              </motion.div>
 
               {items.length > 0 && (
-                <CartSummary
-                  subtotal={subtotal}
-                  freteSelecionado={freteSelecionado}
-                  onCheckout={handleCreateOrderAndCheckout}
-                  disabled={false} // <-- sempre habilitado!
-                  checkoutLabel={
-                    canCheckout
-                      ? (
-                        <span className="flex items-center justify-center gap-2">
-                          Prosseguir para o Mercado Pago
-                          <img
-                            src={MercadoPagoIcon}
-                            alt="Mercado Pago"
-                            className="h-6 w-auto"
-                            style={{
-                              display: "inline-block",
-                              verticalAlign: "middle",
-                              background: "transparent",
-                            }}
-                          />
-                        </span>
-                      )
-                      : "Iniciar Compra"
-                  }
-                  showMercadoPagoInfo={canCheckout}
-                />
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <CartSummary
+                    subtotal={subtotal}
+                    freteSelecionado={freteSelecionado}
+                    onCheckout={handleCreateOrderAndCheckout}
+                    disabled={false} // <-- sempre habilitado!
+                    checkoutLabel={
+                      canCheckout
+                        ? (
+                          <span className="flex items-center justify-center gap-2">
+                            Prosseguir para o Mercado Pago
+                            {/* <img
+                              src={MercadoPagoIcon}
+                              alt="Mercado Pago"
+                              className="h-6 w-auto"
+                              style={{
+                                display: "inline-block",
+                                verticalAlign: "middle",
+                                background: "transparent",
+                              }}
+                            /> */}
+                          </span>
+                        )
+                        : "Iniciar Compra"
+                    }
+                    showMercadoPagoInfo={canCheckout}
+                  />
+                </motion.div>
               )}
             </div>
           </motion.div>
