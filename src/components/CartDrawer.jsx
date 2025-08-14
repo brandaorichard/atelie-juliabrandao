@@ -269,33 +269,74 @@ export default function CartDrawer({ open, onClose }) {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 10 }}
                   transition={{ duration: 0.3 }}
+                  className="sticky bottom-0 left-0 right-0 bg-[#f9e7f6] px-3 md:px-6 py-4 z-10"
                 >
-                  <CartSummary
-                    subtotal={subtotal}
-                    freteSelecionado={freteSelecionado}
-                    onCheckout={handleCreateOrderAndCheckout}
-                    disabled={false} // <-- sempre habilitado!
-                    checkoutLabel={
-                      canCheckout
-                        ? (
-                          <span className="flex items-center justify-center gap-2">
-                            Prosseguir para o Mercado Pago
-                            {/* <img
-                              src={MercadoPagoIcon}
-                              alt="Mercado Pago"
-                              className="h-6 w-auto"
-                              style={{
-                                display: "inline-block",
-                                verticalAlign: "middle",
-                                background: "transparent",
-                              }}
-                            /> */}
-                          </span>
-                        )
-                        : "Iniciar Compra"
-                    }
-                    showMercadoPagoInfo={canCheckout}
-                  />
+                  {/* Bloco do total */}
+                  <div className="mb-3">
+                    <div className="flex justify-between text-sm mb-1">
+                      <span>Subtotal</span>
+                      <span>
+                        {subtotal.toLocaleString("pt-BR", {
+                          style: "currency",
+                          currency: "BRL",
+                        })}
+                      </span>
+                    </div>
+                    {freteSelecionado && (
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>Frete</span>
+                        <span>
+                          {Number(freteSelecionado.price).toLocaleString("pt-BR", {
+                            style: "currency",
+                            currency: "BRL",
+                          })}
+                        </span>
+                      </div>
+                    )}
+                    <div className="flex justify-between font-semibold text-base mt-2">
+                      <span>Total</span>
+                      <span>
+                        {(
+                          subtotal +
+                          (freteSelecionado ? Number(freteSelecionado.price) : 0)
+                        ).toLocaleString("pt-BR", {
+                          style: "currency",
+                          currency: "BRL",
+                        })}
+                      </span>
+                    </div>
+                  </div>
+                  {/* Bloco fixo Mercado Pago */}
+                  <div className="flex items-center gap-2 border border-[#ae95d9] bg-[#f9e7f6] rounded px-3 py-2 mb-3">
+                    <img
+                      src={MercadoPagoIcon}
+                      alt="Mercado Pago"
+                      className="h-8 w-auto"
+                      style={{
+                        background: "transparent",
+                        display: "inline-block",
+                        verticalAlign: "middle",
+                      }}
+                    />
+                    <div>
+                      <div className="text-sm text-gray-700">
+                        Vamos te redirecionar para o Mercado Pago
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        Se não tiver conta Mercado Pago, use seu e-mail.
+                      </div>
+                    </div>
+                  </div>
+                  {/* Botão Mercado Pago */}
+                  <button
+                    className={`w-full rounded-full py-3 font-medium transition flex items-center justify-center gap-2
+                      bg-[#7a4fcf] hover:bg-[#ae95d9] text-white
+                      ${!canCheckout ? "opacity-50 cursor-not-allowed" : "opacity-100 cursor-pointer"}`}
+                    onClick={handleCreateOrderAndCheckout}
+                    disabled={!canCheckout}
+                  >
+                    Prosseguir para o Mercado Pago
+                  </button>
                 </motion.div>
               )}
             </div>
