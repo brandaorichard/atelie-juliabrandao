@@ -19,6 +19,8 @@ import OrdersPage from "./pages/OrdersPage";
 import MinhaContaPage from "./pages/MinhaContaPage";
 import OrderDetailPage from "./pages/OrderDetailPage";
 
+import MercadoPagoWebhookTeste from "./pages/MercadoPagoWebhookTeste";
+
 import "./index.css";
 
 import ConfirmEmailPage from "./pages/ConfirmEmailPage"; // importe o componente
@@ -46,6 +48,7 @@ function App() {
         <Route path="/minha-conta" element={<MinhaContaPage />} />
         <Route path="/pedido/:id" element={<OrderDetailPage />} />
         <Route path="/produto/:slug" element={<ProductPage />} />
+        <Route path="/mercadopago-webhook-teste" element={<MercadoPagoWebhookTeste />} />
       </Routes>
       <Footer />
       <SocialMediasSection />
