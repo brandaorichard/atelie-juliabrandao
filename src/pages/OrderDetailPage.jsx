@@ -87,9 +87,9 @@ export default function OrderDetailPage() {
             <p className="font-semibold">Pedido #{order._id}</p>
             <p className="text-sm text-gray-500">{new Date(order.date).toLocaleDateString()}</p>
           </div>
-          <div>
+          {/* <div>
             <span className="px-3 py-1 rounded text-white bg-purple-600">{order.status}</span>
-          </div>
+          </div> */}
         </div>
 
         <div>
@@ -123,9 +123,9 @@ export default function OrderDetailPage() {
         <p>
           <strong>Total:</strong> R$ {order.total.toFixed(2)}
         </p>
-        <p>
+        {/* <p>
           <strong>Pagamento:</strong> {order.paymentMethod}
-        </p>
+        </p> */}
         <p>
           <strong>Entrega:</strong> {order.deliveryAddress}
         </p>
