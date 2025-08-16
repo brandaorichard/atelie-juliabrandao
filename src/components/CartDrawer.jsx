@@ -118,20 +118,13 @@ export default function CartDrawer({ open, onClose }) {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            orderId: orderResult.order._id,
-            items: orderResult.order.items.map(i => ({
-              title: i.title,
-              quantity: i.quantity,
-              unit_price: i.price
-            })),
-            freight: {
-              title: freteSelecionado?.title || freteSelecionado?.service || "Frete",
-              value: Number(freteSelecionado?.price) || 0
-            },
-            payer: {
-              email: orderResult.order.payer?.email,
-              name: orderResult.order.payer?.name,
-              cpf: orderResult.order.payer?.cpf
+            userId: orderResult.order.userId,
+            items: orderResult.order.items, // precisa conter o campo slug!
+            total: orderResult.order.total,
+            paymentMethod: orderResult.order.paymentMethod,
+            deliveryAddress: orderResult.order.deliveryAddress,
+            buyer: {
+              email: orderResult.order.payer?.email
             }
           }),
         }
