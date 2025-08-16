@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { removeFromCart, setQuantity, clearCart } from "../redux/cartSlice";
 import { showToast } from "../redux/toastSlice";
@@ -31,6 +31,9 @@ export default function CartDrawer({ open, onClose }) {
   const [preferenceId, setPreferenceId] = useState(null);
   const [loadingCheckout, setLoadingCheckout] = useState(false);
   const [lastOrderId, setLastOrderId] = useState(null);
+  const [freteAviso, setFreteAviso] = useState(false);
+  const [freteBordaVermelha, setFreteBordaVermelha] = useState(false);
+  const [numeroCasaAviso, setNumeroCasaAviso] = useState(false);
 
   const images = useCartImages(items);
   const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
@@ -47,6 +50,8 @@ export default function CartDrawer({ open, onClose }) {
     handleFreteChange,
     enderecoCep,
   } = useFrete(items);
+
+  const numeroCasaRef = useRef(null);
 
   const canCheckout =
     !!freteSelecionado &&
@@ -83,7 +88,17 @@ export default function CartDrawer({ open, onClose }) {
 
   const handleCreateOrderAndCheckout = useCallback(async () => {
     setTouched(true);
-    if (!canCheckout) return;
+    if (!freteSelecionado) {
+      setFreteAviso(true);
+      setTimeout(() => setFreteAviso(false), 3000);
+      return;
+    }
+    if (!canCheckout) {
+      setNumeroCasaAviso(true);
+      numeroCasaRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      setTimeout(() => setNumeroCasaAviso(false), 3000);
+      return;
+    }
     if (!token) {
       dispatch(showToast({ type: "error", message: "Você precisa estar logado para finalizar a compra." }));
       setShowLoginPreview(true);
@@ -211,25 +226,39 @@ export default function CartDrawer({ open, onClose }) {
                 </motion.div>
                 {items.length > 0 && (
                   <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                    transition={{ duration: 0.3 }}
-                    className="mt-4"
+                    id="frete-card"
+                    className={`mt-4 ${freteBordaVermelha ? "border-2 border-red-500" : ""}`}
                   >
-                    <FreightSection
-                      fullWidth
-                      cepInput={cepInput}
-                      onCepChange={handleCepInputChange}
-                      onCalcular={calcularFrete}
-                      loadingFrete={loadingFrete}
-                      erroFrete={erroFrete}
-                      opcoesFrete={fretes || []}
-                      freteSelecionado={freteSelecionado}
-                      onSelectFrete={handleFreteChange}
-                      endereco={enderecoCep}
-                      showCepInput={!cep || cep.length !== 8}
-                    />
+                    <div
+                      className={`relative ${freteBordaVermelha ? "border-2 border-red-500 rounded-lg transition-all duration-300" : ""}`}
+                      style={{ transition: "border-color 0.3s" }}
+                    >
+                      <FreightSection
+                        fullWidth
+                        cepInput={cepInput}
+                        onCepChange={handleCepInputChange}
+                        onCalcular={calcularFrete}
+                        loadingFrete={loadingFrete}
+                        erroFrete={erroFrete}
+                        opcoesFrete={fretes || []}
+                        freteSelecionado={freteSelecionado}
+                        onSelectFrete={(frete) => {
+                          handleFreteChange(frete);
+                          setFreteAviso(false);
+                          setFreteBordaVermelha(false);
+                        }}
+                        endereco={enderecoCep}
+                        showCepInput={!cep || cep.length !== 8}
+                      />
+                      {freteAviso && (
+                        <p
+                          className="text-xs text-red-600 mt-2 transition-opacity duration-300"
+                          style={{ opacity: freteAviso ? 1 : 0 }}
+                        >
+                          Selecione uma opção de frete para continuar.
+                        </p>
+                      )}
+                    </div>
                   </motion.div>
                 )}
 
@@ -258,17 +287,19 @@ export default function CartDrawer({ open, onClose }) {
                           Número *
                         </label>
                         <input
-                          className={`w-full border rounded px-3 py-2 text-xs ${
-                            touched && !numeroCasa.trim()
-                              ? "border-red-500"
-                              : "border-gray-300"
+                          ref={numeroCasaRef}
+                          className={`w-full border rounded px-3 py-2 text-xs transition-all duration-300 ${
+                            numeroCasaAviso ? "border-2 border-red-500" : "border-gray-300"
                           }`}
                           value={numeroCasa}
                           onChange={(e) => setNumeroCasa(e.target.value)}
                           placeholder="Ex: 123"
                         />
-                        {touched && !canCheckout && (
-                          <p className="text-[11px] text-red-600 mt-2">
+                        {numeroCasaAviso && (
+                          <p
+                            className="text-[11px] text-red-600 mt-2 transition-opacity duration-300"
+                            style={{ opacity: numeroCasaAviso ? 1 : 0 }}
+                          >
                             Preencha o número da casa.
                           </p>
                         )}
@@ -347,7 +378,7 @@ export default function CartDrawer({ open, onClose }) {
                     />
                     <div>
                       {!preferenceId ? (
-                        <div className="text-center">
+                        <div className="">
                           <div className="text-sm text-gray-700">
                             O pagamento é realizado pelo Mercado Pago, ambiente seguro.
                           </div>
@@ -358,7 +389,7 @@ export default function CartDrawer({ open, onClose }) {
                       ) : (
                         <div className="">
                           <div className="text-sm text-gray-700">
-                            Clique abaixo para finalizar o pagamento no Mercado Pago.
+                            Clique abaixo para prosseguir com o pagamento via Mercado Pago.
                           </div>
                           <div className="text-xs text-gray-500">
                             Se não tiver conta Mercado Pago, use seu e-mail.

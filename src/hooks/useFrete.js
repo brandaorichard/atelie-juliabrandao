@@ -8,6 +8,7 @@ export function useFrete(items) {
   const fretes = useSelector((s) => s.frete.fretes);
   const freteSelecionado = useSelector((s) => s.frete.freteSelecionado);
   const enderecoCep = useSelector((s) => s.frete.enderecoCep);
+  const [freteAviso, setFreteAviso] = useState(false);
 
   const [cepInput, setCepInput] = useState(cep || "");
   const [loadingFrete, setLoadingFrete] = useState(false);
@@ -95,6 +96,7 @@ export function useFrete(items) {
           cep: cepInput || freteSelecionado?.cep || cep,
         })
       );
+      setFreteAviso(false);
     },
     [dispatch, freteSelecionado, cepInput, cep]
   );
