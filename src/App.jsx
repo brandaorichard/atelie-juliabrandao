@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useParams } from "react-router-dom";
 import Header from "./components/Header";
 import SocialMediasSection from "./components/SocialMediasSection";
 import ProductPage from "./components/ProductPage";
@@ -19,11 +19,15 @@ import OrdersPage from "./pages/OrdersPage";
 import MinhaContaPage from "./pages/MinhaContaPage";
 import OrderDetailPage from "./pages/OrderDetailPage";
 
-import MercadoPagoWebhookTeste from "./pages/MercadoPagoWebhookTeste";
-
 import "./index.css";
 
 import ConfirmEmailPage from "./pages/ConfirmEmailPage"; // importe o componente
+
+// Página de redirecionamento
+function PedidoRedirect() {
+  const { id } = useParams();
+  return <Navigate to={`/pedido/${id}`} replace />;
+}
 
 function App() {
   const [cartOpen, setCartOpen] = React.useState(false);
@@ -48,7 +52,9 @@ function App() {
         <Route path="/minha-conta" element={<MinhaContaPage />} />
         <Route path="/pedido/:id" element={<OrderDetailPage />} />
         <Route path="/produto/:slug" element={<ProductPage />} />
-        <Route path="/mercadopago-webhook-teste" element={<MercadoPagoWebhookTeste />} />
+        <Route path="/pedido/:id/pendente" element={<PedidoRedirect />} />
+        <Route path="/pedido/:id/sucesso" element={<PedidoRedirect />} />
+        <Route path="/pedido/:id/erro" element={<PedidoRedirect />} />
       </Routes>
       <Footer />
       <SocialMediasSection />
