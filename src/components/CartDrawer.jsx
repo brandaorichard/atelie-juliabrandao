@@ -14,6 +14,9 @@ import { useNavigate } from "react-router-dom";
 import MercadoPagoIcon from "../assets/icons/mercadopago2.png"
 import LoginPreview from "./LoginPreview"; // importe o componente
 import { login } from "../redux/authSlice"; // ajuste o caminho se necessário
+import { initMercadoPago, Wallet } from "@mercadopago/sdk-react";
+
+initMercadoPago(import.meta.env.VITE_MP_PUBLIC_KEY, { locale: 'pt-BR' });
 
 export default function CartDrawer({ open, onClose }) {
   const dispatch = useDispatch();
@@ -25,6 +28,8 @@ export default function CartDrawer({ open, onClose }) {
   const [complemento, setComplemento] = useState("");
   const [touched, setTouched] = useState(false);
   const [showLoginPreview, setShowLoginPreview] = useState(false);
+  const [preferenceId, setPreferenceId] = useState(null);
+  const [loadingCheckout, setLoadingCheckout] = useState(false);
 
   const images = useCartImages(items);
   const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
@@ -77,28 +82,17 @@ export default function CartDrawer({ open, onClose }) {
 
   const handleCreateOrderAndCheckout = useCallback(async () => {
     setTouched(true);
-    if (!canCheckout) {
-      // dispatch(
-      //   showToast({
-      //     type: "error",
-      //     message: "Preencha o número da casa para continuar.",
-      //   })
-      // );
-      return;
-    }
-
+    if (!canCheckout) return;
     if (!token) {
-      dispatch(
-        showToast({
-          type: "error",
-          message: "Você precisa estar logado para finalizar a compra.",
-        })
-      );
-      setShowLoginPreview(true); // exibe o preview do login
+      dispatch(showToast({ type: "error", message: "Você precisa estar logado para finalizar a compra." }));
+      setShowLoginPreview(true);
       return;
     }
 
-    const result = await createOrderAndCheckout({
+    setLoadingCheckout(true);
+
+    // 1. Crie o pedido normalmente
+    const orderResult = await createOrderAndCheckout({
       token,
       items,
       freteSelecionado,
@@ -111,15 +105,41 @@ export default function CartDrawer({ open, onClose }) {
         cidade: enderecoCep?.localidade || "",
         uf: enderecoCep?.uf || "",
         numero: numeroCasa,
-        complemento, // opcional
+        complemento,
       },
     });
 
-    if (result.ok && result.order?._id) {
-      dispatch(clearCart()); // limpa o carrinho após a compra
-      onClose?.();
-      navigate(`/pedido/${result.order._id}`);
+    // 2. Gere a preferência Mercado Pago usando o pedido criado
+    if (orderResult.ok && orderResult.order?._id) {
+      const prefRes = await fetch(
+        "https://atelie-juliabrandao-backend-production.up.railway.app/api/checkout/preference",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            orderId: orderResult.order._id,
+            items: orderResult.order.items.map(i => ({
+              title: i.title,
+              quantity: i.quantity,
+              unit_price: i.price
+            })),
+            freight: {
+              title: freteSelecionado?.title || freteSelecionado?.service || "Frete",
+              value: Number(freteSelecionado?.price) || 0
+            },
+            payer: {
+              email: orderResult.order.payer?.email,
+              name: orderResult.order.payer?.name,
+              cpf: orderResult.order.payer?.cpf
+            }
+          }),
+        }
+      );
+      const prefData = await prefRes.json();
+      setPreferenceId(prefData.preferenceId); // Agora renderiza o Wallet!
     }
+
+    setLoadingCheckout(false);
   }, [
     token,
     items,
@@ -132,8 +152,6 @@ export default function CartDrawer({ open, onClose }) {
     cep,
     enderecoCep,
     canCheckout,
-    onClose,
-    navigate,
   ]);
 
   return (
@@ -342,14 +360,19 @@ export default function CartDrawer({ open, onClose }) {
                     </div>
                   </div>
                   {/* Botão Mercado Pago */}
-                  <button
-                    className={`w-full rounded-full py-3 font-medium transition flex items-center justify-center gap-2
-                      bg-[#7a4fcf] hover:bg-[#ae95d9] text-white
-                      ${!canCheckout ? "opacity-50" : "opacity-100"}`}
-                    onClick={handleCreateOrderAndCheckout}
-                  >
-                    Prosseguir para o Mercado Pago
-                  </button>
+                  {!preferenceId ? (
+                    <button
+                      className="w-full rounded-full py-3 font-medium transition flex items-center justify-center gap-2 bg-[#7a4fcf] hover:bg-[#ae95d9] text-white"
+                      onClick={handleCreateOrderAndCheckout}
+                      disabled={loadingCheckout}
+                    >
+                      {loadingCheckout ? "Carregando..." : "Prosseguir para o Mercado Pago"}
+                    </button>
+                  ) : (
+                    <div style={{ width: "100%", maxWidth: 340, margin: "0 auto" }}>
+                      <Wallet initialization={{ preferenceId }} />
+                    </div>
+                  )}
                 </motion.div>
               )}
             </div>
