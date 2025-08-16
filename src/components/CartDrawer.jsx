@@ -339,11 +339,11 @@ export default function CartDrawer({ open, onClose }) {
                     </div>
                   </div>
                   {/* Bloco fixo Mercado Pago */}
-                  <div className="flex items-center gap-2 border border-[#ae95d9] bg-[#f9e7f6] rounded px-3 py-2 mb-3">
+                  <div className="flex items-center gap-2 border border-[#1c70df] bg-[#f9e7f6] rounded px-3 py-2 mb-3">
                     <img
                       src={MercadoPagoIcon}
                       alt="Mercado Pago"
-                      className="h-8 w-auto"
+                      className="h-12 w-auto"
                       style={{
                         background: "transparent",
                         display: "inline-block",
@@ -351,25 +351,38 @@ export default function CartDrawer({ open, onClose }) {
                       }}
                     />
                     <div>
-                      <div className="text-sm text-gray-700">
-                        Vamos te redirecionar para o Mercado Pago
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        Se não tiver conta Mercado Pago, use seu e-mail.
-                      </div>
+                      {!preferenceId ? (
+                        <div className="text-center">
+                          <div className="text-sm text-gray-700">
+                            O pagamento é realizado pelo Mercado Pago, ambiente seguro.
+                          </div>
+                          {/* <div className="text-xs text-gray-500">
+                            Você será direcionado para o Mercado Pago após iniciar a compra.
+                          </div> */}
+                        </div>
+                      ) : (
+                        <div className="">
+                          <div className="text-sm text-gray-700">
+                            Clique abaixo para finalizar o pagamento no Mercado Pago.
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            Se não tiver conta Mercado Pago, use seu e-mail.
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
-                  {/* Botão Mercado Pago */}
+                  {/* Botão de ação */}
                   {!preferenceId ? (
                     <button
                       className="w-full rounded-full py-3 font-medium transition flex items-center justify-center gap-2 bg-[#7a4fcf] hover:bg-[#ae95d9] text-white"
                       onClick={handleCreateOrderAndCheckout}
                       disabled={loadingCheckout}
                     >
-                      {loadingCheckout ? "Carregando..." : "Prosseguir para o Mercado Pago"}
+                      {loadingCheckout ? "Carregando..." : "Iniciar compra"}
                     </button>
                   ) : (
-                    <div style={{ width: "100%", maxWidth: 340, margin: "0 auto" }}>
+                    <div style={{ width: "100%", maxWidth: 395, margin: "0 auto" }}>
                       <Wallet initialization={{ preferenceId }} />
                     </div>
                   )}
