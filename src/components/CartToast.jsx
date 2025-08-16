@@ -32,7 +32,7 @@ export default function CartToast({ product, quantity, total, totalQuantity, onV
         </span>
       </div>
       <button
-        className="w-full bg-[#ae95d9] hover:bg-[#7a4fcf] text-white rounded py-2 font-medium transition cursor-pointer"
+        className="w-full bg-[#7a4fcf] text-white rounded py-2 font-medium transition cursor-pointer"
         onClick={onViewCart}
       >
         Ver carrinho

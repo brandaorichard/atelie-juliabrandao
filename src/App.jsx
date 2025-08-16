@@ -18,6 +18,7 @@ import ConfirmEmailInstructionPage from "./pages/ConfirmEmailInstructionPage";
 import OrdersPage from "./pages/OrdersPage";
 import MinhaContaPage from "./pages/MinhaContaPage";
 import OrderDetailPage from "./pages/OrderDetailPage";
+import PedidoSucessoRedirect from "./pages/PedidoSucessoRedirect"; // importando o redirecionamento
 
 import "./index.css";
 
@@ -52,9 +53,9 @@ function App() {
         <Route path="/minha-conta" element={<MinhaContaPage />} />
         <Route path="/pedido/:id" element={<OrderDetailPage />} />
         <Route path="/produto/:slug" element={<ProductPage />} />
-        <Route path="/pedido/:id/pendente" element={<PedidoRedirect />} />
-        <Route path="/pedido/:id/sucesso" element={<PedidoRedirect />} />
-        <Route path="/pedido/:id/erro" element={<PedidoRedirect />} />
+        <Route path="/pedido/:id/pendente" element={<PedidoSucessoRedirect />} />
+        <Route path="/pedido/:id/sucesso" element={<PedidoSucessoRedirect />} />
+        <Route path="/pedido/:id/erro" element={<PedidoSucessoRedirect />} />
       </Routes>
       <Footer />
       <SocialMediasSection />
