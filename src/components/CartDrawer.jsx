@@ -30,6 +30,7 @@ export default function CartDrawer({ open, onClose }) {
   const [showLoginPreview, setShowLoginPreview] = useState(false);
   const [preferenceId, setPreferenceId] = useState(null);
   const [loadingCheckout, setLoadingCheckout] = useState(false);
+  const [lastOrderId, setLastOrderId] = useState(null);
 
   const images = useCartImages(items);
   const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
@@ -137,6 +138,7 @@ export default function CartDrawer({ open, onClose }) {
       );
       const prefData = await prefRes.json();
       setPreferenceId(prefData.preferenceId); // Agora renderiza o Wallet!
+      setLastOrderId(orderResult.order._id);
     }
 
     setLoadingCheckout(false);
