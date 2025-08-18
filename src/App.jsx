@@ -23,6 +23,7 @@ import PedidoSucessoRedirect from "./pages/PedidoSucessoRedirect"; // importando
 import "./index.css";
 
 import ConfirmEmailPage from "./pages/ConfirmEmailPage"; // importe o componente
+import ConfirmEmailChangePage from "./pages/ConfirmEmailChangePage";
 
 // Página de redirecionamento
 function PedidoRedirect() {
@@ -56,6 +57,8 @@ function App() {
         <Route path="/pedido/:id/pendente" element={<PedidoSucessoRedirect />} />
         <Route path="/pedido/:id/sucesso" element={<PedidoSucessoRedirect />} />
         <Route path="/pedido/:id/erro" element={<PedidoSucessoRedirect />} />
+        {/* Rota para confirmação de alteração de email */}
+        <Route path="/confirm-email-change/:token" element={<ConfirmEmailChangePage />} />
       </Routes>
       <Footer />
       <SocialMediasSection />
