@@ -18,7 +18,7 @@ export default function ConfirmEmailChangePage() {
     async function confirmEmailChange() {
       try {
         const response = await fetch(
-          `https://atelie-juliabrandao-backend-production.up.railway.app/api/auth/confirm/${token}`,
+          `https://atelie-juliabrandao-backend-production.up.railway.app/api/auth/confirm-email-change/${token}`,
           { method: "GET" }
         );
         const data = await response.json();
