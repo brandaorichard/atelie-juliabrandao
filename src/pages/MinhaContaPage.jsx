@@ -6,6 +6,7 @@ import { login } from "../redux/authSlice";
 import FormAddress from "../components/FormAddress";
 import UserData from "../components/UserData";
 import UserSecurity from "../components/UserSecurity";
+import UserEmail from "../components/UserEmail";
 import { initializePerfil, handleSavePerfil } from "../utils/userProfileUtils";
 import { initializeEndereco, handleSaveEndereco, handleCepChange } from "../utils/addressUtils";
 
@@ -72,6 +73,9 @@ export default function MinhaContaPage() {
         show={show}
       />
 
+      {/* Alteração de Email */}
+      {/* <UserEmail user={user} token={token} dispatch={dispatch} showToast={showToast} /> */}
+
       {/* Endereço */}
       <section>
         <div className="flex items-center justify-between mb-4 mt-15">
@@ -122,6 +126,13 @@ export default function MinhaContaPage() {
           setShowPasswordForm(false);
           dispatch(showToast({ message: "Senha alterada (mock).", iconType: "info" }));
         }}
+        currentEmail={user.email}
+        pendingEmail={user.pendingEmail}
+        onRequestEmailChange={(newEmail) => {
+          // Aqui você pode implementar a lógica de alteração de email, ex: chamada para o backend
+          dispatch(showToast({ message: `Solicitação para alterar email para ${newEmail}`, iconType: "info" }));
+        }}
+        loadingEmailChange={false}
       />
     </div>
   );
