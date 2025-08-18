@@ -6,7 +6,8 @@ import { login } from "../redux/authSlice";
 import FormAddress from "../components/FormAddress";
 import UserData from "../components/UserData";
 import UserSecurity from "../components/UserSecurity";
-import { buscarEnderecoPorCep } from "../utils/cepUtils";
+import { initializePerfil, handleSavePerfil } from "../utils/userProfileUtils";
+import { initializeEndereco, handleSaveEndereco, handleCepChange } from "../utils/addressUtils";
 
 export default function MinhaContaPage() {
   const dispatch = useDispatch();
@@ -18,25 +19,8 @@ export default function MinhaContaPage() {
   const [isEditingEndereco, setIsEditingEndereco] = useState(false);
   const [showPasswordForm, setShowPasswordForm] = useState(false);
 
-  const [perfil, setPerfil] = useState({
-    nome: user.nome || "",
-    email: user.email || "",
-    telefone: user.telefone || "",
-    cpf: user.cpf || "",
-    dataNascimento: "",
-    genero: "",
-  });
-
-  const [endereco, setEndereco] = useState({
-    cep: "",
-    logradouro: "",
-    numero: "",
-    complemento: "",
-    bairro: "",
-    cidade: "",
-    uf: "",
-    referencia: "",
-  });
+  const [perfil, setPerfil] = useState(initializePerfil(user));
+  const [endereco, setEndereco] = useState(initializeEndereco(user.endereco));
 
   useEffect(() => {
     async function fetchUser() {
@@ -53,25 +37,9 @@ export default function MinhaContaPage() {
         const data = await res.json();
         if (res.ok) {
           dispatch(login({ user: data, token }));
-          setPerfil({
-            nome: data.nome || "",
-            email: data.email || "",
-            telefone: data.telefone || "",
-            cpf: data.cpf || "",
-            dataNascimento: "",
-            genero: "",
-          });
+          setPerfil(initializePerfil(data));
           if (data.endereco) {
-            setEndereco({
-              cep: data.endereco.cep || "",
-              logradouro: data.endereco.logradouro || "",
-              numero: data.endereco.numero || "",
-              complemento: data.endereco.complemento || "",
-              bairro: data.endereco.bairro || "",
-              cidade: data.endereco.cidade || "",
-              uf: data.endereco.uf || "",
-              referencia: data.endereco.referencia || "",
-            });
+            setEndereco(initializeEndereco(data.endereco));
           }
         }
       } catch (err) {
@@ -81,56 +49,7 @@ export default function MinhaContaPage() {
     fetchUser();
   }, [token, dispatch]);
 
-  function handleSavePerfil(e) {
-    e.preventDefault();
-    setIsEditingPerfil(false);
-    dispatch(showToast({ message: "Perfil salvo (mock).", iconType: "info" }));
-  }
-
-  function handleChangePassword(e) {
-    e.preventDefault();
-    setShowPasswordForm(false);
-    dispatch(showToast({ message: "Senha alterada (mock).", iconType: "info" }));
-  }
-
-  async function handleSaveEndereco(e) {
-    e.preventDefault();
-    try {
-      const res = await fetch(
-        "https://atelie-juliabrandao-backend-production.up.railway.app/api/auth/user/endereco",
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
-          },
-          body: JSON.stringify(endereco),
-        }
-      );
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || data.message || "Erro ao salvar endereço");
-      setEndereco(data.endereco);
-      setIsEditingEndereco(false);
-      dispatch(showToast({ message: "Endereço salvo com sucesso!", iconType: "success" }));
-      dispatch(login({ user: { ...user, endereco: data.endereco }, token }));
-    } catch (err) {
-      dispatch(showToast({ message: err.message, iconType: "error" }));
-    }
-  }
-
-  async function handleCepChange(e) {
-    const cep = e.target.value;
-    setEndereco({ ...endereco, cep });
-    const dados = await buscarEnderecoPorCep(cep);
-    if (dados) {
-      setEndereco(end => ({
-        ...end,
-        ...dados,
-      }));
-    }
-  }
-
-  const show = (val, placeholder = "-") => val ? val : placeholder;
+  const show = (val, placeholder = "-") => (val ? val : placeholder);
 
   return (
     <div className="p-6 max-w-2xl mx-auto mt-8">
@@ -148,7 +67,7 @@ export default function MinhaContaPage() {
         perfil={perfil}
         isEditingPerfil={isEditingPerfil}
         setIsEditingPerfil={setIsEditingPerfil}
-        handleSavePerfil={handleSavePerfil}
+        handleSavePerfil={(e) => handleSavePerfil(e, setIsEditingPerfil, dispatch, showToast)}
         setPerfil={setPerfil}
         show={show}
       />
@@ -185,9 +104,11 @@ export default function MinhaContaPage() {
           <FormAddress
             endereco={endereco}
             setEndereco={setEndereco}
-            onSubmit={handleSaveEndereco}
+            onSubmit={(e) =>
+              handleSaveEndereco(e, endereco, token, dispatch, user, setEndereco, setIsEditingEndereco, showToast, login)
+            }
             onCancel={() => setIsEditingEndereco(false)}
-            handleCepChange={handleCepChange}
+            handleCepChange={(e) => handleCepChange(e, endereco, setEndereco)}
           />
         )}
       </section>
@@ -196,7 +117,11 @@ export default function MinhaContaPage() {
       <UserSecurity
         showPasswordForm={showPasswordForm}
         setShowPasswordForm={setShowPasswordForm}
-        handleChangePassword={handleChangePassword}
+        handleChangePassword={(e) => {
+          e.preventDefault();
+          setShowPasswordForm(false);
+          dispatch(showToast({ message: "Senha alterada (mock).", iconType: "info" }));
+        }}
       />
     </div>
   );
