@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function EnderecoForm({ endereco, setEndereco, onSubmit, onCancel, handleCepChange }) {
+export default function FormAddress({ endereco, setEndereco, onSubmit, onCancel, handleCepChange }) {
   return (
     <form onSubmit={onSubmit} className="grid gap-4 sm:grid-cols-2 text-sm">
       <div>
