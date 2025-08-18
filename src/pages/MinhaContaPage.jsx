@@ -3,6 +3,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { showToast } from "../redux/toastSlice";
 import { useNavigate } from "react-router-dom";
 import { login } from "../redux/authSlice";
+import EnderecoForm from "../components/EnderecoForm";
+import { buscarEnderecoPorCep } from "../utils/cepUtils";
 
 export default function MinhaContaPage() {
   const dispatch = useDispatch();
@@ -10,12 +12,10 @@ export default function MinhaContaPage() {
   const token = useSelector((s) => s.auth.token);
   const user = useSelector((s) => s.auth.user) || {};
 
-  // Estados de edição
   const [isEditingPerfil, setIsEditingPerfil] = useState(false);
   const [isEditingEndereco, setIsEditingEndereco] = useState(false);
   const [showPasswordForm, setShowPasswordForm] = useState(false);
 
-  // Perfil state
   const [perfil, setPerfil] = useState({
     nome: user.nome || "",
     email: user.email || "",
@@ -25,7 +25,6 @@ export default function MinhaContaPage() {
     genero: "",
   });
 
-  // Endereço único
   const [endereco, setEndereco] = useState({
     cep: "",
     logradouro: "",
@@ -37,7 +36,6 @@ export default function MinhaContaPage() {
     referencia: "",
   });
 
-  // Carrega dados atualizados do usuário ao montar/minha conta
   useEffect(() => {
     async function fetchUser() {
       if (!token) return;
@@ -118,28 +116,18 @@ export default function MinhaContaPage() {
     }
   }
 
-  function handleCepChange(e) {
-    const cep = e.target.value.replace(/\D/g, "");
-    setEndereco({ ...endereco, cep: e.target.value });
-
-    if (cep.length === 8) {
-      fetch(`https://viacep.com.br/ws/${cep}/json/`)
-        .then(res => res.json())
-        .then(data => {
-          if (!data.erro) {
-            setEndereco(end => ({
-              ...end,
-              logradouro: data.logradouro || "",
-              bairro: data.bairro || "",
-              cidade: data.localidade || "",
-              uf: data.uf || "",
-            }));
-          }
-        });
+  async function handleCepChange(e) {
+    const cep = e.target.value;
+    setEndereco({ ...endereco, cep });
+    const dados = await buscarEnderecoPorCep(cep);
+    if (dados) {
+      setEndereco(end => ({
+        ...end,
+        ...dados,
+      }));
     }
   }
 
-  // Utilitário para exibir valor ou placeholder
   const show = (val, placeholder = "-") => val ? val : placeholder;
 
   return (
@@ -267,109 +255,13 @@ export default function MinhaContaPage() {
             <div className="text-sm text-gray-500 mb-2">Nenhum endereço cadastrado.</div>
           )
         ) : (
-          <form onSubmit={handleSaveEndereco} className="grid gap-4 sm:grid-cols-2 text-sm">
-            <div>
-              <label className="block mb-1">CEP *</label>
-              <input
-                className="w-full border rounded px-3 py-2"
-                value={endereco.cep}
-                onChange={handleCepChange}
-                maxLength={9}
-                required
-              />
-            </div>
-            <div className="sm:col-span-2">
-              <label className="block mb-1">Logradouro *</label>
-              <input
-                className="w-full border rounded px-3 py-2"
-                value={endereco.logradouro}
-                onChange={(e) =>
-                  setEndereco({ ...endereco, logradouro: e.target.value })
-                }
-                required
-              />
-            </div>
-            <div>
-              <label className="block mb-1">Número *</label>
-              <input
-                className="w-full border rounded px-3 py-2"
-                value={endereco.numero}
-                onChange={(e) =>
-                  setEndereco({ ...endereco, numero: e.target.value })
-                }
-                required
-              />
-            </div>
-            <div>
-              <label className="block mb-1">Complemento</label>
-              <input
-                className="w-full border rounded px-3 py-2"
-                value={endereco.complemento}
-                onChange={(e) =>
-                  setEndereco({ ...endereco, complemento: e.target.value })
-                }
-              />
-            </div>
-            <div>
-              <label className="block mb-1">Bairro *</label>
-              <input
-                className="w-full border rounded px-3 py-2"
-                value={endereco.bairro}
-                onChange={(e) =>
-                  setEndereco({ ...endereco, bairro: e.target.value })
-                }
-                required
-              />
-            </div>
-            <div>
-              <label className="block mb-1">Cidade *</label>
-              <input
-                className="w-full border rounded px-3 py-2"
-                value={endereco.cidade}
-                onChange={(e) =>
-                  setEndereco({ ...endereco, cidade: e.target.value })
-                }
-                required
-              />
-            </div>
-            <div>
-              <label className="block mb-1">UF *</label>
-              <input
-                className="w-full border rounded px-3 py-2"
-                value={endereco.uf}
-                onChange={(e) =>
-                  setEndereco({
-                    ...endereco,
-                    uf: e.target.value.toUpperCase().slice(0, 2),
-                  })
-                }
-                maxLength={2}
-                required
-              />
-            </div>
-            <div className="sm:col-span-2">
-              <label className="block mb-1">Referência</label>
-              <input
-                className="w-full border rounded px-3 py-2"
-                value={endereco.referencia}
-                onChange={(e) =>
-                  setEndereco({ ...endereco, referencia: e.target.value })
-                }
-              />
-            </div>
-            <div className="sm:col-span-2 flex gap-3 pt-2">
-              <button className="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded text-sm">
-                Salvar endereço
-              </button>
-              <button
-                type="button"
-                onClick={() => setIsEditingEndereco(false)}
-                className="text-sm underline text-gray-600"
-              >
-                Cancelar
-              </button>
-            </div>
-          </form>
+          <EnderecoForm
+            endereco={endereco}
+            setEndereco={setEndereco}
+            onSubmit={handleSaveEndereco}
+            onCancel={() => setIsEditingEndereco(false)}
+            handleCepChange={handleCepChange}
+          />
         )}
       </section>
 
