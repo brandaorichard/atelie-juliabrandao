@@ -38,7 +38,7 @@ export default function MinhaContaPage() {
         const data = await res.json();
         if (res.ok) {
           dispatch(login({ user: data, token }));
-          setPerfil(initializePerfil(data));
+          setPerfil(initializePerfil(data)); // <-- perfil.email será atualizado aqui
           if (data.endereco) {
             setEndereco(initializeEndereco(data.endereco));
           }
