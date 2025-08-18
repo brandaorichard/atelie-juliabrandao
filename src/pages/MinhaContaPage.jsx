@@ -1,16 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { showToast } from "../redux/toastSlice";
 import { useNavigate } from "react-router-dom";
+import { login } from "../redux/authSlice";
 
 export default function MinhaContaPage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const token = useSelector((s) => s.auth.token);
   const user = useSelector((s) => s.auth.user) || {};
 
-  // Perfil state
+  // Estados de edição
   const [isEditingPerfil, setIsEditingPerfil] = useState(false);
+  const [isEditingEndereco, setIsEditingEndereco] = useState(false);
   const [showPasswordForm, setShowPasswordForm] = useState(false);
+
+  // Perfil state
   const [perfil, setPerfil] = useState({
     nome: user.nome || "",
     email: user.email || "",
@@ -21,7 +26,6 @@ export default function MinhaContaPage() {
   });
 
   // Endereço único
-  const [isEditingEndereco, setIsEditingEndereco] = useState(false);
   const [endereco, setEndereco] = useState({
     cep: "",
     logradouro: "",
@@ -32,6 +36,50 @@ export default function MinhaContaPage() {
     uf: "",
     referencia: "",
   });
+
+  // Carrega dados atualizados do usuário ao montar/minha conta
+  useEffect(() => {
+    async function fetchUser() {
+      if (!token) return;
+      try {
+        const res = await fetch(
+          "https://atelie-juliabrandao-backend-production.up.railway.app/api/auth/user/me",
+          {
+            headers: {
+              "Authorization": `Bearer ${token}`,
+            },
+          }
+        );
+        const data = await res.json();
+        if (res.ok) {
+          dispatch(login({ user: data, token }));
+          setPerfil({
+            nome: data.nome || "",
+            email: data.email || "",
+            telefone: data.telefone || "",
+            cpf: data.cpf || "",
+            dataNascimento: "",
+            genero: "",
+          });
+          if (data.endereco) {
+            setEndereco({
+              cep: data.endereco.cep || "",
+              logradouro: data.endereco.logradouro || "",
+              numero: data.endereco.numero || "",
+              complemento: data.endereco.complemento || "",
+              bairro: data.endereco.bairro || "",
+              cidade: data.endereco.cidade || "",
+              uf: data.endereco.uf || "",
+              referencia: data.endereco.referencia || "",
+            });
+          }
+        }
+      } catch (err) {
+        dispatch(showToast({ message: "Erro ao carregar dados do usuário", iconType: "error" }));
+      }
+    }
+    fetchUser();
+  }, [token, dispatch]);
 
   function handleSavePerfil(e) {
     e.preventDefault();
@@ -45,10 +93,50 @@ export default function MinhaContaPage() {
     dispatch(showToast({ message: "Senha alterada (mock).", iconType: "info" }));
   }
 
-  function handleSaveEndereco(e) {
+  async function handleSaveEndereco(e) {
     e.preventDefault();
-    setIsEditingEndereco(false);
-    dispatch(showToast({ message: "Endereço salvo (mock).", iconType: "info" }));
+    try {
+      const res = await fetch(
+        "https://atelie-juliabrandao-backend-production.up.railway.app/api/auth/user/endereco",
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
+          },
+          body: JSON.stringify(endereco),
+        }
+      );
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || data.message || "Erro ao salvar endereço");
+      setEndereco(data.endereco);
+      setIsEditingEndereco(false);
+      dispatch(showToast({ message: "Endereço salvo com sucesso!", iconType: "success" }));
+      dispatch(login({ user: { ...user, endereco: data.endereco }, token }));
+    } catch (err) {
+      dispatch(showToast({ message: err.message, iconType: "error" }));
+    }
+  }
+
+  function handleCepChange(e) {
+    const cep = e.target.value.replace(/\D/g, "");
+    setEndereco({ ...endereco, cep: e.target.value });
+
+    if (cep.length === 8) {
+      fetch(`https://viacep.com.br/ws/${cep}/json/`)
+        .then(res => res.json())
+        .then(data => {
+          if (!data.erro) {
+            setEndereco(end => ({
+              ...end,
+              logradouro: data.logradouro || "",
+              bairro: data.bairro || "",
+              cidade: data.localidade || "",
+              uf: data.uf || "",
+            }));
+          }
+        });
+    }
   }
 
   // Utilitário para exibir valor ou placeholder
@@ -185,9 +273,7 @@ export default function MinhaContaPage() {
               <input
                 className="w-full border rounded px-3 py-2"
                 value={endereco.cep}
-                onChange={(e) =>
-                  setEndereco({ ...endereco, cep: e.target.value })
-                }
+                onChange={handleCepChange}
                 maxLength={9}
                 required
               />
