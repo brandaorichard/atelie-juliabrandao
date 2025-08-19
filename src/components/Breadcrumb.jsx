@@ -7,7 +7,7 @@ export default function Breadcrumb() {
         </li>
         <span className="text-[#ae95d9]">{" > "}</span>
         <li>
-          <a href="#" className="underline hover:text-[#ae95d9]">Bebês Reborn Por Encomenda</a>
+          <a href="/categoria1" className="underline hover:text-[#ae95d9]">Bebês Reborn Por Encomenda</a>
         </li>
       </ol>
     </nav>
