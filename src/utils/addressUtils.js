@@ -38,8 +38,7 @@ export async function handleSaveEndereco(e, endereco, token, dispatch, user, set
   }
 }
 
-export async function handleCepChange(e, endereco, setEndereco) {
-  const cep = e.target.value;
+export async function handleCepChange(cep, endereco, setEndereco) {
   setEndereco({ ...endereco, cep });
   const dados = await buscarEnderecoPorCep(cep);
   if (dados) {
