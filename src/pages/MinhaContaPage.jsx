@@ -10,6 +10,7 @@ import UserEmail from "../components/UserEmail";
 import { initializePerfil, handleSavePerfil } from "../utils/userProfileUtils";
 import { initializeEndereco, handleSaveEndereco, handleCepChange } from "../utils/addressUtils";
 import { normalizeDateToYMD } from "../utils/dateUtils";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function MinhaContaPage() {
   const dispatch = useDispatch();
@@ -58,7 +59,13 @@ export default function MinhaContaPage() {
   const show = (val, placeholder = "-") => (val ? val : placeholder);
 
   return (
-    <div className="p-6 max-w-2xl mx-auto mt-8">
+    <motion.div
+      className="p-6 max-w-2xl mx-auto mt-8"
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 30 }}
+      transition={{ duration: 0.4 }}
+    >
       {/* Breadcrumb */}
       <nav className="flex mb-6 text-sm items-center gap-2 text-[#7a4fcf] font-normal">
         <span className="cursor-pointer underline" onClick={() => navigate("/")}>
@@ -69,17 +76,24 @@ export default function MinhaContaPage() {
       </nav>
 
       {/* Dados do usuário */}
-      <UserData
-        perfil={perfil}
-        isEditingPerfil={isEditingPerfil}
-        setIsEditingPerfil={setIsEditingPerfil}
-        handleSavePerfil={(e) => handleSavePerfil(e, setIsEditingPerfil, dispatch, showToast)}
-        setPerfil={setPerfil}
-        show={show}
-      />
-
-      {/* Alteração de Email */}
-      {/* <UserEmail user={user} token={token} dispatch={dispatch} showToast={showToast} /> */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={isEditingPerfil ? "edit-perfil" : "view-perfil"}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 20 }}
+          transition={{ duration: 0.3 }}
+        >
+          <UserData
+            perfil={perfil}
+            isEditingPerfil={isEditingPerfil}
+            setIsEditingPerfil={setIsEditingPerfil}
+            handleSavePerfil={(e) => handleSavePerfil(e, setIsEditingPerfil, dispatch, showToast)}
+            setPerfil={setPerfil}
+            show={show}
+          />
+        </motion.div>
+      </AnimatePresence>
 
       {/* Endereço */}
       <section>
@@ -94,51 +108,78 @@ export default function MinhaContaPage() {
             </button>
           )}
         </div>
-        {!isEditingEndereco ? (
-          endereco.cep ? (
-            <ul className="text-sm space-y-1 mb-2">
-              <li><b>CEP:</b> {show(endereco.cep)}</li>
-              <li><b>Logradouro:</b> {show(endereco.logradouro)}</li>
-              <li><b>Número:</b> {show(endereco.numero)}</li>
-              <li><b>Complemento:</b> {show(endereco.complemento)}</li>
-              <li><b>Bairro:</b> {show(endereco.bairro)}</li>
-              <li><b>Cidade:</b> {show(endereco.cidade)}</li>
-              <li><b>UF:</b> {show(endereco.uf)}</li>
-              <li><b>Referência:</b> {show(endereco.referencia)}</li>
-            </ul>
+        <AnimatePresence mode="wait">
+          {!isEditingEndereco ? (
+            <motion.div
+              key="view-endereco"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              transition={{ duration: 0.3 }}
+            >
+              {endereco.cep ? (
+                <ul className="text-sm space-y-1 mb-2">
+                  <li><b>CEP:</b> {show(endereco.cep)}</li>
+                  <li><b>Logradouro:</b> {show(endereco.logradouro)}</li>
+                  <li><b>Número:</b> {show(endereco.numero)}</li>
+                  <li><b>Complemento:</b> {show(endereco.complemento)}</li>
+                  <li><b>Bairro:</b> {show(endereco.bairro)}</li>
+                  <li><b>Cidade:</b> {show(endereco.cidade)}</li>
+                  <li><b>UF:</b> {show(endereco.uf)}</li>
+                  <li><b>Referência:</b> {show(endereco.referencia)}</li>
+                </ul>
+              ) : (
+                <div className="text-sm text-gray-500 mb-2">Nenhum endereço cadastrado.</div>
+              )}
+            </motion.div>
           ) : (
-            <div className="text-sm text-gray-500 mb-2">Nenhum endereço cadastrado.</div>
-          )
-        ) : (
-          <FormAddress
-            endereco={endereco}
-            setEndereco={setEndereco}
-            onSubmit={(e) =>
-              handleSaveEndereco(e, endereco, token, dispatch, user, setEndereco, setIsEditingEndereco, showToast, login)
-            }
-            onCancel={() => setIsEditingEndereco(false)}
-            handleCepChange={(e) => handleCepChange(e, endereco, setEndereco)}
-          />
-        )}
+            <motion.div
+              key="edit-endereco"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <FormAddress
+                endereco={endereco}
+                setEndereco={setEndereco}
+                onSubmit={(e) =>
+                  handleSaveEndereco(e, endereco, token, dispatch, user, setEndereco, setIsEditingEndereco, showToast, login)
+                }
+                onCancel={() => setIsEditingEndereco(false)}
+                handleCepChange={(e) => handleCepChange(e, endereco, setEndereco)}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </section>
 
       {/* Segurança */}
-      <UserSecurity
-        showPasswordForm={showPasswordForm}
-        setShowPasswordForm={setShowPasswordForm}
-        handleChangePassword={(e) => {
-          e.preventDefault();
-          setShowPasswordForm(false);
-          dispatch(showToast({ message: "Senha alterada (mock).", iconType: "info" }));
-        }}
-        currentEmail={user.email}
-        pendingEmail={user.pendingEmail}
-        onRequestEmailChange={(newEmail) => {
-          // Aqui você pode implementar a lógica de alteração de email, ex: chamada para o backend
-          dispatch(showToast({ message: `Solicitação para alterar email para ${newEmail}`, iconType: "info" }));
-        }}
-        loadingEmailChange={false}
-      />
-    </div>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={showPasswordForm ? "edit-password" : "view-password"}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 20 }}
+          transition={{ duration: 0.3 }}
+        >
+          <UserSecurity
+            showPasswordForm={showPasswordForm}
+            setShowPasswordForm={setShowPasswordForm}
+            handleChangePassword={(e) => {
+              e.preventDefault();
+              setShowPasswordForm(false);
+              dispatch(showToast({ message: "Senha alterada (mock).", iconType: "info" }));
+            }}
+            currentEmail={user.email}
+            pendingEmail={user.pendingEmail}
+            onRequestEmailChange={(newEmail) => {
+              dispatch(showToast({ message: `Solicitação para alterar email para ${newEmail}`, iconType: "info" }));
+            }}
+            loadingEmailChange={false}
+          />
+        </motion.div>
+      </AnimatePresence>
+    </motion.div>
   );
 }

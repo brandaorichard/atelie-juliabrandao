@@ -1,4 +1,5 @@
 import React from "react";
+import { motion } from "framer-motion";
 
 function onlyDigits(value = "") {
   return value.replace(/\D/g, ""); // Remove tudo que não for dígito
@@ -16,7 +17,14 @@ function formatCep(value = "") {
 
 export default function FormAddress({ endereco, setEndereco, onSubmit, onCancel, handleCepChange }) {
   return (
-    <form onSubmit={onSubmit} className="grid gap-4 sm:grid-cols-2 text-sm">
+    <motion.form
+      onSubmit={onSubmit}
+      className="grid gap-4 sm:grid-cols-2 text-sm"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 20 }}
+      transition={{ duration: 0.3 }}
+    >
       <div>
         <label className="block mb-1">CEP *</label>
         <input
@@ -117,6 +125,6 @@ export default function FormAddress({ endereco, setEndereco, onSubmit, onCancel,
           Cancelar
         </button>
       </div>
-    </form>
+    </motion.form>
   );
 }

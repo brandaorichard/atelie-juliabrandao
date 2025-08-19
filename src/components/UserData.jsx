@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { updateUser } from "../redux/authSlice";
 import { normalizeDateToYMD, formatDateToBR } from "../utils/dateUtils";
+import { motion } from "framer-motion";
 
 // Funções de máscara
 function onlyDigits(v = "") {
@@ -111,7 +112,14 @@ export default function DadosUsuario({
           <li><b>Data de nascimento:</b> {formatDateToBR(perfil.dataNascimento)}</li>
         </ul>
       ) : (
-        <form onSubmit={handleSavePerfil} className="grid gap-4 sm:grid-cols-2 text-sm">
+        <motion.form
+          onSubmit={handleSavePerfil}
+          className="grid gap-4 sm:grid-cols-2 text-sm"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 20 }}
+          transition={{ duration: 0.3 }}
+        >
           {erro && (
             <div className="sm:col-span-2 text-xs text-red-600 bg-red-50 border border-red-200 px-3 py-2 rounded">
               {erro}
@@ -190,7 +198,7 @@ export default function DadosUsuario({
               Cancelar
             </button>
           </div>
-        </form>
+        </motion.form>
       )}
     </section>
   );

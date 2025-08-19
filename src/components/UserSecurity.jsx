@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { showToast } from "../redux/toastSlice";
 import { login } from "../redux/authSlice";
+import { motion, AnimatePresence } from "framer-motion";
 
 function CheckIcon({ color = "green" }) {
   return (
@@ -156,148 +157,193 @@ export default function UserSecurity({
             </span>
           </div>
         )}
-        {!showEmailForm && (
-          <button
-            className="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded text-sm"
-            onClick={() => setShowEmailForm(true)}
-          >
-            Alterar email
-          </button>
-        )}
-        {showEmailForm && (
-          <form onSubmit={handleRequestEmailChange} className="max-w-sm">
-            <label className="block text-sm font-medium mb-1">
-              Novo email *
-            </label>
-            <div className="flex gap-2">
-              <input
-                type="email"
-                value={newEmail}
-                onChange={(e) => setNewEmail(e.target.value)}
-                required
-                className="flex-1 border rounded px-3 py-2 text-sm"
-                placeholder="seu-novo-email@exemplo.com"
-              />
-              <button
-                type="submit"
-                disabled={
-                  isRequesting || !newEmail || newEmail === currentEmail
-                }
-                className={`bg-purple-600 hover:bg-purple-700 disabled:opacity-60 disabled:cursor-not-allowed text-white px-5 py-2 rounded text-sm whitespace-nowrap`}
+        <AnimatePresence mode="wait">
+          {!showEmailForm && (
+            <motion.button
+              className="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded text-sm"
+              onClick={() => setShowEmailForm(true)}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              transition={{ duration: 0.3 }}
+            >
+              Alterar email
+            </motion.button>
+          )}
+          {showEmailForm && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <form
+                onSubmit={handleRequestEmailChange}
+                className="max-w-sm"
               >
-                {isRequesting ? "Enviando..." : "Solicitar"}
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowEmailForm(false)}
-                className="text-purple-700 hover:underline"
-              >
-                Cancelar
-              </button>
-            </div>
-          </form>
-        )}
+                <label className="block text-sm font-medium mb-1">
+                  Novo email *
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="email"
+                    value={newEmail}
+                    onChange={(e) => setNewEmail(e.target.value)}
+                    required
+                    className="flex-1 border rounded px-3 py-2 text-sm"
+                    placeholder="seu-novo-email@exemplo.com"
+                  />
+                  <motion.button
+                    type="submit"
+                    disabled={
+                      isRequesting || !newEmail || newEmail === currentEmail
+                    }
+                    className={`bg-purple-600 hover:bg-purple-700 disabled:opacity-60 disabled:cursor-not-allowed text-white px-5 py-2 rounded text-sm whitespace-nowrap`}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 20 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    {isRequesting ? "Enviando..." : "Solicitar"}
+                  </motion.button>
+                  <motion.button
+                    type="button"
+                    onClick={() => setShowEmailForm(false)}
+                    className="text-purple-700 hover:underline"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 20 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    Cancelar
+                  </motion.button>
+                </div>
+              </form>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Alteração de Senha */}
-      {!showPasswordForm && (
-        <button
-          className="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded text-sm mb-4"
-          onClick={() => setShowPasswordForm(true)}
-        >
-          Alterar senha
-        </button>
-      )}
-      {showPasswordForm && (
-        <form onSubmit={handleChangePassword} className="grid gap-2 max-w-xs">
-          <label className="block text-sm font-medium ">Senha atual *</label>
-          <input
-            type="password"
-            value={senhaAtual}
-            onChange={(e) => setSenhaAtual(e.target.value)}
-            className="border rounded px-3 py-2"
-            required
-          />
-          <div style={{ position: "relative" }}>
-            <label className="block text-sm font-medium mb-1">
-              Nova senha *
-            </label>
+      <AnimatePresence mode="wait">
+        {!showPasswordForm && (
+          <motion.button
+            className="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded text-sm mb-4"
+            onClick={() => setShowPasswordForm(true)}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            transition={{ duration: 0.3 }}
+          >
+            Alterar senha
+          </motion.button>
+        )}
+        {showPasswordForm && (
+          <motion.form
+            onSubmit={handleChangePassword}
+            className="grid gap-2 max-w-xs"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            transition={{ duration: 0.3 }}
+          >
+            <label className="block text-sm font-medium ">Senha atual *</label>
             <input
               type="password"
-              value={novaSenha}
-              onChange={(e) => setNovaSenha(e.target.value)}
-              className="border rounded px-3 py-2 w-full"
+              value={senhaAtual}
+              onChange={(e) => setSenhaAtual(e.target.value)}
+              className="border rounded px-3 py-2"
               required
             />
-            {senhasIguais && novaSenha && confirmarNovaSenha && (
-              <span
-                style={{
-                  position: "absolute",
-                  right: 12,
-                  top: 10,
-                  bottom: 0,
-                  display: "flex",
-                  alignItems: "center",
-                  height: "100%",
-                  pointerEvents: "none",
-                }}
+            <div style={{ position: "relative" }}>
+              <label className="block text-sm font-medium mb-1">
+                Nova senha *
+              </label>
+              <input
+                type="password"
+                value={novaSenha}
+                onChange={(e) => setNovaSenha(e.target.value)}
+                className="border rounded px-3 py-2 w-full"
+                required
+              />
+              {senhasIguais && novaSenha && confirmarNovaSenha && (
+                <span
+                  style={{
+                    position: "absolute",
+                    right: 12,
+                    top: 0,
+                    bottom: 0,
+                    display: "flex",
+                    alignItems: "center",
+                    height: "100%",
+                    pointerEvents: "none",
+                  }}
+                >
+                  <CheckIcon color="green" />
+                </span>
+              )}
+            </div>
+            <div style={{ position: "relative" }}>
+              <label className="block text-sm font-medium mb-1">
+                Confirmar nova senha *
+              </label>
+              <input
+                type="password"
+                value={confirmarNovaSenha}
+                onChange={(e) => setConfirmarNovaSenha(e.target.value)}
+                className={`border rounded px-3 py-2 w-full ${
+                  novaSenha && confirmarNovaSenha && !senhasIguais
+                    ? "border-red-500"
+                    : senhasIguais
+                    ? "border-green-500"
+                    : ""
+                }`}
+                required
+              />
+              {senhasIguais && novaSenha && confirmarNovaSenha && (
+                <span
+                  style={{
+                    position: "absolute",
+                    right: 12,
+                    top: 0,
+                    bottom: 0,
+                    display: "flex",
+                    alignItems: "center",
+                    height: "100%",
+                    pointerEvents: "none",
+                  }}
+                >
+                  <CheckIcon color="green" />
+                </span>
+              )}
+            </div>
+            <div className="flex gap-3">
+              <motion.button
+                className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded"
+                type="submit"
+                disabled={isChangingPassword}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
+                transition={{ duration: 0.3 }}
               >
-                <CheckIcon color="green" />
-              </span>
-            )}
-          </div>
-          <div style={{ position: "relative" }}>
-            <label className="block text-sm font-medium mb-1">
-              Confirmar nova senha *
-            </label>
-            <input
-              type="password"
-              value={confirmarNovaSenha}
-              onChange={(e) => setConfirmarNovaSenha(e.target.value)}
-              className={`border rounded px-3 py-2 w-full ${
-                novaSenha && confirmarNovaSenha && !senhasIguais
-                  ? "border-red-500"
-                  : senhasIguais
-                  ? "border-green-500"
-                  : ""
-              }`}
-              required
-            />
-            {senhasIguais && novaSenha && confirmarNovaSenha && (
-              <span
-                style={{
-                  position: "absolute",
-                  right: 12,
-                  top: 10,
-                  bottom: 0,
-                  display: "flex",
-                  alignItems: "center",
-                  height: "100%",
-                  pointerEvents: "none",
-                }}
+                {isChangingPassword ? "Salvando..." : "Salvar senha"}
+              </motion.button>
+              <motion.button
+                type="button"
+                onClick={() => setShowPasswordForm(false)}
+                className="text-purple-700 hover:underline"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
+                transition={{ duration: 0.3 }}
               >
-                <CheckIcon color="green" />
-              </span>
-            )}
-          </div>
-          <div className="flex gap-3">
-            <button
-              className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded"
-              type="submit"
-              disabled={isChangingPassword}
-            >
-              {isChangingPassword ? "Salvando..." : "Salvar senha"}
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowPasswordForm(false)}
-              className="text-purple-700 hover:underline"
-            >
-              Cancelar
-            </button>
-          </div>
-        </form>
-      )}
+                Cancelar
+              </motion.button>
+            </div>
+          </motion.form>
+        )}
+      </AnimatePresence>
     </section>
   );
 }
