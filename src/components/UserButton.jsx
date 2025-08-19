@@ -120,7 +120,7 @@ export default function UserButton({ mobileFaixa = false }) {
               onClick={() => handleMenu("/minha-conta")}
             >
               <span className="text-xl" aria-label="Perfil" role="img">
-                👤
+                👨🏻‍💼
               </span>
               MINHA CONTA
             </button>
