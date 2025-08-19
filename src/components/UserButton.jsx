@@ -116,7 +116,7 @@ export default function UserButton({ mobileFaixa = false }) {
       "
           >
             <button
-              className="flex items-center gap-3 w-full text-left uppercase text-lg font-light cursor-pointer text-[#616161] py-5 px-8 rounded-t-sm"
+              className="flex items-center gap-3 w-full text-left uppercase text-md font-normal cursor-pointer text-[#616161] py-5 px-8 rounded-t-sm"
               onClick={() => handleMenu("/minha-conta")}
             >
               <span className="text-xl" aria-label="Perfil" role="img">
@@ -125,7 +125,7 @@ export default function UserButton({ mobileFaixa = false }) {
               MINHA CONTA
             </button>
             <button
-              className="flex items-center gap-3 w-full text-left uppercase text-lg cursor-pointer font-light text-[#616161] py-5 px-8"
+              className="flex items-center gap-3 w-full text-left uppercase text-md cursor-pointer font-normal text-[#616161] py-5 px-8"
               onClick={() => handleMenu("/meus-pedidos")}
             >
               <span className="text-xl" aria-label="Pedidos" role="img">
@@ -134,7 +134,7 @@ export default function UserButton({ mobileFaixa = false }) {
               MEUS PEDIDOS
             </button>
             <button
-              className="flex items-center gap-3 w-full text-left uppercase text-lg cursor-pointer font-light text-red-600 py-5 px-8"
+              className="flex items-center gap-3 w-full text-left uppercase text-md cursor-pointer font-light text-red-600 py-5 px-8"
               onClick={handleLogout}
             >
               <span
