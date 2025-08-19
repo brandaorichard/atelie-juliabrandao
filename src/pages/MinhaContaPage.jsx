@@ -9,6 +9,7 @@ import UserSecurity from "../components/UserSecurity";
 import UserEmail from "../components/UserEmail";
 import { initializePerfil, handleSavePerfil } from "../utils/userProfileUtils";
 import { initializeEndereco, handleSaveEndereco, handleCepChange } from "../utils/addressUtils";
+import { normalizeDateToYMD } from "../utils/dateUtils";
 
 export default function MinhaContaPage() {
   const dispatch = useDispatch();
@@ -31,14 +32,18 @@ export default function MinhaContaPage() {
           "https://atelie-juliabrandao-backend-production.up.railway.app/api/auth/user/me",
           {
             headers: {
-              "Authorization": `Bearer ${token}`,
+              Authorization: `Bearer ${token}`,
             },
           }
         );
         const data = await res.json();
         if (res.ok) {
           dispatch(login({ user: data, token }));
-          setPerfil(initializePerfil(data)); // <-- perfil.email será atualizado aqui
+          setPerfil((prev) => ({
+            ...prev,
+            ...data,
+            dataNascimento: normalizeDateToYMD(data.dataNascimento), // Normaliza a data
+          }));
           if (data.endereco) {
             setEndereco(initializeEndereco(data.endereco));
           }

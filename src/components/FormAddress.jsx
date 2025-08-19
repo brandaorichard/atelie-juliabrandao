@@ -1,5 +1,19 @@
 import React from "react";
 
+function onlyDigits(value = "") {
+  return value.replace(/\D/g, ""); // Remove tudo que não for dígito
+}
+
+function onlyLetters(value = "") {
+  return value.replace(/[^a-zA-Z]/g, ""); // Remove tudo que não for letra
+}
+
+// Função para formatar o CEP no padrão 00000-000
+function formatCep(value = "") {
+  const digits = onlyDigits(value).slice(0, 8); // Limita a 8 dígitos
+  return digits.replace(/^(\d{5})(\d)/, "$1-$2"); // Formata como 00000-000
+}
+
 export default function FormAddress({ endereco, setEndereco, onSubmit, onCancel, handleCepChange }) {
   return (
     <form onSubmit={onSubmit} className="grid gap-4 sm:grid-cols-2 text-sm">
@@ -8,8 +22,14 @@ export default function FormAddress({ endereco, setEndereco, onSubmit, onCancel,
         <input
           className="w-full border rounded px-3 py-2"
           value={endereco.cep}
-          onChange={handleCepChange}
-          maxLength={9}
+          onChange={(e) => {
+            const formattedCep = formatCep(e.target.value);
+            setEndereco({ ...endereco, cep: formattedCep });
+            handleCepChange(formattedCep, endereco, setEndereco); // Passa o valor formatado diretamente
+          }}
+          maxLength={9} // Limita o CEP a 9 caracteres (incluindo o "-")
+          placeholder="00000-000"
+          inputMode="numeric" // Exibe teclado numérico em dispositivos móveis
           required
         />
       </div>
@@ -18,7 +38,7 @@ export default function FormAddress({ endereco, setEndereco, onSubmit, onCancel,
         <input
           className="w-full border rounded px-3 py-2"
           value={endereco.logradouro}
-          onChange={e => setEndereco({ ...endereco, logradouro: e.target.value })}
+          onChange={(e) => setEndereco({ ...endereco, logradouro: e.target.value })}
           required
         />
       </div>
@@ -27,7 +47,11 @@ export default function FormAddress({ endereco, setEndereco, onSubmit, onCancel,
         <input
           className="w-full border rounded px-3 py-2"
           value={endereco.numero}
-          onChange={e => setEndereco({ ...endereco, numero: e.target.value })}
+          onChange={(e) =>
+            setEndereco({ ...endereco, numero: onlyDigits(e.target.value) })
+          }
+          placeholder="Número da casa"
+          inputMode="numeric" // Exibe teclado numérico em dispositivos móveis
           required
         />
       </div>
@@ -36,7 +60,7 @@ export default function FormAddress({ endereco, setEndereco, onSubmit, onCancel,
         <input
           className="w-full border rounded px-3 py-2"
           value={endereco.complemento}
-          onChange={e => setEndereco({ ...endereco, complemento: e.target.value })}
+          onChange={(e) => setEndereco({ ...endereco, complemento: e.target.value })}
         />
       </div>
       <div>
@@ -44,7 +68,7 @@ export default function FormAddress({ endereco, setEndereco, onSubmit, onCancel,
         <input
           className="w-full border rounded px-3 py-2"
           value={endereco.bairro}
-          onChange={e => setEndereco({ ...endereco, bairro: e.target.value })}
+          onChange={(e) => setEndereco({ ...endereco, bairro: e.target.value })}
           required
         />
       </div>
@@ -53,7 +77,7 @@ export default function FormAddress({ endereco, setEndereco, onSubmit, onCancel,
         <input
           className="w-full border rounded px-3 py-2"
           value={endereco.cidade}
-          onChange={e => setEndereco({ ...endereco, cidade: e.target.value })}
+          onChange={(e) => setEndereco({ ...endereco, cidade: e.target.value })}
           required
         />
       </div>
@@ -62,8 +86,14 @@ export default function FormAddress({ endereco, setEndereco, onSubmit, onCancel,
         <input
           className="w-full border rounded px-3 py-2"
           value={endereco.uf}
-          onChange={e => setEndereco({ ...endereco, uf: e.target.value.toUpperCase().slice(0, 2) })}
-          maxLength={2}
+          onChange={(e) =>
+            setEndereco({
+              ...endereco,
+              uf: onlyLetters(e.target.value.toUpperCase()).slice(0, 2), // Limita a 2 caracteres
+            })
+          }
+          maxLength={2} // Limita o campo a 2 caracteres
+          placeholder="UF"
           required
         />
       </div>
@@ -72,7 +102,7 @@ export default function FormAddress({ endereco, setEndereco, onSubmit, onCancel,
         <input
           className="w-full border rounded px-3 py-2"
           value={endereco.referencia}
-          onChange={e => setEndereco({ ...endereco, referencia: e.target.value })}
+          onChange={(e) => setEndereco({ ...endereco, referencia: e.target.value })}
         />
       </div>
       <div className="sm:col-span-2 flex gap-3 pt-2">
