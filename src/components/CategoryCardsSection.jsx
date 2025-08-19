@@ -5,9 +5,17 @@ import SortDrawer from "./SortDrawer";
 import RebornCard from "./RebornCard";
 import Breadcrumb from "./Breadcrumb";
 
-function parseBRL(str) {
-  if (!str) return null;
-  return parseFloat(String(str).replace(/\./g, "").replace(",", "."));
+function parseBRL(value) {
+  if (value === null || value === undefined || value === "") return null;
+  if (typeof value === "number") return value;
+  const cleaned = value
+    .toString()
+    .trim()
+    .replace(/\s/g, "")
+    .replace(/\./g, "")
+    .replace(",", ".");
+  const num = Number(cleaned);
+  return isNaN(num) ? null : num;
 }
 
 const sortOptions = [
@@ -17,13 +25,32 @@ const sortOptions = [
   { label: "Z - A", value: "za" },
 ];
 
+function getNumPrice(baby) {
+  const p = parseBRL(baby.price);
+  return typeof p === "number" ? p : null;
+}
+
 function sortBabies(babies, sort) {
   const arr = [...babies];
   switch (sort) {
     case "price-asc":
-      return arr.sort((a, b) => a.price - b.price);
+      return arr.sort((a, b) => {
+        const pa = getNumPrice(a);
+        const pb = getNumPrice(b);
+        if (pa === null && pb === null) return 0;
+        if (pa === null) return 1;
+        if (pb === null) return -1;
+        return pa - pb;
+      });
     case "price-desc":
-      return arr.sort((a, b) => b.price - a.price);
+      return arr.sort((a, b) => {
+        const pa = getNumPrice(a);
+        const pb = getNumPrice(b);
+        if (pa === null && pb === null) return 0;
+        if (pa === null) return 1;
+        if (pb === null) return -1;
+        return pb - pa;
+      });
     case "az":
       return arr.sort((a, b) => a.name.localeCompare(b.name));
     case "za":
@@ -34,10 +61,13 @@ function sortBabies(babies, sort) {
 }
 
 function filterBabies(babies, minValue, maxValue) {
+  const min = parseBRL(minValue);
+  const max = parseBRL(maxValue);
   return babies.filter((baby) => {
-    const price = parseBRL(baby.price);
-    if (minValue && price < parseBRL(minValue)) return false;
-    if (maxValue && price > parseBRL(maxValue)) return false;
+    const price = getNumPrice(baby);
+    if (price === null) return false; // sem preço fica fora de filtros numéricos
+    if (min !== null && price < min) return false;
+    if (max !== null && price > max) return false;
     return true;
   });
 }
@@ -57,10 +87,16 @@ export default function CategoryCardsSection({
   const [sortOpen, setSortOpen] = useState(false);
 
   const filteredBabies = useMemo(() => {
-    let filtered = filterBabies(babies, minValue, maxValue);
-    if ((minValue || maxValue) && filtered.length === 0) setShowWarning(true);
-    else setShowWarning(false);
-    return sortBabies(filtered, selectedSort);
+    let base = babies;
+    // Se não há filtros de faixa aplicados, não filtra por preço (mantém cards com preço vazio)
+    const hasRange = !!(minValue || maxValue);
+    if (hasRange) {
+      base = filterBabies(babies, minValue, maxValue);
+      setShowWarning(base.length === 0);
+    } else {
+      setShowWarning(false);
+    }
+    return sortBabies(base, selectedSort);
   }, [babies, minValue, maxValue, selectedSort]);
 
   function resetFilter() {
@@ -73,7 +109,7 @@ export default function CategoryCardsSection({
     <div className="max-w-6xl mx-auto px-4 py-8 mt-4">
       <Breadcrumb />
       <h1 className="text-2xl font-light text-black mb-6 mt-6">{title}</h1>
-      {/* Filtro e Ordenar */}
+
       {(showFilter || showSort) && (
         <div className="flex items-center gap-2 mb-4">
           {showFilter && (
@@ -96,7 +132,7 @@ export default function CategoryCardsSection({
           )}
         </div>
       )}
-      {/* Drawers */}
+
       <FilterDrawer
         open={filterOpen}
         onClose={() => setFilterOpen(false)}
@@ -114,11 +150,10 @@ export default function CategoryCardsSection({
         selected={selectedSort}
         onSelect={setSelectedSort}
       />
+
       {showWarning && (
         <div className="mb-4 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 rounded flex items-center justify-between">
-          <span>
-            Nenhum bebê encontrado para o valor informado. Tente outros valores ou remova o filtro.
-          </span>
+          <span>Nenhum bebê encontrado para o valor informado.</span>
           <button
             className="ml-4 px-3 py-1 bg-yellow-300 text-yellow-900 rounded hover:bg-yellow-400"
             onClick={resetFilter}
@@ -127,17 +162,16 @@ export default function CategoryCardsSection({
           </button>
         </div>
       )}
-      {/* Grid de cards */}
+
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-  {filteredBabies.map((baby) => (
-    <RebornCard
-      key={baby.id}
-      baby={baby}
-      onClick={() => onCardClick(baby)}
-      mini
-    />
-  ))}
-</div>
+        {filteredBabies.map((baby) => (
+          <RebornCard
+            key={baby.id}
+            baby={baby}
+            onClick={() => onCardClick(baby)}
+          />
+        ))}
+      </div>
     </div>
   );
 }
