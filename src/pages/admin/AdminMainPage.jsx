@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import AccountBreadcrumb from "../../components/AccountBreadcrumb";
 import BabyFormModal from "../../components/admin/BabyFormModal";
 import { loadBabies, addBaby, editBaby, removeBaby } from "../../redux/adminBabiesSlice";
+import BreadcrumbItensAdmin from "../../components/BreadcrumbItensAdmin";
 
 export default function AdminMainPage() {
   const dispatch = useDispatch();
@@ -62,22 +63,34 @@ export default function AdminMainPage() {
   }
 
   return (
-    <div className="px-4 pb-10">
-      <AccountBreadcrumb current="Produtos" />
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-light">Produtos (Bebês)</h1>
+    <div className="space-y-5">
+      <BreadcrumbItensAdmin
+        items={[
+          { label: "Início", to: "/admin" },
+          { label: "Produtos", to: "/admin/produtos" }
+        ]}
+      />
+
+      <div className="flex items-center justify-between">
+        <h1 className="text-lg md:text-xl font-light tracking-wide">Produtos</h1>
         <button
           onClick={openCreate}
-          className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded text-sm"
+          className="
+            px-3 py-1 text-xs md:text-xs font-medium
+            bg-purple-600 hover:bg-purple-500 text-white rounded
+            md:px-4 md:py-2
+          "
         >
-          Novo Bebê
+          Novo
         </button>
       </div>
 
-      <div className="flex gap-2 mb-4 flex-wrap">
+      <div className="flex gap-2 flex-wrap">
         <button
           onClick={() => setTab("todos")}
-            className={`px-3 py-1 rounded text-sm border ${tab === "todos" ? "bg-purple-600 text-white" : "bg-white"}`}
+          className={`px-2.5 py-1 rounded text-[11px] border border-neutral-700 ${
+            tab === "todos" ? "bg-purple-600 text-white" : "bg-neutral-900 text-neutral-300"
+          }`}
         >
           Todos
         </button>
@@ -85,55 +98,63 @@ export default function AdminMainPage() {
           <button
             key={cat}
             onClick={() => setTab(cat)}
-            className={`px-3 py-1 rounded text-sm border ${tab === cat ? "bg-purple-600 text-white" : "bg-white"}`}
+            className={`px-2.5 py-1 rounded text-[11px] border border-neutral-700 ${
+              tab === cat ? "bg-purple-600 text-white" : "bg-neutral-900 text-neutral-300"
+            }`}
           >
             {cat}
           </button>
         ))}
       </div>
 
-      {loading && (
-        <div className="text-sm text-gray-500">Carregando...</div>
-      )}
-
+      {loading && <div className="text-[11px] text-neutral-400">Carregando...</div>}
       {!loading && filtrados.length === 0 && (
-        <div className="text-sm text-gray-500">
-          Nenhum bebê nesta categoria.
-        </div>
+        <div className="text-[11px] text-neutral-400">Nenhum item.</div>
       )}
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div
+        className="
+          grid gap-2
+          grid-cols-2
+          sm:gap-3
+          sm:grid-cols-3
+          md:grid-cols-4
+          lg:grid-cols-5
+          xl:grid-cols-6
+        "
+      >
         {filtrados.map(b => (
-          <div key={b._id} className="border rounded p-3 bg-white flex flex-col">
-            <div className="aspect-square w-full mb-2 overflow-hidden rounded bg-gray-100">
+          <div
+            key={b._id}
+            className="
+              border border-neutral-700 bg-neutral-900 rounded-md
+              p-1.5 sm:p-2 flex flex-col group
+            "
+          >
+            <div className="aspect-square w-full mb-1.5 sm:mb-2 overflow-hidden rounded bg-neutral-800">
               {b.images?.[0] && (
                 <img
                   src={b.images[0]}
                   alt={b.name}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                 />
               )}
             </div>
-            <div className="flex-1">
-              <h3 className="font-medium text-sm line-clamp-2">{b.name}</h3>
-              <p className="text-xs text-gray-500">{b.slug}</p>
-              <p className="text-sm font-semibold mt-1">
-                {Number(b.price).toLocaleString("pt-BR", {
-                  style: "currency",
-                  currency: "BRL"
-                })}
-              </p>
-            </div>
-            <div className="flex gap-2 mt-3">
+            <h3 className="font-medium text-[10px] leading-tight line-clamp-2">{b.name}</h3>
+              <p className="text-[10px] text-neutral-500">{b.slug}</p>
+            <p className="text-[11px] font-semibold mt-1">
+              {Number(b.price).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
+            </p>
+            <div className="flex gap-1 mt-1.5">
               <button
                 onClick={() => openEdit(b)}
-                className="flex-1 text-xs px-2 py-1 border rounded hover:bg-gray-50"
+                className="flex-1 text-[10px] px-1.5 py-1 border border-neutral-600 rounded hover:bg-neutral-800"
               >
                 Editar
               </button>
               <button
                 onClick={() => confirmRemove(b)}
-                className="flex-1 text-xs px-2 py-1 border rounded text-red-600 hover:bg-red-50"
+                className="flex-1 text-[10px] px-1.5 py-1 border border-neutral-600 rounded text-red-300 hover:bg-neutral-800"
               >
                 Remover
               </button>
@@ -153,16 +174,16 @@ export default function AdminMainPage() {
 
       {confirmDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/40" onClick={() => setConfirmDelete(null)} />
-          <div className="relative bg-white rounded p-6 w-full max-w-sm">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setConfirmDelete(null)} />
+          <div className="relative bg-neutral-900 border border-neutral-700 rounded p-6 w-full max-w-sm">
             <h4 className="font-semibold mb-3 text-sm">Confirmar remoção</h4>
-            <p className="text-xs mb-4">
-              Remover definitivamente o bebê <strong>{confirmDelete.name}</strong>?
+            <p className="text-xs mb-4 text-neutral-300">
+              Remover definitivamente <strong>{confirmDelete.name}</strong>?
             </p>
             <div className="flex gap-2 justify-end">
               <button
                 onClick={() => setConfirmDelete(null)}
-                className="px-3 py-1 text-xs border rounded"
+                className="px-3 py-1 text-xs border border-neutral-700 rounded"
               >
                 Cancelar
               </button>
