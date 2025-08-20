@@ -10,7 +10,7 @@ export function useBabies(options = {}) {
   const applyFilter = useCallback(
     (list) => {
       let out = list;
-      if (type) out = out.filter(b => b.type === type || (type === "encomenda" && !b.type));
+      if (type) out = out.filter(b => b.category === type);
       if (customFilter) out = out.filter(customFilter);
       return out;
     },
