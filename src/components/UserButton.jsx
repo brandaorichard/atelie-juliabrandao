@@ -10,6 +10,7 @@ export default function UserButton({ mobileFaixa = false }) {
   const navigate = useNavigate();
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const user = useSelector((state) => state.auth.user);
+  const isAdmin = user?.role === "admin";
   const [open, setOpen] = useState(false);
   const ref = useRef();
 
@@ -115,24 +116,49 @@ export default function UserButton({ mobileFaixa = false }) {
         md:min-w-[200px] md:max-w-[48vw]
       "
           >
-            <button
-              className="flex items-center gap-3 w-full text-left uppercase text-md font-normal cursor-pointer text-[#616161] py-5 px-8 rounded-t-sm"
-              onClick={() => handleMenu("/minha-conta")}
-            >
-              <span className="text-xl" aria-label="Perfil" role="img">
-                👨🏻‍💼
-              </span>
-              MINHA CONTA
-            </button>
-            <button
-              className="flex items-center gap-3 w-full text-left uppercase text-md cursor-pointer font-normal text-[#616161] py-5 px-8"
-              onClick={() => handleMenu("/meus-pedidos")}
-            >
-              <span className="text-xl" aria-label="Pedidos" role="img">
-                📦
-              </span>
-              MEUS PEDIDOS
-            </button>
+            {isAdmin ? (
+              <>
+                <button
+                  className="flex items-center gap-3 w-full text-left uppercase text-md font-normal cursor-pointer text-[#616161] py-5 px-8 rounded-t-sm"
+                  onClick={() => handleMenu("/admin/produtos")}
+                >
+                  <span className="text-xl" aria-label="Produtos" role="img">
+                    🧸
+                  </span>
+                  PRODUTOS
+                </button>
+                <button
+                  className="flex items-center gap-3 w-full text-left uppercase text-md cursor-pointer font-normal text-[#616161] py-5 px-8"
+                  onClick={() => handleMenu("/admin/pedidos")}
+                >
+                  <span className="text-xl" aria-label="Pedidos" role="img">
+                    📦
+                  </span>
+                  PEDIDOS
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  className="flex items-center gap-3 w-full text-left uppercase text-md font-normal cursor-pointer text-[#616161] py-5 px-8 rounded-t-sm"
+                  onClick={() => handleMenu("/minha-conta")}
+                >
+                  <span className="text-xl" aria-label="Perfil" role="img">
+                    👨🏻‍💼
+                  </span>
+                  MINHA CONTA
+                </button>
+                <button
+                  className="flex items-center gap-3 w-full text-left uppercase text-md cursor-pointer font-normal text-[#616161] py-5 px-8"
+                  onClick={() => handleMenu("/meus-pedidos")}
+                >
+                  <span className="text-xl" aria-label="Pedidos" role="img">
+                    📦
+                  </span>
+                  MEUS PEDIDOS
+                </button>
+              </>
+            )}
             <button
               className="flex items-center gap-3 w-full text-left uppercase text-md cursor-pointer font-light text-red-600 py-5 px-8"
               onClick={handleLogout}
