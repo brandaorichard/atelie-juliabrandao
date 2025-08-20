@@ -19,6 +19,8 @@ import OrdersPage from "./pages/OrdersPage";
 import MinhaContaPage from "./pages/MinhaContaPage";
 import OrderDetailPage from "./pages/OrderDetailPage";
 import PedidoSucessoRedirect from "./pages/PedidoSucessoRedirect"; // importando o redirecionamento
+import AdminMainPage from "./pages/admin/AdminMainPage";
+import { useSelector } from "react-redux";
 
 import "./index.css";
 
@@ -29,6 +31,15 @@ import ConfirmEmailChangePage from "./pages/ConfirmEmailChangePage";
 function PedidoRedirect() {
   const { id } = useParams();
   return <Navigate to={`/pedido/${id}`} replace />;
+}
+
+// Componente de rota protegida
+function AdminRoute({ children }) {
+  const user = useSelector(s => s.auth.user);
+  const token = useSelector(s => s.auth.token);
+  if (!token) return <Navigate to="/login" replace />;
+  if (user?.role !== "admin") return <Navigate to="/" replace />;
+  return children;
 }
 
 function App() {
@@ -59,6 +70,15 @@ function App() {
         <Route path="/pedido/:id/erro" element={<PedidoSucessoRedirect />} />
         {/* Rota para confirmação de alteração de email */}
         <Route path="/confirm-email-change/:token" element={<ConfirmEmailChangePage />} />
+        <Route path="/admin" element={<Navigate to="/admin/produtos" replace />} />
+        <Route
+          path="/admin/produtos"
+          element={
+            <AdminRoute>
+              <AdminMainPage />
+            </AdminRoute>
+          }
+        />
       </Routes>
       <Footer />
       <SocialMediasSection />

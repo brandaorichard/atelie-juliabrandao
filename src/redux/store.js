@@ -3,6 +3,7 @@ import cartReducer from "./cartSlice";
 import toastReducer from "./toastSlice";
 import authReducer from "./authSlice";
 import freteReducer from "./freteSlice"; // Import the freteSlice
+import adminBabiesReducer from "./adminBabiesSlice";
 
 const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ const store = configureStore({
     toast: toastReducer,
     auth: authReducer,
     frete: freteReducer, // Add the freteSlice reducer
+    adminBabies: adminBabiesReducer,
   },
 });
 
