@@ -1,28 +1,23 @@
-// Serviço responsável por criar o pedido a partir do carrinho.
-// Ajustado para compatibilizar com o schema Mongoose:
-//  - deliveryAddress: String (antes enviava objeto -> causava 500)
-//  - items: [{ slug, quantity, price }] (removido campo extra 'total')
-//  - paymentMethod: obrigatório (enviamos uma string válida)
-//  - total: Number (inclui frete, se houver)
-// Se quiser salvar detalhes de frete, embutimos no texto do deliveryAddress.
-
+// Serviço responsável apenas por criar o pedido.
+// Mantém deliveryAddress como String (schema atual).
 import { showToast } from "../redux/toastSlice";
-import { clearCart } from "../redux/cartSlice";
 
-export async function createOrderAndCheckout({
+// Renomeado de createOrderAndCheckout -> createOrder
+export async function createOrder({
   token,
   items,
   freteSelecionado,
   subtotal,
   dispatch,
-  address, // {cep, logradouro, bairro, cidade, uf, numero, complemento}
-  paymentMethod = "pendente", // ajuste para 'pix' ou 'mercado-pago' quando implementar
+  address,                 // { cep, logradouro, bairro, cidade, uf, numero, complemento }
+  paymentMethod = "mercadopago",
+  clientRequestId,         // opcional para idempotência (enviar também userId no backend para validar)
 }) {
   if (!token) {
     dispatch(showToast({ type: "error", message: "É necessário estar logado." }));
     return { ok: false };
   }
-  if (!items.length) {
+  if (!items?.length) {
     dispatch(showToast({ type: "error", message: "Carrinho vazio." }));
     return { ok: false };
   }
@@ -35,10 +30,13 @@ export async function createOrderAndCheckout({
     return { ok: false };
   }
 
-  const freteValor = freteSelecionado.price ?? freteSelecionado.valor ?? 0;
+  const freteValor = Number(
+    freteSelecionado.price ??
+    freteSelecionado.valor ??
+    0
+  );
   const total = +(subtotal + freteValor).toFixed(2);
 
-  // Monta string única para deliveryAddress (schema exige String)
   const freteServico = freteSelecionado.name || freteSelecionado.nome || "Frete";
   const prazo =
     freteSelecionado.prazoTexto ||
@@ -48,7 +46,7 @@ export async function createOrderAndCheckout({
   const deliveryAddressString =
     `${address.logradouro}, ${address.numero} - ${address.bairro} - ` +
     `${address.cidade}/${address.uf} - CEP: ${address.cep} - ` +
-    `Compl.: ${address.complemento} | Frete: ${freteServico} (${prazo}) ` +
+    `Compl.: ${address.complemento || ""} | Frete: ${freteServico} (${prazo}) ` +
     `Valor Frete: ${freteValor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}`;
 
   const orderPayload = {
@@ -58,13 +56,12 @@ export async function createOrderAndCheckout({
       price: i.price,
     })),
     total,
-    paymentMethod,        // string obrigatória
-    deliveryAddress: deliveryAddressString, // string conforme schema
+    paymentMethod,
+    deliveryAddress: deliveryAddressString,
+    clientRequestId, // backend deve ignorar duplicado (userId + clientRequestId)
   };
 
   try {
-    console.log("DEBUG orderPayload =>", orderPayload);
-
     const res = await fetch(
       "https://atelie-juliabrandao-backend-production.up.railway.app/api/orders",
       {
@@ -81,12 +78,10 @@ export async function createOrderAndCheckout({
 
     if (!res.ok) {
       console.error("ORDER ERROR:", res.status, json);
-      dispatch(
-        showToast({
-          type: "error",
-            message: json.message || "Erro ao criar pedido.",
-        })
-      );
+      dispatch(showToast({
+        type: "error",
+        message: json.message || "Erro ao criar pedido.",
+      }));
       return { ok: false, error: json };
     }
 
@@ -94,12 +89,10 @@ export async function createOrderAndCheckout({
     return { ok: true, order: json };
   } catch (e) {
     console.error("ORDER FETCH FAIL:", e);
-    dispatch(
-      showToast({
-        type: "error",
-        message: "Falha de conexão com servidor.",
-      })
-    );
+    dispatch(showToast({
+      type: "error",
+      message: "Falha de conexão com servidor.",
+    }));
     return { ok: false, error: e };
   }
 }

@@ -9,7 +9,7 @@ import { FreightSection } from "./cart/FreightSection";
 import { CartSummary } from "./cart/CartSummary";
 import { useCartImages } from "../hooks/useCartImages";
 import { useFrete } from "../hooks/useFrete";
-import { createOrderAndCheckout } from "../services/orderCheckout";
+import { createOrder } from "../services/orderCheckout"; // substituir import antigo
 import { useNavigate } from "react-router-dom";
 import MercadoPagoIcon from "../assets/icons/mercadopago2.png"
 import LoginPreview from "./LoginPreview"; // importe o componente
@@ -22,6 +22,7 @@ export default function CartDrawer({ open, onClose }) {
   const dispatch = useDispatch();
   const items = useSelector((s) => s.cart.items);
   const token = useSelector((s) => s.auth.token);
+  const user = useSelector((s) => s.auth.user);
   const navigate = useNavigate();
 
   const [numeroCasa, setNumeroCasa] = useState("");
@@ -30,6 +31,8 @@ export default function CartDrawer({ open, onClose }) {
   const [showLoginPreview, setShowLoginPreview] = useState(false);
   const [preferenceId, setPreferenceId] = useState(null);
   const [loadingCheckout, setLoadingCheckout] = useState(false);
+  const [orderId, setOrderId] = useState(null);
+  const [clientRequestId] = useState(() => crypto.randomUUID());
   const [lastOrderId, setLastOrderId] = useState(null);
   const [freteAviso, setFreteAviso] = useState(false);
   const [freteBordaVermelha, setFreteBordaVermelha] = useState(false);
@@ -86,10 +89,14 @@ export default function CartDrawer({ open, onClose }) {
     [dispatch, images, subtotal, items]
   );
 
-  const handleCreateOrderAndCheckout = useCallback(async () => {
+  const handleStartCheckout = useCallback(async () => {
+    if (loadingCheckout || orderId || preferenceId) return;
+
     setTouched(true);
+
     if (!freteSelecionado) {
       setFreteAviso(true);
+      setFreteBordaVermelha(true);
       setTimeout(() => setFreteAviso(false), 3000);
       return;
     }
@@ -105,63 +112,81 @@ export default function CartDrawer({ open, onClose }) {
       return;
     }
 
-    setLoadingCheckout(true);
+    try {
+      setLoadingCheckout(true);
 
-    // 1. Crie o pedido normalmente
-    const orderResult = await createOrderAndCheckout({
-      token,
-      items,
-      freteSelecionado,
-      subtotal,
-      dispatch,
-      address: {
-        cep: enderecoCep?.cep || cepInput || cep,
-        logradouro: enderecoCep?.logradouro || "",
-        bairro: enderecoCep?.bairro || "",
-        cidade: enderecoCep?.localidade || "",
-        uf: enderecoCep?.uf || "",
-        numero: numeroCasa,
-        complemento,
-      },
-    });
+      // 1. Cria pedido
+      const orderResult = await createOrder({
+        token,
+        items,
+        freteSelecionado,
+        subtotal,
+        address: {
+          cep: enderecoCep?.cep || cepInput || cep,
+          logradouro: enderecoCep?.logradouro || "",
+          bairro: enderecoCep?.bairro || "",
+          cidade: enderecoCep?.localidade || "",
+          uf: enderecoCep?.uf || "",
+          numero: numeroCasa,
+          complemento,
+        },
+        dispatch,
+        clientRequestId,
+      });
 
-    // 2. Gere a preferência Mercado Pago usando o pedido criado
-    if (orderResult.ok && orderResult.order?._id) {
+      if (!orderResult.ok || !orderResult.order?._id) {
+        setLoadingCheckout(false);
+        return;
+      }
+
+      const createdOrder = orderResult.order;
+      setOrderId(createdOrder._id);
+
+      // 2. Gera preference usando somente orderId + buyer (ajuste backend)
+      const buyerEmail = createdOrder.payer?.email || createdOrder.userEmail || user?.email;
       const prefRes = await fetch(
         "https://atelie-juliabrandao-backend-production.up.railway.app/api/checkout/preference",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            userId: orderResult.order.userId,
-            items: orderResult.order.items, // precisa conter o campo slug!
-            total: orderResult.order.total,
-            paymentMethod: orderResult.order.paymentMethod,
-            deliveryAddress: orderResult.order.deliveryAddress,
-            buyer: {
-              email: orderResult.order.payer?.email
-            }
+            orderId: createdOrder._id,
+            buyer: { email: buyerEmail },
           }),
         }
       );
-      const prefData = await prefRes.json();
-      setPreferenceId(prefData.preferenceId); // Agora renderiza o Wallet!
-      setLastOrderId(orderResult.order._id);
-    }
 
-    setLoadingCheckout(false);
+      const prefData = await prefRes.json().catch(() => ({}));
+      if (!prefRes.ok || !prefData.preferenceId) {
+        dispatch(showToast({ type: "error", message: "Erro ao gerar preferência de pagamento." }));
+        setLoadingCheckout(false);
+        return;
+      }
+
+      setPreferenceId(prefData.preferenceId);
+    } catch (err) {
+      console.error(err);
+      dispatch(showToast({ type: "error", message: "Falha ao iniciar checkout." }));
+    } finally {
+      setLoadingCheckout(false);
+    }
   }, [
+    loadingCheckout,
+    orderId,
+    preferenceId,
+    freteSelecionado,
+    canCheckout,
     token,
     items,
-    freteSelecionado,
     subtotal,
-    dispatch,
-    numeroCasa,
-    complemento,
+    enderecoCep,
     cepInput,
     cep,
-    enderecoCep,
-    canCheckout,
+    numeroCasa,
+    complemento,
+    dispatch,
+    clientRequestId,
+    user
   ]);
 
   return (
@@ -401,11 +426,15 @@ export default function CartDrawer({ open, onClose }) {
                   {/* Botão de ação */}
                   {!preferenceId ? (
                     <button
-                      className="w-full rounded-full py-3 font-medium transition flex items-center justify-center gap-2 bg-[#7a4fcf] hover:bg-[#ae95d9] text-white"
-                      onClick={handleCreateOrderAndCheckout}
-                      disabled={loadingCheckout}
+                      className="w-full rounded-full py-3 font-medium transition flex items-center justify-center gap-2 bg-[#7a4fcf] hover:bg-[#ae95d9] text-white disabled:opacity-60"
+                      onClick={handleStartCheckout}
+                      disabled={loadingCheckout || !!orderId}
                     >
-                      {loadingCheckout ? "Carregando..." : "Iniciar compra"}
+                      {loadingCheckout
+                        ? "Processando..."
+                        : orderId
+                          ? "Gerando pagamento..."
+                          : "Iniciar compra"}
                     </button>
                   ) : (
                     <div style={{ width: "100%", maxWidth: 395, margin: "0 auto" }}>
