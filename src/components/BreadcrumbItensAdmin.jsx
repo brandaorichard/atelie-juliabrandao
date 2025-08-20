@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 export default function BreadcrumbItens({ items }) {
   return (
     <nav className="text-sm py-4 px-2 -ml-2" aria-label="Breadcrumb">
-      <ol className="flex items-center gap-2 text-purple-500 font-light">
+      <ol className="flex items-center gap-2 text-[#7a4fcf] font-light">
         {items.map((item, idx) => (
           <li key={idx} className="flex items-center">
             {item.to ? (
@@ -14,12 +14,12 @@ export default function BreadcrumbItens({ items }) {
                 {item.label}
               </Link>
             ) : (
-              <span className="text-purple-500 font-medium underline">
+              <span className="text-[#7a4fcf] font-medium underline">
                 {item.label}
               </span>
             )}
             {idx < items.length - 1 && (
-              <span className="mx-1 text-purple-500">{'>'}</span>
+              <span className="mx-1 text-[#7a4fcf]">{'>'}</span>
             )}
           </li>
         ))}

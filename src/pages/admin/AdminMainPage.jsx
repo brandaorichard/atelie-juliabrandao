@@ -72,12 +72,12 @@ export default function AdminMainPage() {
       />
 
       <div className="flex items-center justify-between">
-        <h1 className="text-lg md:text-xl font-light tracking-wide">Produtos</h1>
+        <h1 className="text-lg md:text-xl font-light tracking-wide text-neutral-900">Produtos</h1>
         <button
           onClick={openCreate}
           className="
             px-3 py-1 text-xs md:text-xs font-medium
-            bg-purple-600 hover:bg-purple-500 text-white rounded
+            bg-[#7a4fcf] hover:bg-[#ae95d9] text-white rounded
             md:px-4 md:py-2
           "
         >
@@ -88,8 +88,8 @@ export default function AdminMainPage() {
       <div className="flex gap-2 flex-wrap">
         <button
           onClick={() => setTab("todos")}
-          className={`px-2.5 py-1 rounded text-[11px] border border-neutral-700 ${
-            tab === "todos" ? "bg-purple-600 text-white" : "bg-neutral-900 text-neutral-300"
+          className={`px-2.5 py-1 rounded text-[11px] border border-[#e0d6f7] ${
+            tab === "todos" ? "bg-[#7a4fcf] text-white" : "bg-white text-neutral-900"
           }`}
         >
           Todos
@@ -98,8 +98,8 @@ export default function AdminMainPage() {
           <button
             key={cat}
             onClick={() => setTab(cat)}
-            className={`px-2.5 py-1 rounded text-[11px] border border-neutral-700 ${
-              tab === cat ? "bg-purple-600 text-white" : "bg-neutral-900 text-neutral-300"
+            className={`px-2.5 py-1 rounded text-[11px] border border-[#e0d6f7] ${
+              tab === cat ? "bg-[#7a4fcf] text-white" : "bg-white text-neutral-900"
             }`}
           >
             {cat}
@@ -107,9 +107,9 @@ export default function AdminMainPage() {
         ))}
       </div>
 
-      {loading && <div className="text-[11px] text-neutral-400">Carregando...</div>}
+      {loading && <div className="text-[11px] text-neutral-600">Carregando...</div>}
       {!loading && filtrados.length === 0 && (
-        <div className="text-[11px] text-neutral-400">Nenhum item.</div>
+        <div className="text-[11px] text-neutral-600">Nenhum item.</div>
       )}
 
       <div
@@ -127,11 +127,13 @@ export default function AdminMainPage() {
           <div
             key={b._id}
             className="
-              border border-neutral-700 bg-neutral-900 rounded-md
+              border border-[#e0d6f7] bg-transparent rounded-xs
               p-1.5 sm:p-2 flex flex-col group
+              shadow-sm hover:shadow-md transition-shadow
+              min-h-[265px] sm:min-h-[285px]   // <-- altura aumentada ~15%
             "
           >
-            <div className="aspect-square w-full mb-1.5 sm:mb-2 overflow-hidden rounded bg-neutral-800">
+            <div className="aspect-[1/1.15] w-full mb-1.5 sm:mb-2 overflow-hidden rounded bg-[#f7f3fa] flex items-center justify-center">
               {b.images?.[0] && (
                 <img
                   src={b.images[0]}
@@ -140,21 +142,21 @@ export default function AdminMainPage() {
                 />
               )}
             </div>
-            <h3 className="font-medium text-[10px] leading-tight line-clamp-2">{b.name}</h3>
-              <p className="text-[10px] text-neutral-500">{b.slug}</p>
-            <p className="text-[11px] font-semibold mt-1">
+            <h3 className="font-medium text-[10px] leading-tight line-clamp-2 text-neutral-900">{b.name}</h3>
+            <p className="text-[10px] text-neutral-600">{b.slug}</p>
+            <p className="text-[11px] font-semibold mt-1 text-neutral-900">
               {Number(b.price).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
             </p>
             <div className="flex gap-1 mt-1.5">
               <button
                 onClick={() => openEdit(b)}
-                className="flex-1 text-[10px] px-1.5 py-1 border border-neutral-600 rounded hover:bg-neutral-800"
+                className="flex-1 text-[10px] px-1.5 py-1 border border-[#e0d6f7] rounded hover:bg-[#f7f3fa] text-neutral-900 bg-transparent"
               >
                 Editar
               </button>
               <button
                 onClick={() => confirmRemove(b)}
-                className="flex-1 text-[10px] px-1.5 py-1 border border-neutral-600 rounded text-red-300 hover:bg-neutral-800"
+                className="flex-1 text-[10px] px-1.5 py-1 border border-[#e0d6f7] rounded text-red-500 hover:bg-[#f7f3fa] bg-transparent"
               >
                 Remover
               </button>
@@ -175,21 +177,21 @@ export default function AdminMainPage() {
       {confirmDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/50" onClick={() => setConfirmDelete(null)} />
-          <div className="relative bg-neutral-900 border border-neutral-700 rounded p-6 w-full max-w-sm">
-            <h4 className="font-semibold mb-3 text-sm">Confirmar remoção</h4>
-            <p className="text-xs mb-4 text-neutral-300">
+          <div className="relative bg-white border border-[#e0d6f7] rounded p-6 w-full max-w-sm">
+            <h4 className="font-semibold mb-3 text-sm text-neutral-900">Confirmar remoção</h4>
+            <p className="text-xs mb-4 text-neutral-600">
               Remover definitivamente <strong>{confirmDelete.name}</strong>?
             </p>
             <div className="flex gap-2 justify-end">
               <button
                 onClick={() => setConfirmDelete(null)}
-                className="px-3 py-1 text-xs border border-neutral-700 rounded"
+                className="px-3 py-1 text-xs border border-[#e0d6f7] rounded text-neutral-900"
               >
                 Cancelar
               </button>
               <button
                 onClick={doRemove}
-                className="px-3 py-1 text-xs rounded bg-red-600 text-white"
+                className="px-3 py-1 text-xs rounded bg-red-500 text-white"
               >
                 Remover
               </button>
