@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { login } from "../redux/authSlice";
 import { showToast } from "../redux/toastSlice";
 import BreadcrumbItens from "../components/BreadcrumbItens";
+import AccountBreadcrumb from "../components/AccountBreadcrumb";
 
 // Função para formatar CPF para 000.000.000-00
 function formatCpf(cpf) {
@@ -20,6 +21,8 @@ export default function LoginPage() {
   const [erro, setErro] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const user = useSelector((s) => s.auth.user);
+  const isAdmin = user?.role === "admin";
 
   const handleIdentificadorChange = (e) => {
     let value = e.target.value;
@@ -35,14 +38,36 @@ export default function LoginPage() {
     setErro("");
     setLoading(true);
 
-    // Se for CPF só números, formata para 000.000.000-00
     let identificadorFormatado = identificador;
     if (/^\d{11}$/.test(identificador)) {
       identificadorFormatado = formatCpf(identificador);
     }
+    
+    async function tryAdminLogin() {
+      if (!identificadorFormatado.includes("@")) return null; // admin só por email
+      const res = await fetch(
+        "https://atelie-juliabrandao-backend-production.up.railway.app/api/admin/login",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: identificadorFormatado, senha }),
+        }
+      );
+      if (!res.ok) return null;
+      const data = await res.json();
+      return {
+        token: data.token,
+        user: {
+          nome: data.admin.nome,
+            email: data.admin.email,
+            role: data.admin.role || "admin",
+            id: data.admin.id,
+        },
+      };
+    }
 
-    try {
-      const response = await fetch(
+    async function tryUserLogin() {
+      const res = await fetch(
         "https://atelie-juliabrandao-backend-production.up.railway.app/api/auth/login",
         {
           method: "POST",
@@ -50,24 +75,34 @@ export default function LoginPage() {
           body: JSON.stringify({ identificador: identificadorFormatado, senha }),
         }
       );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setErro(data.message || "Erro ao fazer login");
-        setLoading(false);
-        return;
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.message || "Erro ao fazer login");
       }
+      return {
+        token: data.token,
+        user: {
+          nome: data.nome,
+          email: data.email,
+          role: data.role || "user",
+          _id: data._id,
+          cpf: data.cpf,
+          telefone: data.telefone,
+        },
+      };
+    }
 
-      // Dispara o login no Redux (isso já salva no localStorage pelo slice)
+    try {
+      let authData = await tryAdminLogin();
+      if (!authData) authData = await tryUserLogin();
+
       dispatch(
         login({
-          user: { nome: data.nome, email: data.email, _id: data._id, cpf: data.cpf, telefone: data.telefone },
-          token: data.token,
+          user: authData.user,
+          token: authData.token,
         })
       );
 
-      // Toast de sucesso
       dispatch(
         showToast({
           message: "Login realizado com sucesso!",
@@ -75,10 +110,14 @@ export default function LoginPage() {
         })
       );
 
-      // Redirecione para a home ou dashboard
-      navigate("/");
+      // Redireciona conforme role
+      if (authData.user.role === "admin") {
+        navigate("/admin"); // ajuste se painel inicia em outra rota
+      } else {
+        navigate("/");
+      }
     } catch (err) {
-      setErro("Erro de conexão com o servidor");
+      setErro(err.message);
     } finally {
       setLoading(false);
     }
@@ -87,9 +126,11 @@ export default function LoginPage() {
   return (
     <div className="min-h-[55vh] flex flex-col bg-[#f9e7f6]">
       <div className="w-full max-w-2xl mx-auto pt-5 px-4">
-        <BreadcrumbItens
-          items={[{ label: "Início", to: "/" }, { label: "Login" }]}
-        />
+        {isAdmin ? (
+          <AccountBreadcrumb current="Login" />
+        ) : (
+          <BreadcrumbItens items={[{ label: "Início", to: "/" }, { label: "Login" }]} />
+        )}
         <h1 className="text-3xl md:text-4xl font-light text-gray-800 mb-8 tracking-wide">
           Iniciar sessão
         </h1>
