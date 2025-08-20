@@ -20,6 +20,8 @@ import MinhaContaPage from "./pages/MinhaContaPage";
 import OrderDetailPage from "./pages/OrderDetailPage";
 import PedidoSucessoRedirect from "./pages/PedidoSucessoRedirect"; // importando o redirecionamento
 import AdminMainPage from "./pages/admin/AdminMainPage";
+import AdminLayout from "./components/admin/AdminLayout";
+import AdminHeroPage from "./pages/admin/AdminHeroPage";
 import { useSelector } from "react-redux";
 
 import "./index.css";
@@ -47,6 +49,31 @@ function App() {
 
   return (
     <BrowserRouter>
+      <Routes>
+        {/* Admin (layout próprio) */}
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<AdminHeroPage />} />
+          <Route path="produtos" element={<AdminMainPage />} />
+          {/* futuros:
+          <Route path="pedidos" element={<AdminOrdersPage />} />
+          <Route path="usuarios" element={<AdminUsersPage />} /> */}
+        </Route>
+
+        {/* Site público (layout padrão) */}
+        <Route
+          path="/*"
+          element={
+            <SiteShell cartOpen={cartOpen} setCartOpen={setCartOpen} />
+          }
+        />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
+function SiteShell({ cartOpen, setCartOpen }) {
+  return (
+    <>
       <ScrollToTop />
       <Header />
       <ToastContainer onViewCart={() => setCartOpen(true)} />
@@ -70,19 +97,10 @@ function App() {
         <Route path="/pedido/:id/erro" element={<PedidoSucessoRedirect />} />
         {/* Rota para confirmação de alteração de email */}
         <Route path="/confirm-email-change/:token" element={<ConfirmEmailChangePage />} />
-        <Route path="/admin" element={<Navigate to="/admin/produtos" replace />} />
-        <Route
-          path="/admin/produtos"
-          element={
-            <AdminRoute>
-              <AdminMainPage />
-            </AdminRoute>
-          }
-        />
       </Routes>
       <Footer />
       <SocialMediasSection />
-    </BrowserRouter>
+    </>
   );
 }
 
