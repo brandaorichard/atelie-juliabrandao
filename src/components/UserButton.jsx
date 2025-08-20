@@ -117,26 +117,15 @@ export default function UserButton({ mobileFaixa = false }) {
       "
           >
             {isAdmin ? (
-              <>
-                <button
-                  className="flex items-center gap-3 w-full text-left uppercase text-md font-normal cursor-pointer text-[#616161] py-5 px-8 rounded-t-sm"
-                  onClick={() => handleMenu("/admin/produtos")}
-                >
-                  <span className="text-xl" aria-label="Produtos" role="img">
-                    🧸
-                  </span>
-                  PRODUTOS
-                </button>
-                <button
-                  className="flex items-center gap-3 w-full text-left uppercase text-md cursor-pointer font-normal text-[#616161] py-5 px-8"
-                  onClick={() => handleMenu("/admin/pedidos")}
-                >
-                  <span className="text-xl" aria-label="Pedidos" role="img">
-                    📦
-                  </span>
-                  PEDIDOS
-                </button>
-              </>
+              <button
+                className="flex items-center gap-3 w-full text-left uppercase text-md font-normal cursor-pointer text-[#616161] py-5 px-8 rounded-t-sm"
+                onClick={() => handleMenu("/admin")}
+              >
+                <span className="text-xl" aria-label="Painel Admin" role="img">
+                  🛠️
+                </span>
+                PAINEL ADMIN
+              </button>
             ) : (
               <>
                 <button
