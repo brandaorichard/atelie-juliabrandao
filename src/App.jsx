@@ -29,6 +29,8 @@ import "./index.css";
 import ConfirmEmailPage from "./pages/ConfirmEmailPage"; // importe o componente
 import ConfirmEmailChangePage from "./pages/ConfirmEmailChangePage";
 
+import AdminOrdersPage from "./pages/admin/AdminOrdersPage";
+
 // Página de redirecionamento
 function PedidoRedirect() {
   const { id } = useParams();
@@ -54,9 +56,9 @@ function App() {
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminHeroPage />} />
           <Route path="produtos" element={<AdminMainPage />} />
-          {/* futuros:
+          {/* futuros: */}
           <Route path="pedidos" element={<AdminOrdersPage />} />
-          <Route path="usuarios" element={<AdminUsersPage />} /> */}
+          {/* <Route path="usuarios" element={<AdminUsersPage />} /> */}
         </Route>
 
         {/* Site público (layout padrão) */}
