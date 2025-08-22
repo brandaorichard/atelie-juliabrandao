@@ -10,7 +10,7 @@ export default function AdminHeroPage() {
       <div className="grid gap-6 sm:grid-cols-3">
         <div className="p-5 rounded-lg bg-white border border-[#e0d6f7]">
           <h2 className="text-sm font-semibold mb-1 text-neutral-900">Produtos</h2>
-          <p className="text-xs text-neutral-600 mb-3">Gerencie catálogo (bebês) por categoria.</p>
+          <p className="text-xs text-neutral-600 mb-3">Gerencie o catálogo (bebês) por categoria.</p>
           <a
             href="/admin/produtos"
             className="inline-block text-xs px-3 py-1 rounded bg-[#7a4fcf] hover:bg-[#ae95d9] text-white"
@@ -20,6 +20,7 @@ export default function AdminHeroPage() {
         </div>
         <div className="p-5 rounded-lg bg-white border border-[#e0d6f7]">
           <h2 className="text-sm font-semibold mb-1 text-neutral-900">Pedidos</h2>
+          <p className="text-xs text-neutral-600 mb-3">Gerencie o catálogo (pedidos) por categoria.</p>
           <a
             href="/admin/pedidos"
             className="inline-block text-xs px-3 py-1 rounded bg-[#7a4fcf] hover:bg-[#ae95d9] text-white"
@@ -27,9 +28,15 @@ export default function AdminHeroPage() {
             Acessar
           </a>
         </div>
-        <div className="p-5 rounded-lg bg-[#f7f3fa] border border-[#e0d6f7] opacity-60">
+        <div className="p-5 rounded-lg bg-[#f7f3fa] border border-[#e0d6f7]">
           <h2 className="text-sm font-semibold mb-1 text-neutral-900">Usuários</h2>
-          <p className="text-xs text-neutral-600 mb-3">(Em breve) Gestão de contas e permissões.</p>
+          <p className="text-xs text-neutral-600 mb-3">Visualize dados completos dos usuários.</p>
+          <a
+            href="/admin/usuarios"
+            className="inline-block text-xs px-3 py-1 rounded bg-[#7a4fcf] hover:bg-[#ae95d9] text-white"
+          >
+            Acessar
+          </a>
         </div>
       </div>
     </div>

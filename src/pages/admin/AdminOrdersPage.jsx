@@ -6,7 +6,7 @@ import {
 } from "../../services/adminOrderService";
 import { useBabies } from "../../hooks/useBabies"; // Importa os bebês para buscar imagens
 import { fetchUserById } from "../../services/adminUserService"; // novo import
-import AdminBreadcrumb from "../../components/AdminBreadcrumb";
+import BreadcrumbItensAdmin from "../../components/BreadcrumbItensAdmin";
 
 const STATUS_OPTIONS = [
   { value: "pendente", label: "Pendente" },
@@ -52,6 +52,7 @@ export default function AdminOrdersPage() {
         );
         setUsersById(userMap);
       } catch (err) {
+        console.error("Erro ao carregar pedidos:", err);
         setOrders([]);
       }
       setLoading(false);
@@ -68,13 +69,13 @@ export default function AdminOrdersPage() {
   }
 
   const breadcrumbItems = [
-    { label: "Início", to: "/admin/produtos" },
+    { label: "Início", to: "/admin" },
     { label: "Pedidos" }
   ];
 
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-6">
-      <AdminBreadcrumb items={breadcrumbItems} />
+      <BreadcrumbItensAdmin items={breadcrumbItems} />
       <h1 className="text-2xl font-light mb-4 text-neutral-900">Pedidos</h1>
       {loading ? (
         <div>Carregando...</div>
