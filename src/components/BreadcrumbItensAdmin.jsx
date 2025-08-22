@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 
-export default function BreadcrumbItens({ items }) {
+export default function BreadcrumbItensAdmin({ items }) {
   return (
     <nav className="text-sm py-4 px-2 -ml-2" aria-label="Breadcrumb">
       <ol className="flex items-center gap-2 text-[#7a4fcf] font-light">
