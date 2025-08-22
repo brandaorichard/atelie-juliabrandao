@@ -18,9 +18,14 @@ export default function AdminHeroPage() {
             Acessar
           </a>
         </div>
-        <div className="p-5 rounded-lg bg-[#f7f3fa] border border-[#e0d6f7] opacity-60">
+        <div className="p-5 rounded-lg bg-white border border-[#e0d6f7]">
           <h2 className="text-sm font-semibold mb-1 text-neutral-900">Pedidos</h2>
-          <p className="text-xs text-neutral-600 mb-3">(Em breve) Acompanhe e atualize status.</p>
+          <a
+            href="/admin/pedidos"
+            className="inline-block text-xs px-3 py-1 rounded bg-[#7a4fcf] hover:bg-[#ae95d9] text-white"
+          >
+            Acessar
+          </a>
         </div>
         <div className="p-5 rounded-lg bg-[#f7f3fa] border border-[#e0d6f7] opacity-60">
           <h2 className="text-sm font-semibold mb-1 text-neutral-900">Usuários</h2>

@@ -19,7 +19,7 @@ import OrdersPage from "./pages/OrdersPage";
 import MinhaContaPage from "./pages/MinhaContaPage";
 import OrderDetailPage from "./pages/OrderDetailPage";
 import PedidoSucessoRedirect from "./pages/PedidoSucessoRedirect"; // importando o redirecionamento
-import AdminMainPage from "./pages/admin/AdminMainPage";
+import AdminBabiesPage from "./pages/admin/AdminBabiesPage";
 import AdminLayout from "./components/admin/AdminLayout";
 import AdminHeroPage from "./pages/admin/AdminHeroPage";
 import { useSelector } from "react-redux";
@@ -55,7 +55,7 @@ function App() {
         {/* Admin (layout próprio) */}
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<AdminHeroPage />} />
-          <Route path="produtos" element={<AdminMainPage />} />
+          <Route path="produtos" element={<AdminBabiesPage />} />
           {/* futuros: */}
           <Route path="pedidos" element={<AdminOrdersPage />} />
           {/* <Route path="usuarios" element={<AdminUsersPage />} /> */}
