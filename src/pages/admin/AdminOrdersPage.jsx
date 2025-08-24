@@ -14,6 +14,13 @@ const STATUS_OPTIONS = [
   { value: "finalizado", label: "Finalizado" },
 ];
 
+const STATUS_FILTERS = [
+  { value: "todos", label: "Todos" },
+  { value: "pendente", label: "Pendente" },
+  { value: "pronto/enviado", label: "Pronto/Enviado" },
+  { value: "finalizado", label: "Finalizado" },
+];
+
 export default function AdminOrdersPage() {
   const token = useSelector(s => s.auth.token);
   const [orders, setOrders] = useState([]);
@@ -22,6 +29,7 @@ export default function AdminOrdersPage() {
   const [editStatus, setEditStatus] = useState("");
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [usersById, setUsersById] = useState({}); // novo estado
+  const [statusTab, setStatusTab] = useState("todos");
 
   // Busca todos os bebês para mapear slug -> imagem
   const { babies } = useBabies();
@@ -73,17 +81,37 @@ export default function AdminOrdersPage() {
     { label: "Pedidos" }
   ];
 
+  // Filtra os pedidos pelo status selecionado
+  const filteredOrders = statusTab === "todos"
+    ? orders
+    : orders.filter(o => o.status === statusTab);
+
   return (
     <div className="space-y-5 max-w-lg w-full mx-auto px-2">
       <BreadcrumbItensAdmin items={breadcrumbItems} />
       <h1 className="text-lg md:text-xl font-light tracking-wide text-neutral-900">Pedidos</h1>
+
+      <div className="flex gap-2 flex-wrap">
+        {STATUS_FILTERS.map(f => (
+          <button
+            key={f.value}
+            onClick={() => setStatusTab(f.value)}
+            className={`px-2.5 py-1 rounded text-[11px] border border-[#e0d6f7] ${
+              statusTab === f.value ? "bg-[#7a4fcf] text-white" : "bg-white text-neutral-900"
+            }`}
+          >
+            {f.label}
+          </button>
+        ))}
+      </div>
+
       {loading ? (
         <div>Carregando...</div>
-      ) : orders.length === 0 ? (
+      ) : filteredOrders.length === 0 ? (
         <p>Nenhum pedido encontrado.</p>
       ) : (
         <div className="flex flex-col gap-4">
-          {orders.map(order => (
+          {filteredOrders.map(order => (
             <div
               key={order._id}
               className="border border-[#e0d6f7] rounded-xl bg-white shadow-sm p-4 flex flex-col gap-2 w-full"
