@@ -78,6 +78,7 @@ export default function CategoryCardsSection({
   onCardClick,
   showFilter = true,
   showSort = true,
+  breadcrumbItems
 }) {
   const [selectedSort, setSelectedSort] = useState("price-asc");
   const [minValue, setMinValue] = useState("");
@@ -106,9 +107,9 @@ export default function CategoryCardsSection({
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 mt-4">
-      <Breadcrumb />
-      <h1 className="text-2xl font-light text-black mb-6 mt-6">{title}</h1>
+    <div className="max-w-6xl mx-auto px-4 pt-8 md:pt-10 pb-8">
+      <Breadcrumb items={breadcrumbItems} />
+      <h1 className="text-2xl font-light text-black mb-4">{title}</h1>
 
       {(showFilter || showSort) && (
         <div className="flex items-center gap-2 mb-4">
