@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { FaTrash } from "react-icons/fa";
 import {
   fetchOrdersAdmin,
   updateOrderStatus
@@ -30,6 +31,7 @@ export default function AdminOrdersPage() {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [usersById, setUsersById] = useState({}); // novo estado
   const [statusTab, setStatusTab] = useState("todos");
+  const [confirmDelete, setConfirmDelete] = useState(null);
 
   // Busca todos os bebês para mapear slug -> imagem
   const { babies } = useBabies();
@@ -76,6 +78,24 @@ export default function AdminOrdersPage() {
     setOrders(data);
   }
 
+  async function handleDeleteOrder(id) {
+    try {
+      await fetch(`https://atelie-juliabrandao-backend-production.up.railway.app/api/admin/orders/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      setConfirmDelete(null);
+      setSelectedOrder(null);
+      const data = await fetchOrdersAdmin(token);
+      setOrders(data);
+    } catch (err) {
+      alert("Erro ao remover pedido.");
+    }
+  }
+
   const breadcrumbItems = [
     { label: "Início", to: "/admin" },
     { label: "Pedidos" }
@@ -85,6 +105,14 @@ export default function AdminOrdersPage() {
   const filteredOrders = statusTab === "todos"
     ? orders
     : orders.filter(o => o.status === statusTab);
+
+  // Contagem de pedidos por status
+  const statusCounts = STATUS_FILTERS.reduce((acc, f) => {
+    acc[f.value] = f.value === "todos"
+      ? orders.length
+      : orders.filter(o => o.status === f.value).length;
+    return acc;
+  }, {});
 
   return (
     <div className="space-y-5 max-w-lg w-full mx-auto px-2">
@@ -100,7 +128,7 @@ export default function AdminOrdersPage() {
               statusTab === f.value ? "bg-[#7a4fcf] text-white" : "bg-white text-neutral-900"
             }`}
           >
-            {f.label}
+            {f.label} <span className="ml-1 text-[11px] font-semibold">({String(statusCounts[f.value]).padStart(2, "0")})</span>
           </button>
         ))}
       </div>
@@ -308,12 +336,48 @@ export default function AdminOrdersPage() {
                 {Number(selectedOrder.total).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
               </span>
             </div>
-            <button
-              className="mt-2 px-4 py-2 rounded border border-[#e0d6f7] text-[#7a4fcf] text-sm"
-              onClick={() => setSelectedOrder(null)}
-            >
-              Fechar
-            </button>
+            <div className="flex gap-2 mt-4 justify-start">
+              <button
+                className="px-4 py-2 rounded border border-[#e0d6f7] text-[#7a4fcf] text-sm"
+                onClick={() => setSelectedOrder(null)}
+              >
+                Fechar
+              </button>
+              <button
+                className="px-3 py-2  text-red-500 flex items-center"
+                onClick={() => setConfirmDelete(selectedOrder)}
+                title="Remover pedido"
+              >
+                <FaTrash size={16} />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de confirmação de remoção */}
+      {confirmDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setConfirmDelete(null)} />
+          <div className="relative bg-white border border-[#e0d6f7] rounded-xl p-6 w-full max-w-sm shadow-lg">
+            <h3 className="text-base font-semibold mb-3 text-neutral-900">Remover pedido</h3>
+            <p className="text-sm text-neutral-700 mb-4">
+              Tem certeza que deseja remover o pedido <span className="font-bold">#{confirmDelete._id}</span>?
+            </p>
+            <div className="flex gap-2 justify-end">
+              <button
+                className="px-3 py-1 rounded border border-[#e0d6f7] text-neutral-900 text-sm"
+                onClick={() => setConfirmDelete(null)}
+              >
+                Cancelar
+              </button>
+              <button
+                className="px-3 py-1 rounded bg-red-500 text-white text-sm"
+                onClick={() => handleDeleteOrder(confirmDelete._id)}
+              >
+                Remover
+              </button>
+            </div>
           </div>
         </div>
       )}
