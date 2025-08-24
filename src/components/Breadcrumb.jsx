@@ -1,15 +1,28 @@
-export default function Breadcrumb() {
-  return (
-    <nav className="mb-4 text-sm">
-      <ol className="flex items-center gap-2 text-[#7a4fcf]">
-        <li>
-          <a href="/" className="underline hover:text-[#ae95d9]">Início</a>
-        </li>
-        <span className="text-[#ae95d9]">{" > "}</span>
-        <li>
-          <a href="/categoria1" className="underline hover:text-[#ae95d9]">Bebês Reborn Por Encomenda</a>
-        </li>
-      </ol>
-    </nav>
-  );
+import { Link } from "react-router-dom";
+
+export default function Breadcrumb({ items }) {
+  // Se itens custom forem passados, usa-os. Caso contrário mantém lógica anterior (não mostrada aqui).
+  if (items && Array.isArray(items)) {
+    return (
+      <nav className="text-[11px] md:text-xs mb-3" aria-label="breadcrumb">
+        <ol className="flex flex-wrap items-center gap-1 text-[#7a4fcf]">
+          {items.map((it, i) => (
+            <li key={i} className="flex items-center gap-1">
+              {it.to ? (
+                <Link to={it.to} className="hover:underline">
+                  {it.label}
+                </Link>
+              ) : (
+                <span className="font-medium">{it.label}</span>
+              )}
+              {i < items.length - 1 && <span className="text-[#7a4fcf]">{">"}</span>}
+            </li>
+          ))}
+        </ol>
+      </nav>
+    );
+  }
+
+  // fallback antigo
+  return null;
 }
