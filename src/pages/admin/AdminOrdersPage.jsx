@@ -74,84 +74,85 @@ export default function AdminOrdersPage() {
   ];
 
   return (
-    <div className="p-6 max-w-6xl mx-auto space-y-6">
+    <div className="space-y-5 max-w-lg w-full mx-auto px-2">
       <BreadcrumbItensAdmin items={breadcrumbItems} />
-      <h1 className="text-2xl font-light mb-4 text-neutral-900">Pedidos</h1>
+      <h1 className="text-lg md:text-xl font-light tracking-wide text-neutral-900">Pedidos</h1>
       {loading ? (
         <div>Carregando...</div>
       ) : orders.length === 0 ? (
         <p>Nenhum pedido encontrado.</p>
       ) : (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-4">
           {orders.map(order => (
             <div
               key={order._id}
-              className="border border-[#e0d6f7] rounded-xl bg-[#f7f3fa] shadow-sm p-6 flex flex-col gap-4 max-w-md mx-auto relative"
+              className="border border-[#e0d6f7] rounded-xl bg-white shadow-sm p-4 flex flex-col gap-2 w-full"
             >
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center justify-between">
-                  <span className="font-semibold text-base">
-                    Pedido <span className="break-all">#{order._id}</span>
-                  </span>
-                  <span className="text-sm text-neutral-600">
-                    {new Date(order.date).toLocaleDateString()}
-                  </span>
-                </div>
-                <span
-                  className="absolute top-4 right-6 text-xs font-semibold text-[#7a4fcf] underline cursor-pointer hover:text-[#ae95d9] transition"
-                  onClick={() => setSelectedOrder(order)}
-                >
-                  Ver detalhes
+              <div className="flex items-center justify-between">
+                <span className="font-semibold text-base break-all">
+                  Cliente: {usersById[order.userId]?.nome || "Cliente"}
                 </span>
-                <div className="flex items-center gap-2 flex-wrap mt-1">
-                  {editId === order._id ? (
-                    <>
-                      <select
-                        value={editStatus}
-                        onChange={e => setEditStatus(e.target.value)}
-                        className="border border-[#e0d6f7] rounded px-3 py-1 text-xs font-medium"
-                        style={{
-                          minWidth: 110,
-                          background: "#f7f3fa", // fundo igual ao card
-                          color: "#7a4fcf",
-                        }}
-                      >
-                        {STATUS_OPTIONS.map(opt => (
-                          <option key={opt.value} value={opt.value}>{opt.label}</option>
-                        ))}
-                      </select>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleStatusUpdate(order._id)}
-                          className="px-3 py-1 rounded bg-[#7a4fcf] text-white text-xs"
-                        >
-                          Salvar
-                        </button>
-                        <button
-                          onClick={() => { setEditId(null); setEditStatus(""); }}
-                          className="px-3 py-1 rounded border border-[#e0d6f7] text-xs"
-                        >
-                          Cancelar
-                        </button>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <span className={`px-3 py-1 rounded text-white text-xs font-medium bg-[#7a4fcf]`}>
-                        {order.status}
-                      </span>
+                <span className="text-sm text-neutral-600">
+                  {new Date(order.date).toLocaleDateString()}
+                </span>
+              </div>
+              <div className="text-xs text-neutral-500 mb-1 break-all">
+                Pedido #{order._id}
+              </div>
+              <div className="flex items-center gap-2 flex-wrap mt-1">
+                {editId === order._id ? (
+                  <>
+                    <select
+                      value={editStatus}
+                      onChange={e => setEditStatus(e.target.value)}
+                      className="border border-[#e0d6f7] rounded px-3 py-1 text-xs font-medium"
+                      style={{
+                        minWidth: 110,
+                        background: "#f7f3fa",
+                        color: "#7a4fcf",
+                      }}
+                    >
+                      {STATUS_OPTIONS.map(opt => (
+                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                      ))}
+                    </select>
+                    <div className="flex gap-2">
                       <button
-                        onClick={() => { setEditId(order._id); setEditStatus(order.status); }}
-                        className="px-3 py-1 rounded border border-[#e0d6f7] text-xs ml-2"
+                        onClick={() => handleStatusUpdate(order._id)}
+                        className="px-3 py-1 rounded bg-[#7a4fcf] text-white text-xs"
                       >
-                        Editar Status
+                        Salvar
                       </button>
-                    </>
-                  )}
-                </div>
+                      <button
+                        onClick={() => { setEditId(null); setEditStatus(""); }}
+                        className="px-3 py-1 rounded border border-[#e0d6f7] text-xs"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <span className="px-3 py-1 rounded text-white text-xs font-medium bg-[#7a4fcf]">
+                      {order.status}
+                    </span>
+                    <button
+                      onClick={() => { setEditId(order._id); setEditStatus(order.status); }}
+                      className="px-3 py-1 rounded border border-[#e0d6f7] text-xs ml-2"
+                    >
+                      Editar Status
+                    </button>
+                    <button
+                      onClick={() => setSelectedOrder(order)}
+                      className="text-xs text-[#7a4fcf] underline font-medium ml-2"
+                    >
+                      Ver detalhes
+                    </button>
+                  </>
+                )}
               </div>
               <div className="flex gap-3 items-center mt-2">
-                {order.items.slice(0, 3).map((item, i) => (
+                {order.items.slice(0, 1).map((item, i) => (
                   <div key={i} className="flex flex-col items-center w-20">
                     <img
                       src={babiesBySlug[item.slug]?.images?.[0] || ""}
@@ -161,19 +162,13 @@ export default function AdminOrdersPage() {
                     <span className="text-[11px] text-neutral-700 text-center truncate w-full">{item.slug}</span>
                   </div>
                 ))}
-                {order.items.length > 3 && (
+                {order.items.length > 1 && (
                   <span className="text-sm text-neutral-600 self-center">
-                    +{order.items.length - 3} itens
+                    +{order.items.length - 1} itens
                   </span>
                 )}
               </div>
               <div className="flex flex-col gap-1 mt-2">
-                <div>
-                  <span className="font-medium">Cliente:</span>{" "}
-                  <span className="text-neutral-700 break-all">
-                    {usersById[order.userId]?.nome || order.userId}
-                  </span>
-                </div>
                 <div>
                   <span className="font-medium">Entrega:</span>{" "}
                   <span className="text-neutral-700 break-all">{order.deliveryAddress}</span>
