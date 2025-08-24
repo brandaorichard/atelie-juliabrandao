@@ -65,11 +65,19 @@ export default function ProductPage() {
   }
 
   const prontaEntrega = baby.category === "pronta_entrega";
+  const porSemelhanca = baby.category === "semelhanca";
+
   const breadcrumbItems = prontaEntrega
     ? [
         { label: "Início", to: "/" },
         { label: "Bebes Reborn a Pronta Entrega", to: "/categoria2" },
         { label: baby.name }
+      ]
+    : porSemelhanca
+    ? [
+        { label: "Início", to: "/" },
+        { label: "Bebes Reborn por Semelhança", to: "/categoria3" },
+        
       ]
     : [
         { label: "Início", to: "/" },
