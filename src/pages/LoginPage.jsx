@@ -112,7 +112,7 @@ export default function LoginPage() {
 
       // Redireciona conforme role
       if (authData.user.role === "admin") {
-        navigate("/admin/produtos"); // ajuste se painel inicia em outra rota
+        navigate("/admin"); // ajuste se painel inicia em outra rota
       } else {
         navigate("/");
       }
