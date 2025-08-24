@@ -51,7 +51,7 @@ export default function AdminUsersPage() {
               className="border border-[#e0d6f7] rounded-xl bg-white shadow-sm p-4 flex flex-col gap-2 w-full"
             >
               <div className="flex items-center justify-between">
-                <span className="font-semibold text-base break-all">{user.nome}</span>
+                <span className="font-semibold text-base break-all text-neutral-900">{user.nome}</span>
                 <button
                   onClick={() => setExpandedId(expandedId === user._id ? null : user._id)}
                   className="text-xs text-[#7a4fcf] underline font-medium"
@@ -59,11 +59,11 @@ export default function AdminUsersPage() {
                   {expandedId === user._id ? "Fechar" : "Ver mais"}
                 </button>
               </div>
-              <div className="text-xs text-neutral-500 mb-1 break-all">Email: {user.email}</div>
-              <div className="text-xs text-neutral-500 mb-1 break-all">CPF: {user.cpf}</div>
-              <div className="text-xs text-neutral-500 mb-1 break-all">Telefone: {user.telefone}</div>
+              <div className="text-xs text-neutral-900 mb-1 break-all">Email: {user.email}</div>
+              <div className="text-xs text-neutral-900 mb-1 break-all">CPF: {user.cpf}</div>
+              <div className="text-xs text-neutral-900 mb-1 break-all">Telefone: {user.telefone}</div>
               {expandedId === user._id && (
-                <div className="mt-2 text-xs text-neutral-700 space-y-1">
+                <div className="mt-2 text-xs text-neutral-900 space-y-1">
                   <div>
                     <span className="font-medium">Endereço:</span>{" "}
                     <span>
