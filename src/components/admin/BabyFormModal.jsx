@@ -48,7 +48,7 @@ export default function BabyFormModal({ open, onClose, onSubmit, initial }) {
   function handleSubmit(e) {
     e.preventDefault();
     // validações básicas enum
-    const allowedCat = ["encomenda", "pronta_entrega", "semelhanca"];
+    const allowedCat = ["encomenda", "pronta_entrega"];
     const allowedBox = ["pequena", "grande"];
     if (!allowedCat.includes(form.category)) {
       alert("Selecione uma categoria válida.");
