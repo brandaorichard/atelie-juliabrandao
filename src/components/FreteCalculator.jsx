@@ -1,10 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import axios from "axios";
 import { FaExclamationTriangle } from "react-icons/fa";
 import { useSelector, useDispatch } from "react-redux";
 import { setCep, setFreteSelecionado, setFreteData } from "../redux/freteSlice";
 
-export default function FreteCalculator({ items, onFreteSelecionado }) {
+/**
+ * FreteCalculator
+ * Regras para esconder o aviso azul:
+ *  - Se a prop hideProductionNote = true
+ *  - OU se a prop productCategory === 'pronta_entrega'
+ *  - OU se TODOS os items tiverem category === 'pronta_entrega'
+ */
+export default function FreteCalculator({
+  items,
+  onFreteSelecionado,
+  hideProductionNote = false,
+  productCategory // passe a categoria do produto principal quando disponível
+}) {
   const dispatch = useDispatch();
   const cep = useSelector(state => state.frete.cep);
   const freteSelecionado = useSelector(state => state.frete.freteSelecionado);
@@ -13,58 +25,62 @@ export default function FreteCalculator({ items, onFreteSelecionado }) {
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState("");
 
+  // Deriva se todos os itens são pronta_entrega (caso items tragam category)
+  const allProntaEntrega = useMemo(() => {
+    if (!items || items.length === 0) return false;
+    return items.every(i => i.category === "pronta_entrega");
+  }, [items]);
+
+  const shouldHideNote =
+    hideProductionNote ||
+    productCategory === "pronta_entrega" ||
+    allProntaEntrega;
+
   async function calcularFrete() {
     setLoading(true);
     setErro("");
     setFretes([]);
     try {
-      // Garante o formato do CEP com hífen
       const cepFormatado =
         cep.length === 8 ? cep.replace(/(\d{5})(\d{3})/, "$1-$2") : cep;
 
-      // Garante que items estejam no formato [{ slug, quantity }]
-      const itemsFormatados = (items || []).map((item) => ({
+      const itemsFormatados = (items || []).map(item => ({
         slug: item.slug,
         quantity: item.quantity,
       }));
 
       const res = await axios.post(
         "https://atelie-juliabrandao-backend-production.up.railway.app/api/frete/calcular",
-        {
-          cepDestino: cepFormatado,
-          items: itemsFormatados,
-        }
+        { cepDestino: cepFormatado, items: itemsFormatados }
       );
+
       const services = (Array.isArray(res.data) ? res.data : res.data.services || [])
-        .filter((s) => !s.has_error && s.price)
-        .map((s) => ({
+        .filter(s => !s.has_error && s.price)
+        .map(s => ({
           name: s.name,
-          price: s.price,
+            price: s.price,
           deadline: s.delivery_time || (s.delivery_range && s.delivery_range.max) || null,
           company: s.company?.name,
           logo: s.company?.picture,
         }));
+
       setFretes(services);
 
-      // Busca o endereço do CEP via ViaCEP
+      // ViaCEP
       let enderecoViaCep = null;
       const via = await fetch(`https://viacep.com.br/ws/${cep.replace(/\D/g, "")}/json/`);
       if (via.ok) {
         const addr = await via.json();
-        if (!addr.erro) {
-          enderecoViaCep = addr;
-        }
+        if (!addr.erro) enderecoViaCep = addr;
       }
 
-      // Dispatch the frete data, sempre usando o ViaCEP
       dispatch(setFreteData({
         cep: cepFormatado,
         fretes: services,
         enderecoCep: enderecoViaCep,
       }));
 
-      // Optionally call onFreteSelecionado
-      if (onFreteSelecionado) {
+      if (onFreteSelecionado && services[0]) {
         onFreteSelecionado(services[0]);
       }
     } catch (err) {
@@ -101,15 +117,20 @@ export default function FreteCalculator({ items, onFreteSelecionado }) {
           {loading ? "Calculando..." : "Calcular frete"}
         </button>
       </div>
-      <div className="mt-2 flex items-center gap-2 font-light border border-[#1c70df] rounded px-3 py-2 text-[#1c70df] text-center text-xs">
-        <FaExclamationTriangle className="-mr-1 h-6 w-auto" />
-        O prazo da sua entrega deve ser somado com o prazo da confecção do bebê + o envio dos correios.
-      </div>
-      {erro && <div className="text-red-500 mt-2">{erro}</div>}
+
+      {!shouldHideNote && (
+        <div className="mt-2 flex items-center gap-2 font-light border border-[#1c70df] rounded px-3 py-2 text-[#1c70df] text-center text-xs">
+          <FaExclamationTriangle className="-mr-1 h-6 w-auto" />
+          O prazo da sua entrega deve ser somado com o prazo da confecção do bebê + o envio dos correios.
+        </div>
+      )}
+
+      {erro && <div className="text-red-500 mt-2 text-sm">{erro}</div>}
+
       {fretes.length > 0 && (
         <div className="mt-2 space-y-2">
           {fretes.map(frete => (
-            <label key={frete.name} className="flex items-center gap-2">
+            <label key={frete.name} className="flex items-center gap-2 text-sm">
               <input
                 type="radio"
                 name="frete"
