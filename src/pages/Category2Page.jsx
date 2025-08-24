@@ -25,12 +25,17 @@ export default function Category2Page() {
   const { babies, loading, error } = useBabies({ type: "pronta_entrega" });
   const navigate = useNavigate();
 
+  const breadcrumbItems = [
+    { label: "Início", to: "/" },
+    { label: "Bebes Reborn a Pronta Entrega" }
+  ];
+
   return (
     <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        <h1 className="text-2xl font-light text-[#616161] mb-6 mt-6">A pronta entrega</h1>
+      <div className="max-w-6xl mx-auto px-4 py-8 -mt-15">
+        {/* <h1 className="text-2xl font-light text-[#616161] mb-6 mt-6">A pronta entrega</h1> */}
         {/* Filtro e Ordenar */}
-        <div className="flex items-center gap-2 mb-4">
+        {/* <div className="flex items-center gap-2 mb-4">
           <button
             className="flex items-center gap-1 text-[#7a4fcf] text-sm font-medium hover:underline focus:outline-none cursor-pointer"
             onClick={() => setFilterOpen(true)}
@@ -45,7 +50,7 @@ export default function Category2Page() {
             <FaSortAmountDown className="text-base" />
             Ordenar
           </button>
-        </div>
+        </div> */}
         {/* Drawers */}
         <FilterDrawer
           open={filterOpen}
@@ -79,6 +84,7 @@ export default function Category2Page() {
           onCardClick={(baby) => navigate(`/produto/${baby.slug}`)}
           showFilter
           showSort
+          breadcrumbItems={breadcrumbItems}
         />
       )}
     </motion.div>
