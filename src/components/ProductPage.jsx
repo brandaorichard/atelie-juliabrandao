@@ -64,12 +64,25 @@ export default function ProductPage() {
     );
   }
 
+  const prontaEntrega = baby.category === "pronta_entrega";
+  const breadcrumbItems = prontaEntrega
+    ? [
+        { label: "Início", to: "/" },
+        { label: "Bebes Reborn a Pronta Entrega", to: "/categoria2" },
+        { label: baby.name }
+      ]
+    : [
+        { label: "Início", to: "/" },
+        { label: "Bebês Reborn Por Encomenda", to: "/categoria1" },
+        { label: baby.name }
+      ];
+
   return (
-    <section className="w-full bg-[#f9e7f6] min-h-screen py-8 px-2">
-      <div className="max-w-6xl mx-auto flex flex-col md:flex-row gap-8 -mt-2 md:mt-5">
+    <section className="w-full bg-[#f9e7f6] min-h-screen py-6 px-2">
+      <div className="max-w-6xl mx-auto flex flex-col md:flex-row gap-8">
         <ProductCarousel images={baby.images} current={current} setCurrent={setCurrent} name={baby.name} />
         <div className="flex-1 flex flex-col justify-start mt-2 md:mt-0">
-          <Breadcrumb />
+          <Breadcrumb items={breadcrumbItems} />
           <ProductTitlePrice
             name={baby.name}
             price={baby.price}
@@ -81,23 +94,12 @@ export default function ProductPage() {
           <FreteCalculator
             items={[{ slug: baby.slug, quantity }]}
             onFreteSelecionado={setFreteSelecionado}
+            hideProductionNote={prontaEntrega}
           />
-          {/* {freteSelecionado && (
-            <div className="mt-2 text-lg font-semibold text-[#7a4fcf]">
-              Total: {(baby.price * quantity + Number(freteSelecionado.price)).toLocaleString("pt-BR", {
-                style: "currency",
-                currency: "BRL",
-              })}
-            </div>
-          )} */}
-          {/* <button
-            className="mt-4 px-6 py-3 rounded bg-purple-600 text-white font-semibold"
-            onClick={handleAddToCart}
-          >
-            Adicionar ao carrinho
-          </button> */}
           <PaymentMethods />
-          <ProductSection title="Prazo de entrega" items={prazoPadrao} />
+          {!prontaEntrega && (
+            <ProductSection title="Prazo de entrega" items={prazoPadrao} />
+          )}
           <ProductSection title="Características" items={featuresPadrao} />
           <ProductSection title="Itens do enxoval" items={enxovalPadrao} />
           <ProductSection title="Avisos e cuidados" items={avisosPadrao} />
