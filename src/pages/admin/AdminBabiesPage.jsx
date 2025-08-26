@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import BreadcrumbItensAdmin from "../../components/BreadcrumbItensAdmin";
 import BabyFormModal from "../../components/admin/BabyFormModal";
 import { loadBabies, addBaby, editBaby, removeBaby } from "../../redux/adminBabiesSlice";
+import { motion } from "framer-motion";
 
 export default function AdminBabiesPage() {
   const dispatch = useDispatch();
@@ -26,6 +27,15 @@ export default function AdminBabiesPage() {
     if (tab === "todos") return items;
     return items.filter(b => b.category === tab);
   }, [items, tab]);
+
+  const categoriaCounts = useMemo(() => {
+    const counts = {};
+    categorias.forEach(cat => {
+      counts[cat] = items.filter(b => b.category === cat).length;
+    });
+    counts["todos"] = items.length;
+    return counts;
+  }, [categorias, items]);
 
   function openCreate() {
     setEditing(null);
@@ -62,7 +72,12 @@ export default function AdminBabiesPage() {
   }
 
   return (
-    <div className="space-y-5">
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="space-y-5"
+    >
       <BreadcrumbItensAdmin
         items={[
           { label: "Início", to: "/admin" },
@@ -91,7 +106,7 @@ export default function AdminBabiesPage() {
             tab === "todos" ? "bg-[#7a4fcf] text-white" : "bg-white text-neutral-900"
           }`}
         >
-          Todos
+          Todos <span className="ml-1 text-[11px] font-semibold">({String(categoriaCounts["todos"]).padStart(2, "0")})</span>
         </button>
         {categorias.map(cat => (
           <button
@@ -101,7 +116,7 @@ export default function AdminBabiesPage() {
               tab === cat ? "bg-[#7a4fcf] text-white" : "bg-white text-neutral-900"
             }`}
           >
-            {cat}
+            {cat} <span className="ml-1 text-[11px] font-semibold">({String(categoriaCounts[cat]).padStart(2, "0")})</span>
           </button>
         ))}
       </div>
@@ -111,7 +126,10 @@ export default function AdminBabiesPage() {
         <div className="text-[11px] text-neutral-600">Nenhum item.</div>
       )}
 
-      <div
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
         className="
           grid gap-2
           grid-cols-2
@@ -123,8 +141,11 @@ export default function AdminBabiesPage() {
         "
       >
         {filtrados.map(b => (
-          <div
+          <motion.div
             key={b._id}
+            initial={{ opacity: 0, scale: 0.97 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3 }}
             className="
               border border-[#e0d6f7] bg-transparent rounded-xs
               p-1.5 sm:p-2 flex flex-col group
@@ -160,9 +181,9 @@ export default function AdminBabiesPage() {
                 Remover
               </button>
             </div>
-          </div>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
 
       {modalOpen && (
         <BabyFormModal
@@ -176,7 +197,12 @@ export default function AdminBabiesPage() {
       {confirmDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/50" onClick={() => setConfirmDelete(null)} />
-          <div className="relative bg-white border border-[#e0d6f7] rounded p-6 w-full max-w-sm">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.97 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3 }}
+            className="relative bg-white border border-[#e0d6f7] rounded p-6 w-full max-w-sm"
+          >
             <h4 className="font-semibold mb-3 text-sm text-neutral-900">Confirmar remoção</h4>
             <p className="text-xs mb-4 text-neutral-600">
               Remover definitivamente <strong>{confirmDelete.name}</strong>?
@@ -195,9 +221,9 @@ export default function AdminBabiesPage() {
                 Remover
               </button>
             </div>
-          </div>
+          </motion.div>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }
