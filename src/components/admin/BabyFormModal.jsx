@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 
 export default function BabyFormModal({ open, onClose, onSubmit, initial }) {
   const [form, setForm] = useState({
@@ -41,13 +42,13 @@ export default function BabyFormModal({ open, onClose, onSubmit, initial }) {
 
   function handleFiles(e) {
     const files = Array.from(e.target.files);
-    setForm(f => ({ ...f, images: files }));
-    setPreview(files.map(f => URL.createObjectURL(f)));
+    // Acrescenta novas imagens ao array existente
+    setForm(f => ({ ...f, images: [...f.images, ...files] }));
+    setPreview(prev => [...prev, ...files.map(f => URL.createObjectURL(f))]);
   }
 
   function handleSubmit(e) {
     e.preventDefault();
-    // validações básicas enum
     const allowedCat = ["encomenda", "pronta_entrega", "semelhanca"];
     const allowedBox = ["pequena", "grande"];
     if (!allowedCat.includes(form.category)) {
@@ -62,9 +63,20 @@ export default function BabyFormModal({ open, onClose, onSubmit, initial }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex">
+    <motion.div
+      initial={{ opacity: 0, scale: 0.97 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.3 }}
+      className="fixed inset-0 z-50 flex"
+    >
       <div className="absolute inset-0 bg-black/60" onClick={onClose} />
-      <div className="relative ml-auto h-full w-full max-w-md bg-white text-neutral-900 p-6 overflow-y-auto border-l border-[#e0d6f7]">
+      <motion.div
+        initial={{ opacity: 0, x: 40 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: 40 }}
+        transition={{ duration: 0.3 }}
+        className="relative ml-auto h-full w-full max-w-md bg-white text-neutral-900 p-6 overflow-y-auto border-l border-[#e0d6f7]"
+      >
         <h2 className="text-lg font-medium mb-4">{initial ? "Editar Bebê" : "Novo Bebê"}</h2>
         <form onSubmit={handleSubmit} className="space-y-3">
           <div>
@@ -202,7 +214,7 @@ export default function BabyFormModal({ open, onClose, onSubmit, initial }) {
             </button>
           </div>
         </form>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
