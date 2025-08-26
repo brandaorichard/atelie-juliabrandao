@@ -72,7 +72,7 @@ export default function Category3Preview() {
   return (
     <div className="max-w-6xl mx-auto px-4 mt-10 sm:px-6 lg:px-8">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-light text-black">A Semelhança</h2>
+        <h2 className="text-xl font-light text-black">Por Semelhança</h2>
         <motion.button
           id="ver-mais-link-semelhanca"
           whileTap={isMobile ? { scale: 0.95 } : {}}
@@ -166,6 +166,7 @@ export default function Category3Preview() {
               <RebornCard
                 baby={baby}
                 onClick={() => navigate(`/produto/${baby.slug}`)}
+                context="category3"
                 mini
               />
             </div>
