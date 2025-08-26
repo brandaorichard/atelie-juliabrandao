@@ -100,6 +100,9 @@ export default function CategoryCardsSection({
     return sortBabies(base, selectedSort);
   }, [babies, minValue, maxValue, selectedSort]);
 
+  // Detecta se está na categoria 3 (por semelhança)
+  const isCategory3 = title === "Por Semelhança";
+
   function resetFilter() {
     setMinValue("");
     setMaxValue("");
@@ -170,6 +173,7 @@ export default function CategoryCardsSection({
             key={baby.id}
             baby={baby}
             onClick={() => onCardClick(baby)}
+            context={isCategory3 ? "category3" : undefined} // <--- Passa context só na categoria3
           />
         ))}
       </div>
