@@ -1,6 +1,12 @@
 // components/RebornCard.jsx
-export default function RebornCard({ baby, onClick }) {
+export default function RebornCard({ baby, onClick, context }) {
   const cover = baby.img || (baby.images && baby.images[0]) || "";
+  // context: "category3" ou "category3preview" passado pelo pai
+
+  const isSemelhanca =
+    (baby.category === "semelhanca" || baby.type === "semelhanca") &&
+    (context === "category3" || context === "category3preview");
+
   return (
     <div
       onClick={onClick}
@@ -29,10 +35,15 @@ export default function RebornCard({ baby, onClick }) {
           {baby.name}
         </span>
         <div className="flex items-end gap-2 mb-1">
-          <span className="text-base md:text-lg font-bold text-[#7a4fcf]">
-            {typeof baby.price === "number"
-              ? `R$${baby.price.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`
-              : baby.price}
+          <span className="flex flex-col text-base md:text-lg font-bold text-[#7a4fcf]">
+            {isSemelhanca && (
+              <span className="text-xs font-semibold text-[#616161] mb-1">A partir de:</span>
+            )}
+            <span>
+              {typeof baby.price === "number"
+                ? `R$${baby.price.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}`
+                : baby.price}
+            </span>
           </span>
           {baby.oldPrice && (
             <span className="text-xs text-[#616161] line-through">
@@ -42,7 +53,7 @@ export default function RebornCard({ baby, onClick }) {
             </span>
           )}
         </div>
-        {baby.installment && (
+        {baby.installment && !isSemelhanca && (
           <span className="text-xs text-[#ae95d9]">{baby.installment}</span>
         )}
       </div>
