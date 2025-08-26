@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { FaTrash } from "react-icons/fa";
+import { motion } from "framer-motion";
 import {
   fetchOrdersAdmin,
   updateOrderStatus
@@ -115,7 +116,12 @@ export default function AdminOrdersPage() {
   }, {});
 
   return (
-    <div className="space-y-5 max-w-lg w-full mx-auto px-2">
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="space-y-5 max-w-lg w-full mx-auto px-2"
+    >
       <BreadcrumbItensAdmin items={breadcrumbItems} />
       <h1 className="text-lg md:text-xl font-light tracking-wide text-neutral-900">Pedidos</h1>
 
@@ -140,8 +146,11 @@ export default function AdminOrdersPage() {
       ) : (
         <div className="flex flex-col gap-4">
           {filteredOrders.map(order => (
-            <div
+            <motion.div
               key={order._id}
+              initial={{ opacity: 0, scale: 0.97 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3 }}
               className="border border-[#e0d6f7] rounded-xl bg-white shadow-sm p-4 flex flex-col gap-2 w-full"
             >
               <div className="flex items-center justify-between">
@@ -244,14 +253,19 @@ export default function AdminOrdersPage() {
                   </span>
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       )}
 
       {/* Modal de detalhes do pedido */}
       {selectedOrder && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.97 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.3 }}
+          className="fixed inset-0 z-50 flex items-center justify-center"
+        >
           <div className="absolute inset-0 bg-black/40" onClick={() => setSelectedOrder(null)} />
           <div className="relative bg-white border border-[#e0d6f7] rounded-xl p-6 w-full max-w-xl shadow-lg overflow-y-auto">
             <h2 className="text-lg font-semibold mb-3 text-neutral-900">
@@ -352,12 +366,17 @@ export default function AdminOrdersPage() {
               </button>
             </div>
           </div>
-        </div>
+        </motion.div>
       )}
 
       {/* Modal de confirmação de remoção */}
       {confirmDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.97 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.3 }}
+          className="fixed inset-0 z-50 flex items-center justify-center"
+        >
           <div className="absolute inset-0 bg-black/40" onClick={() => setConfirmDelete(null)} />
           <div className="relative bg-white border border-[#e0d6f7] rounded-xl p-6 w-full max-w-sm shadow-lg">
             <h3 className="text-base font-semibold mb-3 text-neutral-900">Remover pedido</h3>
@@ -379,8 +398,8 @@ export default function AdminOrdersPage() {
               </button>
             </div>
           </div>
-        </div>
+        </motion.div>
       )}
-    </div>
+    </motion.div>
   );
 }
