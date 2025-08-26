@@ -1,7 +1,29 @@
 import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import { motion } from "framer-motion";
+import axios from "axios";
+
+function formatCurrencyInput(value) {
+  // Remove tudo que não é número
+  let cleaned = value.replace(/\D/g, "");
+  // Remove zeros à esquerda
+  cleaned = cleaned.replace(/^0+/, "");
+  // Se vazio, retorna vazio
+  if (!cleaned) return "";
+  // Limita a 8 dígitos (até 999.999,99)
+  cleaned = cleaned.slice(0, 8);
+  // Adiciona zeros à esquerda para garantir pelo menos 3 dígitos
+  cleaned = cleaned.padStart(3, "0");
+  // Insere vírgula antes dos dois últimos dígitos
+  let intPart = cleaned.slice(0, -2);
+  let decimalPart = cleaned.slice(-2);
+  // Adiciona pontos a cada 3 dígitos do inteiro
+  intPart = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  return `${intPart},${decimalPart}`;
+}
 
 export default function BabyFormModal({ open, onClose, onSubmit, initial }) {
+  const token = useSelector(s => s.auth.token);
   const [form, setForm] = useState({
     nome: "",
     slug: "",
@@ -13,6 +35,8 @@ export default function BabyFormModal({ open, onClose, onSubmit, initial }) {
     images: []
   });
   const [preview, setPreview] = useState([]);
+  const [removing, setRemoving] = useState(false);
+  const [deletedImages, setDeletedImages] = useState([]); // NOVO
 
   useEffect(() => {
     if (initial) {
@@ -27,9 +51,11 @@ export default function BabyFormModal({ open, onClose, onSubmit, initial }) {
         images: []
       });
       setPreview(initial.images || []);
+      setDeletedImages([]); // Limpa ao abrir novo modal
     } else {
       setForm(f => ({ ...f, images: [] }));
       setPreview([]);
+      setDeletedImages([]);
     }
   }, [initial]);
 
@@ -37,14 +63,34 @@ export default function BabyFormModal({ open, onClose, onSubmit, initial }) {
 
   function handleChange(e) {
     const { name, value } = e.target;
-    setForm(f => ({ ...f, [name]: value }));
+    if (name === "price") {
+      setForm(f => ({ ...f, price: formatCurrencyInput(value) }));
+    } else {
+      setForm(f => ({ ...f, [name]: value }));
+    }
   }
 
   function handleFiles(e) {
     const files = Array.from(e.target.files);
-    // Acrescenta novas imagens ao array existente
     setForm(f => ({ ...f, images: [...f.images, ...files] }));
     setPreview(prev => [...prev, ...files.map(f => URL.createObjectURL(f))]);
+  }
+
+  async function handleRemoveImage(url) {
+    if (!initial?._id) return;
+    setRemoving(url);
+    try {
+      await axios.put(
+        `https://atelie-juliabrandao-backend-production.up.railway.app/api/admin/bebes/${initial._id}/remove-image`,
+        { url },
+        { headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` } }
+      );
+      setDeletedImages(prev => [...prev, url]); // Marca como deletada
+    } catch (err) {
+      alert("Erro ao remover imagem.");
+    } finally {
+      setRemoving(false);
+    }
   }
 
   function handleSubmit(e) {
@@ -59,6 +105,8 @@ export default function BabyFormModal({ open, onClose, onSubmit, initial }) {
       alert("Selecione um tipo de caixa válido.");
       return;
     }
+    // Remove imagens deletadas do preview antes de enviar
+    setPreview(prev => prev.filter(img => !deletedImages.includes(img)));
     onSubmit(form);
   }
 
@@ -123,9 +171,10 @@ export default function BabyFormModal({ open, onClose, onSubmit, initial }) {
               <label className="block text-xs font-medium">Preço</label>
               <input
                 name="price"
-                type="number"
-                step="0.01"
-                placeholder="ex: 9999.99"
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9.,]*"
+                placeholder="ex: 9.999,99"
                 value={form.price}
                 onChange={handleChange}
                 className="w-full border border-[#e0d6f7] bg-[#f7f3fa] px-2 py-1 rounded text-sm text-neutral-900"
@@ -188,14 +237,53 @@ export default function BabyFormModal({ open, onClose, onSubmit, initial }) {
               className="text-sm"
             />
             <div className="flex flex-wrap gap-2 mt-2">
-              {preview.map((src, i) => (
-                <img
-                  key={i}
-                  src={src}
-                  alt=""
-                  className="w-16 h-16 object-cover rounded border border-[#e0d6f7]"
-                />
+              {/* Imagens já existentes */}
+              {initial?.images?.map((src, i) => (
+                <div key={src} className="relative group">
+                  <img
+                    src={src}
+                    alt=""
+                    className={`w-16 h-16 object-cover rounded border border-[#e0d6f7] transition-all duration-300
+                      ${deletedImages.includes(src) ? "opacity-40 grayscale" : ""}
+                    `}
+                  />
+                  {!deletedImages.includes(src) && (
+                    <button
+                      type="button"
+                      disabled={removing === src}
+                      onClick={() => handleRemoveImage(src)}
+                      className="absolute top-1 right-1 bg-white/80 rounded-full p-1 border border-[#e0d6f7] opacity-80 hover:opacity-100 transition-opacity"
+                      title="Remover imagem"
+                    >
+                      <svg width="18" height="18" fill="none" viewBox="0 0 24 24">
+                        <path
+                          d="M6 7h12M9 7v10m6-10v10M4 7h16l-1.5 12.5A2 2 0 0 1 16.5 21h-9a2 2 0 0 1-2-1.5L4 7z"
+                          stroke="#e53e3e"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </button>
+                  )}
+                  {deletedImages.includes(src) && (
+                    <span className="absolute top-1 right-1 bg-red-100 text-red-600 rounded-full px-2 py-0.5 text-[10px] font-semibold opacity-80">
+                      Removida
+                    </span>
+                  )}
+                </div>
               ))}
+              {/* Novas imagens (pré-visualização) */}
+              {preview
+                .filter(src => !initial?.images?.includes(src))
+                .map((src, i) => (
+                  <img
+                    key={i}
+                    src={src}
+                    alt=""
+                    className="w-16 h-16 object-cover rounded border border-[#e0d6f7]"
+                  />
+                ))}
             </div>
           </div>
           <div className="flex gap-2 pt-2">
