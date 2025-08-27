@@ -67,6 +67,45 @@ export default function ProductPage() {
 
   const prontaEntrega = baby.category === "pronta_entrega";
   const porSemelhanca = baby.category === "semelhanca";
+  const isIndisponivel = baby.status === "indisponivel";
+
+  // Se for produto indisponível, mostrar mensagem
+  if (prontaEntrega && isIndisponivel) {
+    return (
+      <section className="w-full bg-[#f9e7f6] min-h-screen py-6 px-2">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row gap-8">
+          <ProductCarousel images={baby.images} current={current} setCurrent={setCurrent} name={baby.name} />
+          <div className="flex-1 flex flex-col justify-start mt-2 md:mt-0">
+            <Breadcrumb items={breadcrumbItems} />
+            <ProductTitlePrice
+              name={baby.name}
+              price={baby.price}
+              oldPrice={baby.oldPrice}
+              discount={baby.discount}
+              installment={baby.installment}
+            />
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 my-4">
+              <h3 className="text-red-600 font-medium mb-2">Produto Indisponível</h3>
+              <p className="text-sm text-red-700">
+                Este bebê reborn não está mais disponível para compra. 
+                Por favor, confira outras opções de pronta entrega disponíveis.
+              </p>
+              <button 
+                onClick={() => navigate("/categoria2")} 
+                className="mt-3 px-4 py-2 bg-[#7a4fcf] text-white rounded-md text-sm font-medium"
+              >
+                Ver outras opções
+              </button>
+            </div>
+            <PaymentMethods />
+            <ProductSection title="Características" items={featuresPadrao} />
+            <ProductSection title="Itens do enxoval" items={enxovalPadrao} />
+            <ProductSection title="Avisos e cuidados" items={avisosPadrao} />
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   const breadcrumbItems = prontaEntrega
     ? [

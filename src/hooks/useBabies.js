@@ -10,7 +10,15 @@ export function useBabies(options = {}) {
   const applyFilter = useCallback(
     (list) => {
       let out = list;
-      if (type) out = out.filter(b => b.category === type);
+      
+      // Se é tipo pronta_entrega, mostra apenas disponíveis por padrão
+      // a menos que um customFilter seja fornecido (para override)
+      if (type === "pronta_entrega" && !customFilter) {
+        out = out.filter(b => b.category === type && b.status !== "indisponivel");
+      } else if (type) {
+        out = out.filter(b => b.category === type);
+      }
+      
       if (customFilter) out = out.filter(customFilter);
       return out;
     },
