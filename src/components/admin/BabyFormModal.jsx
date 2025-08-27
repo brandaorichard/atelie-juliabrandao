@@ -32,6 +32,7 @@ export default function BabyFormModal({ open, onClose, onSubmit, initial }) {
     installment: "",
     boxType: "",
     description: "",
+    status: "disponivel", // Adicionar status ao estado inicial
     images: []
   });
   const [preview, setPreview] = useState([]);
@@ -48,6 +49,7 @@ export default function BabyFormModal({ open, onClose, onSubmit, initial }) {
         installment: initial.installment || "",
         boxType: initial.boxType || "",
         description: initial.description || "",
+        status: initial.status || "disponivel", // Carregar status existente
         images: []
       });
       setPreview(initial.images || []);
@@ -207,6 +209,21 @@ export default function BabyFormModal({ open, onClose, onSubmit, initial }) {
                 <option value="grande">Grande</option>
               </select>
             </div>
+            {/* Campo de status (novo) - só exibir para pronta_entrega */}
+            {form.category === "pronta_entrega" && (
+              <div>
+                <label className="block text-xs font-medium">Status</label>
+                <select
+                  name="status"
+                  value={form.status}
+                  onChange={handleChange}
+                  className="w-full border border-[#e0d6f7] bg-[#f7f3fa] px-2 py-1 rounded text-sm text-neutral-900"
+                >
+                  <option value="disponivel">Disponível</option>
+                  <option value="indisponivel">Indisponível/Vendido</option>
+                </select>
+              </div>
+            )}
           </div>
           <div>
             <label className="block text-xs font-medium">Descrição</label>

@@ -51,7 +51,25 @@ export const removeBaby = createAsyncThunk("adminBabies/remove", async (id, { ge
 const adminBabiesSlice = createSlice({
   name: "adminBabies",
   initialState: { items: [], loading: false, error: null },
-  reducers: {},
+  reducers: {
+    // Corrigir o updateStatus para usar o nome correto das ações
+    updateStatus: (state, action) => {
+      const { id, status } = action.payload;
+      const item = state.items.find(i => i._id === id);
+      if (item) {
+        item.status = status;
+      }
+    },
+    
+    // Corrigir o setItemLoading para usar o nome correto das ações
+    setItemLoading: (state, action) => {
+      const { id, loading } = action.payload;
+      const item = state.items.find(i => i._id === id);
+      if (item) {
+        item.loading = loading;
+      }
+    }
+  },
   extraReducers: builder => {
     builder
       .addCase(loadBabies.pending, s => { s.loading = true; s.error = null; })
@@ -67,5 +85,8 @@ const adminBabiesSlice = createSlice({
       });
   }
 });
+
+// Importante: exportar as actions dos reducers!
+export const { updateStatus, setItemLoading } = adminBabiesSlice.actions;
 
 export default adminBabiesSlice.reducer;

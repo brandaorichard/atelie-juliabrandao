@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import BreadcrumbItensAdmin from "../../components/BreadcrumbItensAdmin";
 import BabyFormModal from "../../components/admin/BabyFormModal";
-import { loadBabies, addBaby, editBaby, removeBaby } from "../../redux/adminBabiesSlice";
+import { loadBabies, addBaby, editBaby, removeBaby, updateStatus, setItemLoading } from "../../redux/adminBabiesSlice";
+import { showToast } from "../../redux/toastSlice";
 import { motion } from "framer-motion";
 
 export default function AdminBabiesPage() {
@@ -10,6 +11,7 @@ export default function AdminBabiesPage() {
   const { items, loading } = useSelector(s => s.adminBabies);
   const token = useSelector(s => s.auth.token);
   const [tab, setTab] = useState("todos");
+  const [statusFilter, setStatusFilter] = useState("todos"); // Novo estado
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(null);
@@ -24,9 +26,22 @@ export default function AdminBabiesPage() {
   }, [items]);
 
   const filtrados = useMemo(() => {
-    if (tab === "todos") return items;
-    return items.filter(b => b.category === tab);
-  }, [items, tab]);
+    let result = items;
+    
+    // Filtro por categoria
+    if (tab !== "todos") {
+      result = result.filter(b => b.category === tab);
+    }
+    
+    // Filtro por status
+    if (statusFilter === "disponivel") {
+      result = result.filter(b => b.status !== "indisponivel");
+    } else if (statusFilter === "vendido") {
+      result = result.filter(b => b.status === "indisponivel");
+    }
+    
+    return result;
+  }, [items, tab, statusFilter]);
 
   const categoriaCounts = useMemo(() => {
     const counts = {};
@@ -54,6 +69,7 @@ export default function AdminBabiesPage() {
       installment: form.installment,
       description: form.description,
       boxType: form.boxType,
+      status: form.category === "pronta_entrega" ? form.status : "disponivel", // Incluir status
       images: form.images
     };
     if (editing) {
@@ -69,6 +85,45 @@ export default function AdminBabiesPage() {
   function doRemove() {
     if (confirmDelete) dispatch(removeBaby(confirmDelete._id));
     setConfirmDelete(null);
+  }
+
+  // Modificar a função toggleStatus
+  function toggleStatus(bebe) {
+    if (bebe.category !== "pronta_entrega") return;
+    
+    const novoStatus = bebe.status === "disponivel" ? "indisponivel" : "disponivel";
+    
+    // Marcar como loading
+    dispatch(setItemLoading({ id: bebe._id, loading: true }));
+    
+    fetch(`https://atelie-juliabrandao-backend-production.up.railway.app/api/admin/bebes/${bebe._id}/status`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify({ status: novoStatus })
+    })
+    .then(res => {
+      if (!res.ok) throw new Error("Falha ao atualizar status");
+      return res.json();
+    })
+    .then(() => {
+      // Atualiza estado local usando o action
+      dispatch(updateStatus({ id: bebe._id, status: novoStatus }));
+      
+      dispatch(showToast({
+        type: "success",
+        message: `Bebê marcado como ${novoStatus === "disponivel" ? "disponível" : "indisponível"}`
+      }));
+    })
+    .catch(err => {
+      console.error(err);
+      dispatch(showToast({ type: "error", message: "Erro ao atualizar status" }));
+    })
+    .finally(() => {
+      dispatch(setItemLoading({ id: bebe._id, loading: false }));
+    });
   }
 
   return (
@@ -121,6 +176,35 @@ export default function AdminBabiesPage() {
         ))}
       </div>
 
+      {/* Filtros de status (novos) */}
+      <div className="flex gap-2 flex-wrap mt-2">
+        <span className="text-[11px] text-neutral-600 mr-1 self-center">Status:</span>
+        <button
+          onClick={() => setStatusFilter("todos")}
+          className={`px-2.5 py-1 rounded text-[11px] border border-[#e0d6f7] ${
+            statusFilter === "todos" ? "bg-[#7a4fcf] text-white" : "bg-white text-neutral-900"
+          }`}
+        >
+          Todos
+        </button>
+        <button
+          onClick={() => setStatusFilter("disponivel")}
+          className={`px-2.5 py-1 rounded text-[11px] border border-[#e0d6f7] ${
+            statusFilter === "disponivel" ? "bg-[#7a4fcf] text-white" : "bg-white text-neutral-900"
+          }`}
+        >
+          Disponíveis
+        </button>
+        <button
+          onClick={() => setStatusFilter("vendido")}
+          className={`px-2.5 py-1 rounded text-[11px] border border-[#e0d6f7] ${
+            statusFilter === "vendido" ? "bg-[#7a4fcf] text-white" : "bg-white text-neutral-900"
+          }`}
+        >
+          Vendidos
+        </button>
+      </div>
+
       {loading && <div className="text-[11px] text-neutral-600">Carregando...</div>}
       {!loading && filtrados.length === 0 && (
         <div className="text-[11px] text-neutral-600">Nenhum item.</div>
@@ -146,14 +230,20 @@ export default function AdminBabiesPage() {
             initial={{ opacity: 0, scale: 0.97 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.3 }}
-            className="
-              border border-[#e0d6f7] bg-transparent rounded-xs
+            className={`
+              border border-[#e0d6f7] ${b.status === 'indisponivel' ? 'bg-gray-100' : 'bg-transparent'} rounded-xs
               p-1.5 sm:p-2 flex flex-col group
               shadow-sm hover:shadow-md transition-shadow
               min-h-[265px] sm:min-h-[285px]
-            "
+              ${b.status === 'indisponivel' ? 'relative' : ''}
+            `}
           >
-            <div className="aspect-[1/1.15] w-full mb-1.5 sm:mb-2 overflow-hidden rounded bg-[#f7f3fa] flex items-center justify-center">
+            {b.status === 'indisponivel' && b.category === 'pronta_entrega' && (
+              <div className="absolute top-0 right-0 bg-red-500 text-white text-[9px] py-0.5 px-1.5 rounded-bl font-medium z-10">
+                Vendido
+              </div>
+            )}
+            <div className={`aspect-[1/1.15] w-full mb-1.5 sm:mb-2 overflow-hidden rounded bg-[#f7f3fa] flex items-center justify-center ${b.status === 'indisponivel' ? 'opacity-70' : ''}`}>
               {b.images?.[0] && (
                 <img
                   src={b.images[0]}
@@ -168,17 +258,42 @@ export default function AdminBabiesPage() {
               {Number(b.price).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}
             </p>
             <div className="flex gap-1 mt-1.5">
+              {/* Botão de status apenas para produtos pronta_entrega */}
+              {b.category === 'pronta_entrega' && (
+                <button
+                  onClick={() => toggleStatus(b)}
+                  disabled={b.loading}
+                  className={`
+                    text-[10px] px-1.5 py-1 border rounded flex-1
+                    ${b.status === 'disponivel' 
+                      ? 'border-red-200 text-red-600 hover:bg-red-50' 
+                      : 'border-green-200 text-green-600 hover:bg-green-50'}
+                    ${b.loading ? 'opacity-50 cursor-wait' : ''}
+                  `}
+                >
+                  {b.loading ? '...' : b.status === 'disponivel' ? 'Marcar Indisponível' : 'Marcar Disponível'}
+                </button>
+              )}
+              
+              {/* Botão de editar sempre presente */}
               <button
                 onClick={() => openEdit(b)}
                 className="flex-1 text-[10px] px-1.5 py-1 border border-[#e0d6f7] rounded hover:bg-[#f7f3fa] text-neutral-900 bg-transparent"
               >
                 Editar
               </button>
+              
+              {/* Botão de remover como ícone para todos os cards */}
               <button
                 onClick={() => confirmRemove(b)}
-                className="flex-1 text-[10px] px-1.5 py-1 border border-[#e0d6f7] rounded text-red-500 hover:bg-[#f7f3fa] bg-transparent"
+                className="w-8 flex items-center justify-center text-red-500 hover:text-red-700"
+                title="Remover"
               >
-                Remover
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M3 6h18"></path>
+                  <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                  <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                </svg>
               </button>
             </div>
           </motion.div>
